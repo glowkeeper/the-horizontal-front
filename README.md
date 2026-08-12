@@ -11,3 +11,5 @@ The central joke is deliberately contradictory: the player must perform exhausti
 This repository currently contains the initial game concept. No implementation decisions are final yet.
 
 See [docs/game-concept.md](docs/game-concept.md) for the working design brief.
+
+The chosen technical direction is documented in [docs/technical-architecture.md](docs/technical-architecture.md).

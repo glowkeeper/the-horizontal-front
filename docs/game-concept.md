@@ -24,18 +24,14 @@ Possible opening copy:
 ## Core loop
 
 1. A level begins with the player safely in bed.
-2. The boss continuously pushes the bed toward the work side of a Tilt Meter.
-3. Successful player inputs push the meter back toward safety.
+2. The boss continuously tips the bed and pulls the duvet away from the player.
+3. Successful rhythmic inputs pull the duvet back toward safety.
 4. Corporate attacks periodically interrupt the basic tapping rhythm.
 5. Pressure increases throughout the level.
 6. The final ten seconds become a frantic morning offensive.
-7. Survive for roughly 30 seconds to clear the level. Reach the work end of the meter and the player is tipped out of bed.
+7. Survive for roughly 30 seconds to clear the level. Lose the duvet completely and the player is tipped out of bed.
 
-Conceptual meter:
-
-```text
-SAFE IN BED  <----------●---------->  LATE FOR WORK
-```
+The duvet and bed communicate danger directly: the duvet is progressively pulled down, the mattress tilts, the player becomes exposed, and cold work light invades the room. A small optional accessibility indicator may supplement this presentation, but a conventional Tilt Meter is not the primary interface.
 
 The duration, pressure curve, and recovery per input all require playtesting. Thirty seconds is the current starting point, not a final rule.
 
@@ -195,7 +191,7 @@ Potential measures:
 
 - A reduced-input accessibility mode.
 - Configurable hold-to-resist controls.
-- Difficulty based on recent performance rather than fixed extreme speeds.
+- Input requirements calibrated for the selected device and accessibility mode rather than fixed extreme speeds.
 - Short levels and generous pauses.
 - Strong non-colour indicators for changing states.
 - Reduced motion and vibration settings.
@@ -213,20 +209,21 @@ Accessibility mode should change the required input pattern, not patronise the p
 5. **Equivalent effort across devices.** Mobile and desktop need not use identical thresholds.
 6. **Frantic, not harmful.** Physical comedy should never require pain.
 7. **Satirise systems and archetypes.** Keep fictional characters distinct from real individuals.
+8. **Episodes are content, not software releases.** New episodes require data, writing, artwork and audio, but no new programming.
 
 ## Open questions
 
-Several of the original questions have now been explored in detail. See [Expanded design direction](expanded-design-direction.md) for the verbatim discussion covering duvet-based danger, rhythmic input, progression, the recurring boss, narrative, the player character, and failure.
+The original questions about the duvet, rhythm, difficulty, rewards, recurring boss, promotion, narrative, protagonist and failure now have working answers. See [Expanded design direction](expanded-design-direction.md).
 
-- Is the Tilt Meter the clearest representation, or should the bed itself communicate all danger?
-- Does resistance require free tapping, alternating sides, or a rhythm?
-- How adaptive should difficulty be within a level?
-- What does the player earn between levels: cosmetic bedding, excuses, resistance abilities, or nothing?
-- Is the campaign one increasingly absurd week, several bosses, or repeated confrontations with one boss?
-- Should Promotion Opportunity offer genuine alternative builds, or remain primarily a satirical trap?
-- How much narrative happens between the 30-second arcade rounds?
-- Should the player character be visible, customisable, or largely hidden under the duvet?
-- Is failure comical and immediate, or does it lead to a short workplace punishment scene?
+The content architecture and finite episode grammar are documented in [Data-driven episode architecture](data-driven-episode-architecture.md).
+
+Questions that remain genuinely open include:
+
+- What is the smallest episode vocabulary that produces sufficient variety?
+- How should the first set of episodes vary in rhythm, dramatic shape and emotion?
+- Which appearance choices, if any, should the protagonist eventually offer?
+- How much narrative should occur between confrontations without weakening the arcade pace?
+- What should the recurring Orange Fella be called?
 
 ## Naming note
 

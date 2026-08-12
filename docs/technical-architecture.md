@@ -1,0 +1,211 @@
+# Technical architecture
+
+## Chosen direction
+
+The Horizontal Front will be built as a web-first 2D game using:
+
+- **Phaser** for the game loop, rendering, scenes, input, animation and audio.
+- **TypeScript** for application and game code.
+- **Vite** for local development and production builds.
+- **HTML and CSS** for the page shell, accessibility controls and non-game interface where appropriate.
+- **JSON validated against TypeScript schemas** for episodes, confrontations and cartoon compositions.
+- **A static web release first**, with Progressive Web App support considered when useful.
+- **Capacitor later**, if and when the same game is prepared for iOS and Android stores.
+- **No backend initially.** Device-local settings and progress can use browser storage.
+
+The first release target is a responsive, landscape-oriented browser game with touch, keyboard and pointer support.
+
+## Why Phaser fits
+
+The game is an interactive two-dimensional political cartoon. Its principal elements are layered images, limited character animation, speech bubbles, sound, responsive input and a continuously changing gameplay state.
+
+Phaser provides the relevant browser-game machinery:
+
+- A time-based game loop.
+- WebGL and Canvas rendering.
+- Layered sprites and images.
+- Tweens and sprite animation.
+- Camera movement and effects.
+- Keyboard, pointer and touch input.
+- Audio playback.
+- Asset loading.
+- Scene transitions and scaling.
+
+This is a more natural fit than representing the animated bedroom as a large collection of ordinary web-page elements. It also allows gameplay and cartoon sequences to share the same rendering and animation system.
+
+## TypeScript and Phaser
+
+Phaser is a JavaScript library with TypeScript definitions. The project imports Phaser as an npm dependency and uses it from TypeScript:
+
+```ts
+import Phaser from "phaser";
+```
+
+During development and production builds, Vite converts the TypeScript into JavaScript for the browser. TypeScript provides editor assistance, safer refactoring and compile-time checks; it is not a separate runtime.
+
+```text
+TypeScript source
+       ↓
+Vite type-checks and builds
+       ↓
+Browser-compatible JavaScript
+       ↓
+Phaser runs the game in a canvas
+```
+
+## Classes are not the architectural model
+
+Phaser exposes some class-oriented APIs. A Phaser scene is commonly written by extending `Phaser.Scene`, and that is the simplest way to integrate with its lifecycle:
+
+```ts
+class ResistanceScene extends Phaser.Scene {
+  create(): void {
+    // Connect rendering and input to the game engine.
+  }
+
+  update(_time: number, delta: number): void {
+    // Advance the engine and render its current state.
+  }
+}
+```
+
+This does **not** require the game itself to use a class-driven design.
+
+Phaser scene classes should remain thin adapters around the framework. They may:
+
+- Load assets.
+- Create Phaser display objects.
+- Translate touch, keyboard and pointer events into game actions.
+- Pass elapsed time to the engine.
+- Render the engine's state.
+- Start and stop scenes.
+
+They should not own the core rules, episode interpretation or political-cartoon content.
+
+## Preferred programming style
+
+The core engine should favour:
+
+- Plain TypeScript data types.
+- Discriminated unions.
+- Pure functions where practical.
+- Explicit state transitions.
+- Small modules with named exports.
+- Composition rather than inheritance.
+- Immutable inputs and returned state where that remains clear and performant.
+- Dependency injection through ordinary function arguments rather than class hierarchies.
+
+For example:
+
+```ts
+type ResistanceState = {
+  duvetSafety: number;
+  previousSide: "left" | "right" | null;
+  rhythmMomentum: number;
+  elapsedMs: number;
+};
+
+type ResistanceInput = {
+  side: "left" | "right";
+  atMs: number;
+};
+
+function applyResistanceInput(
+  state: ResistanceState,
+  input: ResistanceInput,
+): ResistanceState {
+  const alternated = state.previousSide !== input.side;
+
+  return {
+    ...state,
+    previousSide: input.side,
+    rhythmMomentum: alternated
+      ? Math.min(1, state.rhythmMomentum + 0.1)
+      : Math.max(0, state.rhythmMomentum - 0.05),
+  };
+}
+```
+
+This logic can be tested without starting Phaser or opening a browser. Mobile touch, desktop keyboard and pointer input can all produce the same `ResistanceInput` value.
+
+## Architectural boundary
+
+```text
+Episode JSON and artwork
+           ↓
+Schema validation and content loader
+           ↓
+Functional game engine
+  - rhythm
+  - pressure
+  - attacks
+  - phase timing
+  - outcomes
+           ↓
+Thin Phaser scene adapters
+  - rendering
+  - animation
+  - input capture
+  - audio
+           ↓
+Browser canvas
+```
+
+This boundary prevents Phaser-specific objects from leaking throughout the engine and makes the rules easier to understand, test and potentially reuse.
+
+## Scenes
+
+The likely top-level Phaser scenes are:
+
+- **Boot:** load essential files and validate the content index.
+- **Title:** present the title and route to settings or play.
+- **Briefing:** perform the pre-confrontation cartoon.
+- **Resistance:** run the rhythmic confrontation.
+- **Result:** perform the victory, failure or trap-consequence cartoon.
+- **Interlude:** present occasional longer narrative sequences.
+- **Propaganda Department:** provide development-only episode composition and preview tools.
+
+These are application states and framework integration points, not objects that model the political world.
+
+## Data-driven content
+
+Episodes contain no executable code. They are expressed through validated JSON, writing, artwork and audio using the finite grammar defined in [Data-driven episode architecture](data-driven-episode-architecture.md).
+
+The engine must never branch on a particular episode identifier. A new capability is an explicit, reusable engine expansion and is not part of ordinary episode production.
+
+## Web and mobile path
+
+The game will be implemented and tested in the browser first. The same responsive codebase will support:
+
+- Touch controls on mobile browsers.
+- Keyboard controls on desktop.
+- Pointer controls as a fallback.
+
+If native distribution becomes worthwhile, Capacitor can package the web build for iOS and Android and expose native features such as haptics. Native wrappers should not fork the game rules or episode content.
+
+## Initial exclusions
+
+The first version does not require:
+
+- React or another UI framework.
+- A server-side application.
+- Accounts or authentication.
+- A database or cloud saves.
+- Multiplayer infrastructure.
+- A conventional progression economy.
+- Separate native game implementations.
+- A general-purpose visual game editor.
+
+These exclusions keep the technical system aligned with the project's deliberate simplicity. They can be reconsidered only when a concrete requirement justifies them.
+
+## Technical principles
+
+1. **Phaser is infrastructure, not the domain model.**
+2. **Framework classes remain thin integration adapters.**
+3. **Core rules are plain TypeScript data and functions.**
+4. **Episodes are validated content and never executable code.**
+5. **One rule system serves touch, keyboard and pointer input.**
+6. **Time-based calculations must not depend on frame rate.**
+7. **The browser is the first and canonical runtime.**
+8. **Native packaging must not create a second implementation.**
+9. **Add infrastructure only in response to a demonstrated need.**
