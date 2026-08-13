@@ -52,7 +52,7 @@ Details will continue to evolve deliberately. Free access, open distribution, pr
 
 ## Install
 
-The project requires [Node.js](https://nodejs.org/) and npm. Clone the repository and install the locked dependency versions:
+The project requires Node.js `24.11.0` and npm. The Node version is pinned in `.nvmrc`; compatible version managers can select it automatically. Clone the repository and install the locked dependency versions:
 
 ```sh
 git clone https://github.com/glowkeeper/the-horizontal-front.git
