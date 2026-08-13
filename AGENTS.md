@@ -69,7 +69,20 @@ The chosen stack is:
 - Browser-first delivery
 - Capacitor only later, if native iOS and Android distribution becomes worthwhile
 
-Do not introduce React, another UI framework, a backend, authentication, a database, cloud saves, multiplayer, native forks or additional infrastructure without a concrete agreed requirement.
+Do not introduce React, another UI framework, multiplayer, native forks or additional infrastructure without a concrete agreed requirement.
+
+## Distribution principles
+
+These are project constraints:
+
+- The canonical public home is `thehorizontalfront.org`.
+- Distribute the software and distributable project materials as free/open-source work forming part of the digital commons.
+- Keep the release static and offline-capable. Once its required files are cached, play must not depend on an application backend, account, remote database, third-party API or commercial platform remaining available.
+- Do not add player tracking, behavioural analytics, advertising, payments, paid access, in-game purchases or other monetisation.
+- Keep settings and progress on the player's device; do not add authentication, cloud saves or transmission of player data.
+- The exact licences for code, writing, artwork and audio remain undecided. Do not assume or assign licences without an explicit maintainer decision.
+
+Read `README.md` and the hosting, offline-use and distribution section of `docs/technical-architecture.md` before changing delivery, storage, network access or dependency behaviour.
 
 ## Programming style
 
