@@ -1,11 +1,12 @@
 # The Horizontal Front
 
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
+[![CI](https://github.com/glowkeeper/the-horizontal-front/actions/workflows/ci.yml/badge.svg)](https://github.com/glowkeeper/the-horizontal-front/actions/workflows/ci.yml)
 [![Code: AGPL-3.0-or-later](https://img.shields.io/badge/code-AGPL--3.0--or--later-b8322a.svg?style=flat-square)](LICENSES/AGPL-3.0-or-later.txt)
 [![Cultural work: CC BY-SA 4.0](https://img.shields.io/badge/cultural%20work-CC%20BY--SA%204.0-3e6f8f.svg?style=flat-square)](LICENSES/CC-BY-SA-4.0.txt)
 [![Tracking: none](https://img.shields.io/badge/tracking-none-c8952e.svg?style=flat-square)](PROJECT_CHARTER.md)
 
-**Seize the Means of Relaxation.**
+**Seize the Means of Relaxation. ✊ 🛏️**
 
 > **The Horizontal Front is a free, open-source game about collective power, mutual aid, and resistance to hierarchical systems. It is developed as a digital commons: freely accessible, community-supported, and accountable to its players rather than investors or advertisers.**
 
