@@ -4,6 +4,7 @@ import {
   advanceResistance,
   applyResistanceInput,
   createResistance,
+  getNextRhythmCue,
   getRhythmStepTime,
 } from "../../../src/play/engine/resistance";
 import type {
@@ -21,6 +22,7 @@ const config: ResistanceConfig = {
   momentumRecoveryBonus: 0.5,
   rhythm: {
     steps: [{ side: "left" }, { side: "right" }],
+    leadInBeats: 1,
     beatIntervalMs: 500,
     timingWindowMs: 100,
   },
@@ -62,6 +64,22 @@ describe("resistance engine", () => {
   it("starts the first expected step after one beat interval", () => {
     expect(getRhythmStepTime(config.rhythm, 0)).toBe(500);
     expect(getRhythmStepTime(config.rhythm, 3)).toBe(2_000);
+  });
+
+  it("exposes the next authored cue for presentation adapters", () => {
+    const initial = createResistance(config);
+    const afterLeft = input(initial, "left", 500);
+
+    expect(getNextRhythmCue(initial)).toEqual({
+      side: "left",
+      atMs: 500,
+      step: 0,
+    });
+    expect(getNextRhythmCue(afterLeft)).toEqual({
+      side: "right",
+      atMs: 1_000,
+      step: 1,
+    });
   });
 
   it("rewards the correct side at the correct time", () => {

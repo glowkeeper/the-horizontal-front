@@ -11,6 +11,7 @@ export type RhythmStep = {
 
 export type RhythmPattern = {
   readonly steps: readonly RhythmStep[];
+  readonly leadInBeats: number;
   readonly beatIntervalMs: number;
   readonly timingWindowMs: number;
 };
@@ -59,4 +60,10 @@ export type ResistanceState = {
 export type Resistance = {
   readonly config: ResistanceConfig;
   readonly state: ResistanceState;
+};
+
+export type RhythmCue = {
+  readonly side: ResistanceSide;
+  readonly atMs: number;
+  readonly step: number;
 };

@@ -14,6 +14,7 @@ These instructions apply to every AI coding assistant working in this repository
 - Do not replace understandable code with clever abstractions without discussing the benefit first.
 - Surface decisions that would constrain later design instead of hiding them in scaffolding.
 - Distinguish clearly between provisional bootstrap values and intentional product decisions.
+- Every prototype must exercise the intended production architecture. Provisional content, tuning and artwork are acceptable; disposable architectural shortcuts, episode-specific wiring and deferred boundaries are not. If the production boundary is known, implement it in the prototype.
 - Preserve the maintainer's existing naming, layout and stylistic preferences.
 - Ask before making a material product or architectural decision that has not already been settled in the documentation.
 
@@ -114,6 +115,8 @@ Avoid class hierarchies, service containers, unnecessary design patterns and pre
 - Do not invent fonts, colours or visual branding while performing neutral scaffolding.
 - Reuse responsive cartoon layouts and semantic slots.
 - Episode data may select mechanics, skins, parameters, layouts, assets and documented outcomes.
+- Store authored composition values in validated content rather than embedding them in Phaser code. Layout data owns design-space anchors, pivots, slots and motion parameters; skin or asset data owns visual-part geometry and semantic asset references. TypeScript interprets this finite vocabulary and must not become an episode-specific drawing specification.
+- Resolve artwork through a validated asset catalogue of stable semantic IDs. Episodes and skins must not contain repository file paths, and adding a catalogued asset or selecting it in a skin must not require new TypeScript wiring.
 - Prefer limited cut-out cartoon animation over assuming expensive frame-by-frame animation.
 - Keep the recurring boss fictional and visually original.
 - Failure should remain funny, dramatic and sad rather than becoming empty slapstick.
@@ -179,6 +182,7 @@ For code changes, run the smallest relevant checks and report the result:
 - Type checking and production build for application integration.
 - Focused unit tests for engine rules.
 - Content-schema validation for episode changes.
+- Structural and semantic validation for layout, skin and composition data. Tests must cover coordinate bounds, positive dimensions, unique and required semantic parts, compatible layout/skin references, meaningful pivots and motion direction—not merely successful JSON parsing.
 - Browser or device testing only when relevant to the requested change.
 
 Do not claim a change works without running an appropriate check. Do not turn every small edit into an expansive testing or tooling exercise.

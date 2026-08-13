@@ -166,10 +166,43 @@ const bootScene = await readFile(
   join(projectRoot, "src/play/phaser/scenes/BootScene.ts"),
   "utf8",
 );
+const resistanceScene = await readFile(
+  join(projectRoot, "src/play/phaser/scenes/ResistanceScene.ts"),
+  "utf8",
+);
+const episodeCatalog = await readFile(
+  join(projectRoot, "src/play/content/episodeCatalog.ts"),
+  "utf8",
+);
+const episodeCatalogContent = await readFile(
+  join(projectRoot, "src/play/content/episode-catalog.json"),
+  "utf8",
+);
+const episodeCatalogLoader = await readFile(
+  join(projectRoot, "src/play/content/loadEpisodeCatalog.ts"),
+  "utf8",
+);
+const presentationLoader = await readFile(
+  join(projectRoot, "src/play/content/loadPresentation.ts"),
+  "utf8",
+);
+const bedLayout = await readFile(
+  join(projectRoot, "src/play/phaser/layouts/bedHeadRightLayout.ts"),
+  "utf8",
+);
 
 requirePolicy(
   indexHtml.includes('rel="manifest" href="/manifest.webmanifest"'),
   "index.html must link the offline web-app manifest.",
+);
+requirePolicy(
+  presentationLoader.includes('import.meta.glob("./presentation/layouts/*.json"') &&
+    presentationLoader.includes('import.meta.glob("./presentation/skins/*.json"') &&
+    presentationLoader.includes("assertSensiblePresentation") &&
+    bedLayout.includes("loadPresentation") &&
+    !bedLayout.includes("FOOT_PIVOT_X") &&
+    !bedLayout.includes("DUVET_RESTING_X"),
+  "Presentation layouts and skins must be discovered, validated and interpreted as data rather than embedded composition constants.",
 );
 requirePolicy(
   indexHtml.includes("Content-Security-Policy"),
@@ -221,10 +254,18 @@ requirePolicy(
   "The public site and game must use duvet cream for browser theme chrome.",
 );
 requirePolicy(
-  bootScene.includes("THE MONDAY UPRISING") &&
-    bootScene.includes("Management has been notified of absolutely nothing.") &&
-    bootScene.includes("The Horizontal Front is coming soon ✊ 🛏️"),
-  "The pre-release Phaser scene must retain the approved coming-soon notice.",
+  bootScene.includes("episodeCatalog.episodes") &&
+    bootScene.includes('this.scene.start("ResistanceScene", { episode })'),
+  "The game bootstrap must load validated episode content before starting the reusable resistance scene.",
+);
+requirePolicy(
+  episodeCatalog.includes('import.meta.glob("./episodes/*.json"') &&
+    episodeCatalog.includes("loadEpisodeCatalog") &&
+    episodeCatalogContent.includes('"episodes"') &&
+    episodeCatalogLoader.includes("episodeCatalogSchema.parse") &&
+    !resistanceScene.includes("content/episodes/") &&
+    !resistanceScene.includes("one-scene"),
+  "ResistanceScene must receive validated content through the episode catalog rather than importing or branching on a particular episode.",
 );
 requirePolicy(
   mainSource.includes('import "../shared/registerServiceWorker"'),

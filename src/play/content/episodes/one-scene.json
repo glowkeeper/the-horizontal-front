@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "one-scene",
+  "title": "One Scene",
+  "confrontation": {
+    "resistance": {
+      "durationMs": 25000,
+      "startingSafety": 0.75,
+      "pressurePerSecond": 0.035,
+      "recoveryPerBeat": 0.04,
+      "momentumGain": 0.12,
+      "momentumLoss": 0.18,
+      "momentumRecoveryBonus": 0.5,
+      "rhythm": {
+        "steps": [
+          { "side": "left" },
+          { "side": "right" }
+        ],
+        "leadInBeats": 4,
+        "beatIntervalMs": 500,
+        "timingWindowMs": 200
+      }
+    },
+    "presentation": {
+      "layout": "bed-head-right",
+      "skin": "shape-bedroom",
+      "managementAction": "lift-head"
+    }
+  },
+  "results": {
+    "victory": {
+      "headline": "THE LINE HOLDS"
+    },
+    "forcedVerticalisation": {
+      "headline": "FORCED VERTICALISATION"
+    }
+  }
+}

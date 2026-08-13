@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "episodes": [
+    {
+      "id": "one-scene",
+      "file": "one-scene.json"
+    }
+  ]
+}

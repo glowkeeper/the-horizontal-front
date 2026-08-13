@@ -2,6 +2,7 @@ import Phaser from "phaser";
 
 import { getThemeColour } from "../theme/theme";
 import { BootScene } from "./scenes/BootScene";
+import { ResistanceScene } from "./scenes/ResistanceScene";
 
 const GAME_WIDTH = 1280;
 const GAME_HEIGHT = 720;
@@ -27,7 +28,7 @@ export function createGame(container: HTMLElement): Phaser.Game {
       roundPixels: false,
     },
 
-    scene: [BootScene],
+    scene: [BootScene, ResistanceScene],
   };
 
   return new Phaser.Game(config);

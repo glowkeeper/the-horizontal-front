@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "id": "bed-head-right",
+  "designSize": { "width": 1280, "height": 720 },
+  "backdrop": {
+    "floor": { "x": 640, "y": 590, "width": 1280, "height": 260 },
+    "workLight": { "x": 1280, "y": 360, "width": 1280, "height": 720, "originX": 1, "originY": 0.5 }
+  },
+  "anchors": {
+    "bedFootPivot": { "x": 180, "y": 512 },
+    "bedFromFoot": { "x": 850, "y": -42 },
+    "management": { "x": 1155, "y": 365 },
+    "managementCaption": { "x": 1120, "y": 180 },
+    "title": { "x": 640, "y": 42 },
+    "time": { "x": 640, "y": 84 },
+    "result": { "x": 640, "y": 245 },
+    "restart": { "x": 640, "y": 330 },
+    "nextCue": { "x": 640, "y": 145 },
+    "leftControl": { "x": 410, "y": 630 },
+    "rightControl": { "x": 870, "y": 630 },
+    "feedback": { "x": 640, "y": 630 }
+  },
+  "controls": { "radius": 55, "strokeWidth": 7, "pulseScale": 0.32 },
+  "motion": {
+    "danger": { "bedAngleDegrees": -18, "duvetX": -300, "sleeperX": -130, "workLightAlpha": 0.62 },
+    "rest": { "workLightAlpha": 0.08 },
+    "victory": { "durationMs": 650, "ease": "Sine.Out" },
+    "forcedVerticalisation": {
+      "bedAngleDegrees": -22,
+      "bedDurationMs": 500,
+      "bedEase": "Back.In",
+      "sleeperX": -330,
+      "sleeperY": 160,
+      "sleeperAngleDegrees": -16,
+      "sleeperDurationMs": 700,
+      "sleeperEase": "Quad.In",
+      "duvetX": -760,
+      "duvetAlpha": 0.35,
+      "duvetDurationMs": 650,
+      "duvetEase": "Quad.In"
+    }
+  }
+}

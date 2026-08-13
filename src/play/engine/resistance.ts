@@ -5,6 +5,7 @@ import type {
   ResistanceState,
   RhythmJudgement,
   RhythmPattern,
+  RhythmCue,
 } from "./types";
 import { assertValidResistanceConfig } from "./resistanceConfig";
 
@@ -166,7 +167,23 @@ export function getRhythmStepTime(
   rhythm: RhythmPattern,
   step: number,
 ): number {
-  return (step + 1) * rhythm.beatIntervalMs;
+  return (step + rhythm.leadInBeats) * rhythm.beatIntervalMs;
+}
+
+export function getNextRhythmCue(
+  resistance: Resistance,
+): RhythmCue | null {
+  if (resistance.state.outcome !== "active") {
+    return null;
+  }
+
+  const step = resistance.state.nextRhythmStep;
+
+  return {
+    side: getExpectedSide(resistance.config.rhythm, step),
+    atMs: getRhythmStepTime(resistance.config.rhythm, step),
+    step,
+  };
 }
 
 function expireMissedRhythmSteps(

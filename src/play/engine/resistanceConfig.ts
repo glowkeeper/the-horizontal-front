@@ -14,6 +14,7 @@ export function assertValidResistanceConfig(
     config.momentumRecoveryBonus,
   );
   assertPositive("rhythm.beatIntervalMs", config.rhythm.beatIntervalMs);
+  assertPositiveInteger("rhythm.leadInBeats", config.rhythm.leadInBeats);
   assertNonNegative(
     "rhythm.timingWindowMs",
     config.rhythm.timingWindowMs,
@@ -27,6 +28,12 @@ export function assertValidResistanceConfig(
     throw new Error(
       "rhythm.timingWindowMs must be less than half rhythm.beatIntervalMs",
     );
+  }
+}
+
+function assertPositiveInteger(name: string, value: number): void {
+  if (!Number.isInteger(value) || value <= 0) {
+    throw new Error(`${name} must be a positive integer`);
   }
 }
 

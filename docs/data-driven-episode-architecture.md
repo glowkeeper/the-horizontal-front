@@ -41,7 +41,7 @@ Nothing new is programmed, but the dramatic shape changes.
 
 ## Rhythm as a source of variety
 
-Rhythm is a core rule rather than decorative music laid over a tapping game. An episode may select from a small documented vocabulary of reusable rhythm patterns and parameters. The first prototype needs only a repeating left-right alternation, but later engine capabilities may support accents, rests, strong and weak beats, syncopation, or changes between established patterns.
+Rhythm is a core rule rather than decorative music laid over a tapping game. An episode may select from a small documented vocabulary of reusable rhythm patterns and parameters, including a countable lead-in before the first required input. The first prototype needs only a repeating left-right alternation, but later engine capabilities may support accents, rests, strong and weak beats, syncopation, or changes between established patterns.
 
 The engine judges player input against the required pattern and timing. Successful performance builds rhythmic momentum, which strengthens resistance and helps recover the duvet. Poorly timed or incorrect input loses momentum. The same engine clock should drive judgement and the audio, visual, and optional haptic cues that communicate the rhythm.
 
@@ -150,6 +150,8 @@ Episodes can be broadly ridiculous, quietly sinister, triumphantly rebellious, m
 ## Finite episode grammar
 
 The complete system should have an explicit, documented grammar that a non-programmer can understand.
+
+Episodes are listed in an ordered JSON catalog. Array position defines campaign order and the first entry is the natural starting episode. Each entry pairs a stable episode ID with its JSON filename; the ID does not change when an episode is reordered and can later support saves or direct preview. The loader validates both the catalog and every discovered episode, rejecting duplicate IDs or files, missing or unlisted files, and disagreement between catalog and episode IDs. No episode requires a TypeScript import or registration.
 
 ```text
 An episode consists of:
@@ -281,6 +283,10 @@ Cartoon scenes should use reusable layouts and semantic slots rather than making
 ```
 
 The layout determines responsive placement, scaling, text-safe areas and default layer order. The episode supplies poses, dialogue, props and small artistic offsets.
+
+An episode selects a documented layout and skin by stable ID; it does not contain asset file paths or the complete scene drawing. Layout JSON defines shared design-space anchors, pivots, slots and motion parameters. Skin JSON defines the visual parts occupying those slots through either the finite prototype-shape vocabulary or semantic image IDs resolved by a validated asset catalogue. Shared Phaser adapters validate and interpret those files. This keeps ordinary composition and replacement artwork editable as data without turning episode JSON into a graphical programming language.
+
+Layout and skin validation must check relationships as well as field types. Coordinates and control bounds must fit the design canvas, dimensions must be positive, semantic part IDs must be unique and required parts present, layout/skin references must be compatible, and motion directions must agree with the layout's physical meaning.
 
 ## The Propaganda Department editor
 

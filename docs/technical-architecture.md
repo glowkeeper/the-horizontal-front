@@ -197,6 +197,16 @@ Episodes contain no executable code. They are expressed through validated JSON, 
 
 The engine must never branch on a particular episode identifier. A new capability is an explicit, reusable engine expansion and is not part of ordinary episode production.
 
+Application bootstrap selects content through an ordered JSON episode catalog and validates it before starting a gameplay scene. The first catalog entry is the normal campaign entry point; stable episode IDs identify content independently of its position. Build-time discovery includes every episode JSON file without per-episode TypeScript imports, while catalog loading rejects missing, duplicate, unlisted or identity-mismatched content. Adding and ordering an episode therefore changes data and creative assets, not application code.
+
+Reusable scenes receive the validated episode as scene data; they do not import an episode file or choose an episode ID themselves. Episode presentation data selects a layout and skin. Validated layout JSON owns design-space anchors, pivots, interface slots and reusable motion parameters; validated skin JSON owns prototype primitive geometry or, later, semantic layered-asset references. Phaser code interprets this finite vocabulary and applies runtime state—it does not contain the authored composition coordinates.
+
+Artwork files are resolved through a validated asset catalog using stable semantic IDs. Skins may use either documented prototype shapes or image parts referencing those IDs; they never contain repository paths. Build-time discovery rejects missing and unlisted files, and the generic boot scene preloads catalogued images before the selected presentation is instantiated.
+
+Presentation validation has two levels. Zod schemas enforce the finite structural vocabulary, types and numeric ranges. Semantic validation enforces relationships that schemas alone cannot express: coordinates and controls fit the design canvas, required part IDs exist and are unique, image references resolve, layout and skin are compatible, the bed head lies opposite its foot pivot, lift motion raises the correct end, and loose objects move downhill. A JSON file parsing successfully is not sufficient evidence that a composition is usable.
+
+Prototypes use these same production boundaries. Prototype tuning, writing and shape artwork may be provisional, but episode-specific wiring or disposable scene architecture must not be used as a shortcut.
+
 ## Web and mobile path
 
 The game will be implemented and tested in the browser first. The same responsive codebase will support:
