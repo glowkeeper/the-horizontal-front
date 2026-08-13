@@ -7,7 +7,7 @@ import type {
 export function assertSensiblePresentation(
   layout: ResistanceLayoutContent,
   skin: ResistanceSkin,
-  assetIds: ReadonlySet<string> = new Set(),
+  assetIds: ReadonlySet<string>,
 ): void {
   const { width, height } = layout.designSize;
 
@@ -76,15 +76,23 @@ export function assertSensiblePresentation(
     throw new Error("duvetRestingX must match the duvet composition position");
   }
 
+  for (const part of [
+    ...skin.bed.staticParts,
+    ...skin.bed.sleeperParts,
+    skin.bed.duvet,
+    ...skin.managementParts,
+  ]) {
+    if (part.shape === "image" && !assetIds.has(part.asset)) {
+      throw new Error(`unknown presentation asset: ${part.asset}`);
+    }
+  }
+
   const initialParts = [
     ...skin.bed.staticParts,
     ...skin.bed.sleeperParts,
     skin.bed.duvet,
   ];
   for (const part of initialParts) {
-    if (part.shape === "image" && !assetIds.has(part.asset)) {
-      throw new Error(`unknown presentation asset: ${part.asset}`);
-    }
     const bounds = getPartBounds(part);
     const left = bedFootPivot.x + bedFromFoot.x + bounds.left;
     const right = bedFootPivot.x + bedFromFoot.x + bounds.right;

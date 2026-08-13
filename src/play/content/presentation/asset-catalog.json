@@ -1,4 +1,23 @@
 {
   "schemaVersion": 1,
-  "assets": []
+  "assets": [
+    {
+      "id": "pillow-prototype",
+      "file": "episodes/the-alarm/pillow-prototype.png",
+      "origin": "ai-generated",
+      "status": "prototype-placeholder",
+      "creator": "OpenAI image generation tool, directed by the project maintainer and Codex",
+      "generatedAt": "2026-08-13",
+      "generationTool": "OpenAI built-in image generation (gpt-image-2)",
+      "prompt": "Create one simple soft rectangular bed pillow viewed almost straight-on from the side, slightly squashed and gently irregular like a hand-cut political cartoon prop. Original limited cut-out cartoon illustration, bold charcoal outline, flat cream fabric with two or three subtle hand-drawn crease lines. Centered and isolated with crisp opaque edges. No text, logo, signature, watermark, characters, branding or imitation of a named artist or property.",
+      "edits": [
+        "Generated output already contained an alpha channel and transparent corners; no chroma-key removal was applied.",
+        "Cropped transparent padding while preserving the intended display aspect ratio.",
+        "Downscaled from 1673 by 940 pixels to a 300 by 144 pixel prototype export for two-times display resolution.",
+        "Stored in the episode-owned presentation assets directory."
+      ],
+      "licence": "CC-BY-SA-4.0",
+      "replacementStatus": "Replace or substantially human-refine before production approval."
+    }
+  ]
 }

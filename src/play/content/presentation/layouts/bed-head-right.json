@@ -1,6 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "bed-head-right",
+  "copy": { "managementCaption": "LIFTING THE HEAD\nOF THE BED" },
   "designSize": { "width": 1280, "height": 720 },
   "backdrop": {
     "floor": { "x": 640, "y": 590, "width": 1280, "height": 260 },

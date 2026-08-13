@@ -1,6 +1,5 @@
 import Phaser from "phaser";
 
-import { episodeCatalog } from "../../content/episodeCatalog";
 import { presentationAssets } from "../../content/presentationAssets";
 
 export class BootScene extends Phaser.Scene {
@@ -15,8 +14,6 @@ export class BootScene extends Phaser.Scene {
   }
 
   public create(): void {
-    const [episode] = episodeCatalog.episodes;
-
-    this.scene.start("ResistanceScene", { episode });
+    this.scene.start("CampaignsScene");
   }
 }

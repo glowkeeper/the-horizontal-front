@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "the-alarm-bedroom",
+  "layout": "bed-head-right",
+  "copy": { "managementLabel": "MANAGEMENT" },
+  "bed": {
+    "duvetRestingX": -430,
+    "sleeperRestingX": 0,
+    "staticParts": [
+      { "id": "frame", "shape": "rectangle", "x": -430, "y": 42, "width": 850, "height": 48, "fill": "managementGold", "stroke": "inkCharcoal", "strokeWidth": 5 },
+      { "id": "mattress", "shape": "rectangle", "x": -430, "y": -4, "width": 830, "height": 88, "fill": "paperWhite", "stroke": "inkCharcoal", "strokeWidth": 5 },
+      { "id": "pillow", "shape": "image", "x": -105, "y": -42, "width": 150, "height": 72, "asset": "pillow-prototype" },
+      { "id": "headboard", "shape": "rectangle", "x": 0, "y": -30, "width": 30, "height": 205, "fill": "managementGold", "stroke": "inkCharcoal", "strokeWidth": 5 },
+      { "id": "foot-leg", "shape": "rectangle", "x": -850, "y": 80, "width": 28, "height": 160, "fill": "inkCharcoal" },
+      { "id": "head-leg", "shape": "rectangle", "x": -16, "y": 75, "width": 28, "height": 150, "fill": "inkCharcoal" }
+    ],
+    "sleeperParts": [
+      { "id": "body", "shape": "ellipse", "x": -410, "y": -52, "width": 430, "height": 95, "fill": "resistanceRed", "stroke": "inkCharcoal", "strokeWidth": 4 },
+      { "id": "head", "shape": "circle", "x": -145, "y": -69, "radius": 49, "fill": "duvetCream", "stroke": "inkCharcoal", "strokeWidth": 4 },
+      { "id": "hair", "shape": "ellipse", "x": -145, "y": -96, "width": 76, "height": 30, "fill": "inkCharcoal" },
+      { "id": "gripping-hand", "shape": "circle", "x": -620, "y": -78, "radius": 15, "fill": "duvetCream", "stroke": "inkCharcoal", "strokeWidth": 3 }
+    ],
+    "duvet": { "id": "duvet", "shape": "rectangle", "x": -430, "y": -56, "width": 440, "height": 120, "fill": "duvetCream", "stroke": "resistanceRed", "strokeWidth": 5 }
+  },
+  "managementParts": [
+    { "id": "lifting-arm", "shape": "rectangle", "x": -90, "y": 100, "width": 165, "height": 35, "originX": 1, "originY": 0.5, "angleDegrees": -18, "fill": "managementGold", "stroke": "inkCharcoal", "strokeWidth": 4 },
+    { "id": "hand", "shape": "circle", "x": -190, "y": 130, "radius": 26, "fill": "managementGold", "stroke": "inkCharcoal", "strokeWidth": 4 },
+    { "id": "body", "shape": "rectangle", "x": 0, "y": 45, "width": 150, "height": 210, "fill": "managementGold", "stroke": "inkCharcoal", "strokeWidth": 5 },
+    { "id": "head", "shape": "circle", "x": 0, "y": -85, "radius": 68, "fill": "managementGold", "stroke": "inkCharcoal", "strokeWidth": 5 },
+    { "id": "tie", "shape": "triangle", "x": 0, "y": 35, "points": [-18, -20, 18, -20, 0, 90], "fill": "resistanceRed", "stroke": "inkCharcoal", "strokeWidth": 3 }
+  ]
+}

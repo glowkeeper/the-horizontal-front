@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { assetFilePattern } from "../contentRules.mjs";
 
 const colourRoleSchema = z.enum([
   "duvetCream",
@@ -71,12 +72,40 @@ export const shapePartSchema = z.discriminatedUnion("shape", [
   imagePartSchema,
 ]);
 
+const assetBaseSchema = z.object({
+  id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+  file: z.string().regex(
+    assetFilePattern,
+    "must be a PNG or WebP under shared/ or episodes/<episode-id>/",
+  ),
+  status: z.enum(["prototype-placeholder", "production-approved"]),
+  creator: z.string().trim().min(1),
+  edits: z.array(z.string().trim().min(1)),
+  licence: z.enum(["CC-BY-SA-4.0"]),
+  replacementStatus: z.string().trim().min(1),
+});
+
+const assetSchema = z.discriminatedUnion("origin", [
+  assetBaseSchema.extend({
+    origin: z.literal("ai-generated"),
+    generatedAt: z.string().date(),
+    generationTool: z.string().trim().min(1),
+    prompt: z.string().trim().min(1),
+  }).strict(),
+  assetBaseSchema.extend({
+    origin: z.literal("human-created"),
+  }).strict(),
+  assetBaseSchema.extend({
+    origin: z.literal("licensed-source"),
+    source: z.string().url(),
+    attribution: z.string().trim().min(1),
+    permittedUses: z.string().trim().min(1),
+  }).strict(),
+]);
+
 export const assetCatalogSchema = z.object({
   schemaVersion: z.literal(1),
-  assets: z.array(z.object({
-    id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
-    file: z.string().regex(/^[a-zA-Z0-9][a-zA-Z0-9._/-]*$/),
-  }).strict()),
+  assets: z.array(assetSchema),
 }).strict().superRefine((catalog, context) => {
   for (const field of ["id", "file"] as const) {
     const values = catalog.assets.map((asset) => asset[field]);
@@ -102,6 +131,9 @@ const easeSchema = z.enum(["Sine.Out", "Back.In", "Quad.In"]);
 export const resistanceLayoutSchema = z.object({
   schemaVersion: z.literal(1),
   id: z.literal("bed-head-right"),
+  copy: z.object({
+    managementCaption: z.string().trim().min(1).max(120),
+  }).strict(),
   designSize: z.object({
     width: z.number().int().positive(),
     height: z.number().int().positive(),
@@ -156,6 +188,9 @@ export const resistanceSkinSchema = z.object({
   schemaVersion: z.literal(1),
   id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
   layout: z.literal("bed-head-right"),
+  copy: z.object({
+    managementLabel: z.string().trim().min(1).max(80),
+  }).strict(),
   bed: z.object({
     duvetRestingX: z.number(),
     sleeperRestingX: z.number(),

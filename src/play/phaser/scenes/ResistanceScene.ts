@@ -1,7 +1,17 @@
 import Phaser from "phaser";
 
+import type { Campaign } from "../../content/loadGame";
+import { formatCopy } from "../../content/formatCopy";
+import { game } from "../../content/game";
 import { loadEpisode } from "../../content/loadEpisode";
 import type { Episode } from "../../content/schemas/episodeSchema";
+import {
+  acceptCampaignOutcome,
+  assertCampaignRunMatches,
+  getCurrentCampaignEpisodeIndex,
+  retryCampaignEpisode,
+  type CampaignRun,
+} from "../../engine/campaign";
 import {
   advanceResistance,
   applyResistanceInput,
@@ -19,16 +29,21 @@ import {
   createResistanceLayout,
   type ResistanceLayout,
 } from "../layouts/resistanceLayout";
+import { announce, createButton } from "../sceneChrome";
 
 const MAXIMUM_FRAME_DELTA_MS = 100;
 
 type ResistanceSceneData = {
+  readonly campaign: Campaign;
   readonly episode: unknown;
+  readonly run: CampaignRun;
 };
 
 export class ResistanceScene extends Phaser.Scene {
   private resistance!: Resistance;
+  private campaign!: Campaign;
   private episode!: Episode;
+  private run!: CampaignRun;
   private layout!: ResistanceLayout;
   private confrontationTimeMs = 0;
   private finished = false;
@@ -41,14 +56,17 @@ export class ResistanceScene extends Phaser.Scene {
   private nextCue!: Phaser.GameObjects.Text;
   private timeRemaining!: Phaser.GameObjects.Text;
   private result!: Phaser.GameObjects.Text;
-  private restart!: Phaser.GameObjects.Text;
+  private transitioning = false;
 
   public constructor() {
     super({ key: "ResistanceScene" });
   }
 
   public init(data: ResistanceSceneData): void {
+    this.campaign = data.campaign;
     this.episode = loadEpisode(data.episode);
+    this.run = data.run;
+    assertCampaignRunMatches(this.run, this.campaign.episodes.length);
   }
 
   public create(): void {
@@ -57,15 +75,14 @@ export class ResistanceScene extends Phaser.Scene {
     );
     this.confrontationTimeMs = 0;
     this.finished = false;
+    this.transitioning = false;
     this.lastReportedExpiredStep = -1;
     this.lastAnnouncedNowStep = -1;
 
     this.createBedroom();
     this.createRhythmInterface();
     this.bindInput();
-    this.updateAccessibleStatus(
-      "Hold the line. Follow the alternating left and right rhythm.",
-    );
+    announce(this.episode.confrontation.copy.instructionsStatus);
   }
 
   public update(_time: number, deltaMs: number): void {
@@ -92,19 +109,22 @@ export class ResistanceScene extends Phaser.Scene {
   private createBedroom(): void {
     this.layout = createResistanceLayout(
       this,
-      this.episode.confrontation.presentation,
+      this.episode,
     );
     const { anchors } = this.layout.content;
 
     this.add
-      .text(anchors.title.x, anchors.title.y, "HOLD THE LINE", {
+      .text(anchors.title.x, anchors.title.y, this.episode.confrontation.copy.headline, {
         ...createTextStyles().notice,
         fontSize: "25px",
       })
       .setOrigin(0.5);
 
     this.timeRemaining = this.add
-      .text(anchors.time.x, anchors.time.y, "25.0", {
+      .text(anchors.time.x, anchors.time.y, formatCopy(
+        game.mechanics.resistance.secondsRemaining,
+        { seconds: (this.episode.confrontation.resistance.durationMs / 1_000).toFixed(1) },
+      ), {
         ...createTextStyles().status,
         color: getThemeColour("inkCharcoal"),
       })
@@ -116,15 +136,6 @@ export class ResistanceScene extends Phaser.Scene {
       .setDepth(20)
       .setVisible(false);
 
-    this.restart = this.add
-      .text(anchors.restart.x, anchors.restart.y, "PRESS R OR TAP TO RESIST AGAIN", {
-        ...createTextStyles().body,
-        fontSize: "22px",
-        fontStyle: "bold",
-      })
-      .setOrigin(0.5)
-      .setDepth(20)
-      .setVisible(false);
   }
 
   private createRhythmInterface(): void {
@@ -149,20 +160,20 @@ export class ResistanceScene extends Phaser.Scene {
       .setStrokeStyle(controls.strokeWidth, colours.resistanceRed);
 
     this.add
-      .text(anchors.leftControl.x, anchors.leftControl.y, "LEFT\nA / ←", {
+      .text(anchors.leftControl.x, anchors.leftControl.y, game.mechanics.resistance.leftControl, {
         ...createTextStyles().notice,
         fontSize: "15px",
       })
       .setOrigin(0.5);
     this.add
-      .text(anchors.rightControl.x, anchors.rightControl.y, "RIGHT\nL / →", {
+      .text(anchors.rightControl.x, anchors.rightControl.y, game.mechanics.resistance.rightControl, {
         ...createTextStyles().notice,
         fontSize: "15px",
       })
       .setOrigin(0.5);
 
     this.feedback = this.add
-      .text(anchors.feedback.x, anchors.feedback.y, "FOLLOW THE PULSE", {
+      .text(anchors.feedback.x, anchors.feedback.y, game.mechanics.resistance.initialFeedback, {
         ...createTextStyles().status,
         fontSize: "19px",
       })
@@ -190,12 +201,13 @@ export class ResistanceScene extends Phaser.Scene {
         this.handleResistanceInput(action.side);
       } else if (action?.kind === "restart") {
         this.restartConfrontation();
+      } else if (action?.kind === "continue") {
+        this.acceptOutcomeAndContinue();
       }
     });
 
     this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
       if (this.finished) {
-        this.restartConfrontation();
         return;
       }
 
@@ -238,7 +250,10 @@ export class ResistanceScene extends Phaser.Scene {
       0,
       this.resistance.config.durationMs - state.elapsedMs,
     );
-    this.timeRemaining.setText(`${(remainingMs / 1_000).toFixed(1)} SECONDS`);
+    this.timeRemaining.setText(formatCopy(
+      game.mechanics.resistance.secondsRemaining,
+      { seconds: (remainingMs / 1_000).toFixed(1) },
+    ));
 
     this.leftCue.setScale(1);
     this.rightCue.setScale(1);
@@ -259,7 +274,11 @@ export class ResistanceScene extends Phaser.Scene {
       }
       expectedCue.setScale(1 + pulse * this.layout.content.controls.pulseScale);
       this.nextCue.setText(
-        isNow ? `NOW: ${cue.side.toUpperCase()}` : "",
+        isNow
+          ? formatCopy(game.mechanics.resistance.now, {
+              side: cue.side.toUpperCase(),
+            })
+          : "",
       );
 
       if (isNow && cue.step !== this.lastAnnouncedNowStep) {
@@ -272,7 +291,9 @@ export class ResistanceScene extends Phaser.Scene {
         ) {
           this.feedback
             .setColor(getThemeColour("inkCharcoal"))
-            .setText(`TAP — ${cue.side.toUpperCase()}`);
+            .setText(formatCopy(game.mechanics.resistance.tap, {
+              side: cue.side.toUpperCase(),
+            }));
         }
       }
     }
@@ -307,31 +328,31 @@ export class ResistanceScene extends Phaser.Scene {
     if (judgement.kind === "hit") {
       this.feedback
         .setColor(getThemeColour("resistanceRed"))
-        .setText(
-          `✓ HIT — ${judgement.expectedSide.toUpperCase()}\nSOLIDARITY! ✊ 🛏️`,
-        );
+        .setText(formatCopy(game.mechanics.resistance.hit, {
+          side: judgement.expectedSide.toUpperCase(),
+        }));
       return;
     }
 
     this.feedback.setColor(getThemeColour("inkCharcoal"));
 
     if (judgement.reason === "wrong-side") {
-      this.feedback.setText(
-        `✕ WRONG KEY — ${judgement.expectedSide.toUpperCase()} NEEDED`,
-      );
+      this.feedback.setText(formatCopy(game.mechanics.resistance.wrongSide, {
+        side: judgement.expectedSide.toUpperCase(),
+      }));
       return;
     }
 
     if (judgement.reason === "early") {
-      this.feedback.setText(
-        `✕ TOO EARLY — ${judgement.expectedSide.toUpperCase()} ON NOW`,
-      );
+      this.feedback.setText(formatCopy(game.mechanics.resistance.tooEarly, {
+        side: judgement.expectedSide.toUpperCase(),
+      }));
       return;
     }
 
-    this.feedback.setText(
-      `✕ MISSED — ${judgement.expectedSide.toUpperCase()}`,
-    );
+    this.feedback.setText(formatCopy(game.mechanics.resistance.missed, {
+      side: judgement.expectedSide.toUpperCase(),
+    }));
   }
 
   private finishConfrontation(): void {
@@ -349,8 +370,14 @@ export class ResistanceScene extends Phaser.Scene {
           : getThemeColour("workLightBlue"),
       )
       .setVisible(true);
-    this.restart.setVisible(true);
-    this.feedback.setText(victory ? "REST, BRIEFLY" : "MANAGEMENT PREVAILS");
+    this.feedback.setText(resultContent.feedback);
+    const { restart } = this.layout.content.anchors;
+    createButton(this, restart.x - 220, restart.y, 360, game.interface.retryEpisode, () => {
+      this.restartConfrontation();
+    });
+    createButton(this, restart.x + 220, restart.y, 360, game.interface.acceptOutcome, () => {
+      this.acceptOutcomeAndContinue();
+    });
 
     if (victory) {
       this.layout.animateVictory();
@@ -358,17 +385,43 @@ export class ResistanceScene extends Phaser.Scene {
       this.layout.animateForcedVerticalisation();
     }
 
-    this.updateAccessibleStatus(
-      victory
-        ? "Victory. The line holds. Press R or tap to resist again."
-        : "Forced verticalisation. Press R or tap to resist again.",
-    );
+    announce(formatCopy(game.interface.resultStatus, {
+      outcome: resultContent.headline,
+      feedback: resultContent.feedback,
+    }));
   }
 
   private restartConfrontation(): void {
-    if (this.finished) {
-      this.scene.restart({ episode: this.episode });
+    if (this.finished && !this.transitioning) {
+      this.transitioning = true;
+      this.scene.restart({
+        campaign: this.campaign,
+        episode: this.episode,
+        run: retryCampaignEpisode(this.run),
+      });
     }
+  }
+
+  private acceptOutcomeAndContinue(): void {
+    const outcome = this.resistance.state.outcome;
+    if (!this.finished || this.transitioning || outcome === "active") return;
+    this.transitioning = true;
+
+    const run = acceptCampaignOutcome(this.run, outcome);
+    const nextEpisodeIndex = getCurrentCampaignEpisodeIndex(run);
+    if (nextEpisodeIndex === null) {
+      this.scene.start("CampaignDebriefingScene", {
+        campaign: this.campaign,
+        run,
+      });
+      return;
+    }
+
+    this.scene.start("ResistanceScene", {
+      campaign: this.campaign,
+      episode: this.campaign.episodes[nextEpisodeIndex],
+      run,
+    });
   }
 
   private colours() {
@@ -386,11 +439,4 @@ export class ResistanceScene extends Phaser.Scene {
     return Phaser.Display.Color.HexStringToColor(getThemeColour(role)).color;
   }
 
-  private updateAccessibleStatus(message: string): void {
-    const status = document.querySelector<HTMLElement>("#game-status");
-
-    if (status) {
-      status.textContent = message;
-    }
-  }
 }

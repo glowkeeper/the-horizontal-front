@@ -10,19 +10,18 @@ import { createTextStyles, getThemeColour } from "../../theme/theme";
 import { getResistancePresentation } from "../presentation/resistancePresentation";
 import type { ResistanceLayout } from "./resistanceLayout";
 
-type Presentation = Episode["confrontation"]["presentation"];
-
 export function createBedHeadRightLayout(
   scene: Phaser.Scene,
-  selection: Presentation,
+  episode: Episode,
 ): ResistanceLayout {
+  const selection = episode.confrontation.presentation;
   if (selection.managementAction !== "lift-head") {
     throw new Error(
       `The bed-head-right layout does not support ${selection.managementAction}`,
     );
   }
 
-  const { layout, skin } = loadPresentation(selection);
+  const { layout, skin } = loadPresentation(episode);
   const colours = getColours();
   const { backdrop, anchors, motion } = layout;
 
@@ -60,7 +59,7 @@ export function createBedHeadRightLayout(
   );
   management.add(skin.managementParts.map((part) => createShape(scene, part)));
   management.add(
-    scene.add.text(0, 45, "MANAGEMENT", {
+    scene.add.text(0, 45, skin.copy.managementLabel, {
       ...createTextStyles().notice,
       fontSize: "16px",
       wordWrap: { width: 125 },
@@ -69,7 +68,7 @@ export function createBedHeadRightLayout(
   scene.add.text(
     anchors.managementCaption.x,
     anchors.managementCaption.y,
-    "LIFTING THE HEAD\nOF THE BED",
+    layout.copy.managementCaption,
     {
       ...createTextStyles().notice,
       color: getThemeColour("managementGold"),

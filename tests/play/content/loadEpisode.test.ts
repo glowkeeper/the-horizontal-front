@@ -1,63 +1,107 @@
 import { describe, expect, it } from "vitest";
 
-import oneSceneContent from "../../../src/play/content/episodes/one-scene.json";
-import { episodeCatalog } from "../../../src/play/content/episodeCatalog";
+import campaignContent from "../../../src/play/content/campaigns/the-monday-uprising.json";
+import episodeContent from "../../../src/play/content/episodes/the-alarm.json";
+import { game } from "../../../src/play/content/game";
+import gameContent from "../../../src/play/content/game.json";
 import { loadEpisode } from "../../../src/play/content/loadEpisode";
-import { loadEpisodeCatalog } from "../../../src/play/content/loadEpisodeCatalog";
+import { loadGame } from "../../../src/play/content/loadGame";
 import { createResistance } from "../../../src/play/engine/resistance";
+import { contentIdSchema } from "../../../src/play/content/schemas/gameSchema";
+import { findPlaceholderIdSegment } from "../../../src/play/content/contentRules.mjs";
 
-describe("episode loading", () => {
-  it("uses catalog order as the campaign order", () => {
-    expect(episodeCatalog.episodes.map(({ id }) => id)).toEqual([
-      "one-scene",
-    ]);
-    expect(episodeCatalog.getById("one-scene")).toBe(
-      episodeCatalog.episodes[0],
-    );
+const campaignModules = {
+  "./campaigns/the-monday-uprising.json": campaignContent,
+};
+const episodeModules = { "./episodes/the-alarm.json": episodeContent };
+
+describe("game content loading", () => {
+  it("loads the ordered game, campaign and episode hierarchy", () => {
+    expect(game.id).toBe("the-horizontal-front");
+    expect(game.campaigns[0].title).toBe("The Monday Uprising");
+    expect(game.entryEpisode).toBe(game.campaigns[0].episodes[0]);
+    expect(game.campaigns[0].episodes.map(({ id }) => id)).toEqual(["the-alarm"]);
   });
 
-  it("loads the One Scene episode as validated content", () => {
-    const episode = loadEpisode(oneSceneContent);
+  it("requires campaign briefing and debriefing copy", () => {
+    expect(() => loadGame(gameContent, {
+      "./campaigns/the-monday-uprising.json": {
+        ...campaignContent,
+        briefing: { ...campaignContent.briefing, body: "" },
+      },
+    }, episodeModules)).toThrow();
+    expect(() => loadGame(gameContent, {
+      "./campaigns/the-monday-uprising.json": {
+        ...campaignContent,
+        debriefing: { ...campaignContent.debriefing, scoreLabel: "" },
+      },
+    }, episodeModules)).toThrow();
+  });
 
-    expect(episode.id).toBe("one-scene");
+  it("requires validated global interface copy and its placeholders", () => {
+    expect(() => loadGame(
+      { ...gameContent, interface: { ...gameContent.interface, campaignsHeading: "" } },
+      campaignModules,
+      episodeModules,
+    )).toThrow();
+    expect(() => loadGame(
+      {
+        ...gameContent,
+        interface: { ...gameContent.interface, campaignsStatus: "No selection" },
+      },
+      campaignModules,
+      episodeModules,
+    )).toThrow(/must contain exactly/);
+  });
+
+  it("requires episode-authored confrontation copy and finite templates", () => {
+    expect(() => loadEpisode({
+      ...episodeContent,
+      confrontation: {
+        ...episodeContent.confrontation,
+        copy: { ...episodeContent.confrontation.copy, headline: "" },
+      },
+    })).toThrow();
+    expect(() => loadGame({
+      ...gameContent,
+      mechanics: {
+        resistance: { ...gameContent.mechanics.resistance, now: "NOW" },
+      },
+    }, campaignModules, episodeModules)).toThrow(/must contain exactly/);
+  });
+
+  it("loads The Alarm as validated playable content", () => {
+    const episode = loadEpisode(episodeContent);
+    expect(episode.id).toBe("the-alarm");
     expect(episode.confrontation.resistance.rhythm.steps).toEqual([
       { side: "left" },
       { side: "right" },
     ]);
-    expect(episode.confrontation.resistance.rhythm.leadInBeats).toBe(4);
     expect(episode.confrontation.presentation).toEqual({
       layout: "bed-head-right",
-      skin: "shape-bedroom",
+      skin: "the-alarm-bedroom",
       managementAction: "lift-head",
     });
   });
 
   it("supplies resistance configuration directly to the engine", () => {
-    const episode = loadEpisode(oneSceneContent);
-    const resistance = createResistance(
-      episode.confrontation.resistance,
-    );
-
+    const episode = loadEpisode(episodeContent);
+    const resistance = createResistance(episode.confrontation.resistance);
     expect(resistance.config).toBe(episode.confrontation.resistance);
     expect(resistance.state.duvetSafety).toBe(0.75);
   });
 
-  it("rejects unknown fields instead of growing an implicit grammar", () => {
+  it("rejects unknown episode fields and overlapping rhythm windows", () => {
+    expect(() => loadEpisode({ ...episodeContent, executableScript: "tipBed()" }))
+      .toThrow();
     expect(() => loadEpisode({
-      ...oneSceneContent,
-      executableScript: "tipBed()",
-    })).toThrow();
-  });
-
-  it("rejects overlapping rhythm timing windows", () => {
-    expect(() => loadEpisode({
-      ...oneSceneContent,
+      ...episodeContent,
       confrontation: {
-        ...oneSceneContent.confrontation,
+        ...episodeContent.confrontation,
         resistance: {
-          ...oneSceneContent.confrontation.resistance,
+          ...episodeContent.confrontation.resistance,
           rhythm: {
-            ...oneSceneContent.confrontation.resistance.rhythm,
+            ...episodeContent.confrontation.resistance.rhythm,
             timingWindowMs: 250,
           },
         },
@@ -65,62 +109,86 @@ describe("episode loading", () => {
     })).toThrow(/must be less than half beatIntervalMs/);
   });
 
-  it("rejects an undocumented layout", () => {
-    expect(() => loadEpisode({
-      ...oneSceneContent,
-      confrontation: {
-        ...oneSceneContent.confrontation,
-        presentation: {
-          ...oneSceneContent.confrontation.presentation,
-          layout: "boss-somewhere-or-other",
-        },
-      },
-    })).toThrow();
+  it("rejects numeric sequence segments without rejecting ordinary words", () => {
+    for (const id of ["episode-01", "chapter-1", "part-2", "1"] as const) {
+      expect(() => contentIdSchema.parse(id)).toThrow(/numeric sequence/);
+    }
+    for (const id of [
+      "crime-scene",
+      "test-of-strength",
+      "campaign-of-terror",
+      "one-scene",
+    ] as const) {
+      expect(contentIdSchema.parse(id)).toBe(id);
+    }
   });
 
-  it("rejects a catalog entry whose episode file is missing", () => {
-    expect(() => loadEpisodeCatalog(
-      {
-        schemaVersion: 1,
-        episodes: [{ id: "missing", file: "missing.json" }],
-      },
-      {},
-    )).toThrow(/Missing episode file/);
+  it("identifies only unambiguous placeholder segments for build policy", () => {
+    expect(findPlaceholderIdSegment("monday-prototype")).toBe("prototype");
+    expect(findPlaceholderIdSegment("crime-scene")).toBeUndefined();
+    expect(findPlaceholderIdSegment("test-of-strength")).toBeUndefined();
   });
 
-  it("rejects episode files which are not ordered in the catalog", () => {
-    expect(() => loadEpisodeCatalog(
+  it("requires reference filenames to exactly match their IDs", () => {
+    expect(() => loadGame(
       {
-        schemaVersion: 1,
-        episodes: [{ id: "one-scene", file: "one-scene.json" }],
+        ...gameContent,
+        campaigns: [{ id: "the-monday-uprising", file: "monday.json" }],
       },
-      {
-        "./episodes/one-scene.json": oneSceneContent,
-        "./episodes/forgotten.json": oneSceneContent,
-      },
-    )).toThrow(/Unlisted episode files/);
+      campaignModules,
+      episodeModules,
+    )).toThrow(/filename must exactly match/);
   });
 
-  it("rejects duplicate identities and files", () => {
-    expect(() => loadEpisodeCatalog(
+  it("rejects missing and unlisted campaign files", () => {
+    expect(() => loadGame(gameContent, {}, episodeModules))
+      .toThrow(/Missing campaign file/);
+    expect(() => loadGame(gameContent, {
+      ...campaignModules,
+      "./campaigns/forgotten.json": campaignContent,
+    }, episodeModules)).toThrow(/Unlisted campaign files/);
+  });
+
+  it("rejects missing and unlisted episode files", () => {
+    expect(() => loadGame(gameContent, campaignModules, {}))
+      .toThrow(/Missing episode file/);
+    expect(() => loadGame(gameContent, campaignModules, {
+      ...episodeModules,
+      "./episodes/forgotten.json": episodeContent,
+    })).toThrow(/Unlisted episode files/);
+  });
+
+  it("rejects duplicate episode IDs globally across campaigns", () => {
+    const secondCampaign = {
+      ...campaignContent,
+      id: "management-retaliates",
+      title: "Management Retaliates",
+    };
+    expect(() => loadGame(
       {
-        schemaVersion: 1,
-        episodes: [
-          { id: "one-scene", file: "one-scene.json" },
-          { id: "one-scene", file: "one-scene.json" },
+        ...gameContent,
+        campaigns: [
+          gameContent.campaigns[0],
+          { id: "management-retaliates", file: "management-retaliates.json" },
         ],
       },
-      { "./episodes/one-scene.json": oneSceneContent },
-    )).toThrow(/Duplicate episode IDs/);
+      {
+        ...campaignModules,
+        "./campaigns/management-retaliates.json": secondCampaign,
+      },
+      episodeModules,
+    )).toThrow(/Duplicate episode ID across campaigns/);
   });
 
-  it("rejects disagreement between catalog and episode identity", () => {
-    expect(() => loadEpisodeCatalog(
-      {
-        schemaVersion: 1,
-        episodes: [{ id: "different-id", file: "one-scene.json" }],
+  it("rejects identity disagreement at each content boundary", () => {
+    expect(() => loadGame(gameContent, {
+      "./campaigns/the-monday-uprising.json": {
+        ...campaignContent,
+        id: "monday-revolt",
       },
-      { "./episodes/one-scene.json": oneSceneContent },
-    )).toThrow(/Episode ID mismatch/);
+    }, episodeModules)).toThrow(/Campaign ID mismatch/);
+    expect(() => loadGame(gameContent, campaignModules, {
+      "./episodes/the-alarm.json": { ...episodeContent, id: "the-siren" },
+    })).toThrow(/Episode ID mismatch/);
   });
 });

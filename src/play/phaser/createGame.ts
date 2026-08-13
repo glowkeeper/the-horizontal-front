@@ -2,10 +2,11 @@ import Phaser from "phaser";
 
 import { getThemeColour } from "../theme/theme";
 import { BootScene } from "./scenes/BootScene";
+import { CampaignBriefingScene } from "./scenes/CampaignBriefingScene";
+import { CampaignDebriefingScene } from "./scenes/CampaignDebriefingScene";
+import { CampaignsScene } from "./scenes/CampaignsScene";
 import { ResistanceScene } from "./scenes/ResistanceScene";
-
-const GAME_WIDTH = 1280;
-const GAME_HEIGHT = 720;
+import { GAME_HEIGHT, GAME_WIDTH } from "./design";
 
 export function createGame(container: HTMLElement): Phaser.Game {
   const config: Phaser.Types.Core.GameConfig = {
@@ -28,7 +29,13 @@ export function createGame(container: HTMLElement): Phaser.Game {
       roundPixels: false,
     },
 
-    scene: [BootScene, ResistanceScene],
+    scene: [
+      BootScene,
+      CampaignsScene,
+      CampaignBriefingScene,
+      ResistanceScene,
+      CampaignDebriefingScene,
+    ],
   };
 
   return new Phaser.Game(config);

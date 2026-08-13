@@ -151,7 +151,43 @@ Episodes can be broadly ridiculous, quietly sinister, triumphantly rebellious, m
 
 The complete system should have an explicit, documented grammar that a non-programmer can understand.
 
-Episodes are listed in an ordered JSON catalog. Array position defines campaign order and the first entry is the natural starting episode. Each entry pairs a stable episode ID with its JSON filename; the ID does not change when an episode is reordered and can later support saves or direct preview. The loader validates both the catalog and every discovered episode, rejecting duplicate IDs or files, missing or unlisted files, and disagreement between catalog and episode IDs. No episode requires a TypeScript import or registration.
+The authored root is `game.json`. It contains an ordered list of campaigns; each campaign JSON contains an ordered list of episodes. The first campaign and its first episode are the natural entry point. Stable IDs use descriptive lowercase kebab-case without numeric sequence segments, and each JSON filename must exactly match its ID. Episode IDs are globally unique across campaigns so saves, previews, presentation ownership and diagnostics never need a campaign-qualified identity.
+
+Durable IDs name the finished creative work, not the implementation stage that produced it. `one-scene` and `resistance-test` were implementation stand-ins; `the-alarm` names the episode. The build rejects a small set of unambiguous placeholder segments, but this is chiefly an authorial judgement rather than something a vocabulary-blocking regex can decide.
+
+IDs do not contain numeric sequence segments; spell meaningful numbers as words, for example `clause-four` or `the-nine-to-five`.
+
+The generic loader discovers every campaign and episode JSON file without per-content TypeScript imports. It rejects duplicate IDs or files, missing or unlisted files, identity/filename disagreement and episodes listed by more than one campaign.
+
+Each campaign has a finite narrative flow:
+
+```text
+briefing → ordered playable episodes → debriefing
+```
+
+The campaign JSON authors non-empty briefing and debriefing headlines and body copy, plus the debriefing label for the tally. It does not author a score or executable entry, continuation or exit criteria. After an episode result, the player may retry without recording anything or accept either victory or forced verticalisation and advance. Plain TypeScript campaign rules count accepted victories as episodes held, accepted outcomes as episodes attempted, and present `held / total` after the final episode.
+
+The player-facing application follows the same hierarchy. Boot presents a Campaigns screen generated from every validated campaign. Selecting one opens its briefing. After its debriefing, replay returns through that campaign's briefing with a fresh tally, while Campaigns returns to the catalogue. These are generic application states, not campaign-specific routes.
+
+Player-visible language is entirely data-driven and partitioned by ownership:
+
+- `game.json` owns global page and interface vocabulary, navigation labels, input labels, shared mechanic feedback and accessible-status templates.
+- Campaign JSON owns that campaign's briefing, debriefing and tally label.
+- Episode JSON owns episode-specific confrontation headings, instructions and outcome prose.
+- Presentation layout and skin JSON own captions and labels attached to their authored visual roles.
+- The engine owns computed values such as time, side and campaign totals, which are inserted into validated named-placeholder templates.
+
+Phaser code selects and formats this copy but contains no player-visible string literals. The build policy checks this boundary so new scene text cannot silently become code-owned again.
+
+Template fields use named placeholders containing letters and numbers only. Literal braces are not permitted in a template field, although ordinary non-template prose may contain them. Copy fields have conservative length limits so malformed content cannot silently spill far beyond the prototype canvas; richer overflow handling remains presentation work.
+
+```text
+game.json
+campaigns/
+  the-monday-uprising.json
+episodes/
+  the-alarm.json
+```
 
 ```text
 An episode consists of:
@@ -284,7 +320,27 @@ Cartoon scenes should use reusable layouts and semantic slots rather than making
 
 The layout determines responsive placement, scaling, text-safe areas and default layer order. The episode supplies poses, dialogue, props and small artistic offsets.
 
-An episode selects a documented layout and skin by stable ID; it does not contain asset file paths or the complete scene drawing. Layout JSON defines shared design-space anchors, pivots, slots and motion parameters. Skin JSON defines the visual parts occupying those slots through either the finite prototype-shape vocabulary or semantic image IDs resolved by a validated asset catalogue. Shared Phaser adapters validate and interpret those files. This keeps ordinary composition and replacement artwork editable as data without turning episode JSON into a graphical programming language.
+An episode selects a documented layout and skin by stable ID; it does not contain asset file paths or the complete scene drawing. Layout JSON defines shared design-space anchors, pivots, slots and motion parameters. Skin JSON defines the visual parts occupying those slots through either the finite prototype-shape vocabulary or semantic image IDs resolved by a validated asset catalogue. Both skins and catalogue-owned files use `shared/` and `episodes/<episode-id>/` namespaces. Shared skins can use only shared assets. An episode-owned skin can use shared assets and assets owned by the same episode, and only that episode can select it. Shared Phaser adapters validate and interpret those files. This keeps ordinary composition and replacement artwork editable as data without turning episode JSON into a graphical programming language.
+
+Each asset-catalogue entry is ordinary authored data. For example:
+
+```json
+{
+  "id": "pillow-prototype",
+  "file": "episodes/the-alarm/pillow-prototype.png",
+  "kind": "image",
+  "status": "prototype-placeholder",
+  "creator": "Creator or source",
+  "generatedAt": "2026-08-13",
+  "generationTool": "Tool used, when applicable",
+  "prompt": "Generation prompt, when applicable",
+  "edits": ["Human selection, preparation and editing performed"],
+  "licence": "CC-BY-SA-4.0",
+  "replacementStatus": "What must happen before production approval"
+}
+```
+
+`id` is the stable name used by skins. `file` is the only repository path and must be a PNG or WebP inside an allowed ownership namespace. The remaining fields preserve provenance and distinguish provisional material from production-approved artwork.
 
 Layout and skin validation must check relationships as well as field types. Coordinates and control bounds must fit the design canvas, dimensions must be positive, semantic part IDs must be unique and required parts present, layout/skin references must be compatible, and motion directions must agree with the layout's physical meaning.
 

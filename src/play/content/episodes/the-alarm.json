@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "id": "one-scene",
-  "title": "One Scene",
+  "id": "the-alarm",
+  "title": "The Alarm",
   "confrontation": {
     "resistance": {
       "durationMs": 25000,
@@ -23,16 +23,22 @@
     },
     "presentation": {
       "layout": "bed-head-right",
-      "skin": "shape-bedroom",
+      "skin": "the-alarm-bedroom",
       "managementAction": "lift-head"
+    },
+    "copy": {
+      "headline": "HOLD THE LINE",
+      "instructionsStatus": "Hold the line. Follow the alternating left and right rhythm."
     }
   },
   "results": {
     "victory": {
-      "headline": "THE LINE HOLDS"
+      "headline": "THE LINE HOLDS",
+      "feedback": "REST, BRIEFLY"
     },
     "forcedVerticalisation": {
-      "headline": "FORCED VERTICALISATION"
+      "headline": "FORCED VERTICALISATION",
+      "feedback": "MANAGEMENT PREVAILS"
     }
   }
 }

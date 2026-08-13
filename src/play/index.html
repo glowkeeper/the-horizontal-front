@@ -4,16 +4,16 @@
     <meta charset="UTF-8" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="description" content="Play The Horizontal Front." />
+    <meta name="description" content="{{GAME_PAGE_DESCRIPTION}}" />
     <meta name="theme-color" content="#f3e8d0" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <title>Play — The Horizontal Front</title>
+    <title>{{GAME_PAGE_TITLE}}</title>
   </head>
   <body class="game-page">
-    <a class="game-exit" href="/">Return to the Front</a>
+    <a class="game-exit" href="/">{{GAME_EXIT_LABEL}}</a>
     <main id="app">
-      <p id="game-status" class="visually-hidden">Hold the line. Follow the alternating left and right rhythm.</p>
-      <div id="game" role="application" aria-label="The Horizontal Front resistance prototype" aria-describedby="game-status"></div>
+      <p id="game-status" class="visually-hidden" aria-live="polite" aria-atomic="true">{{GAME_LOADING_STATUS}}</p>
+      <div id="game" role="application" aria-label="{{GAME_ARIA_LABEL}}" aria-describedby="game-status"></div>
     </main>
     <script type="module" src="/src/play/main.ts"></script>
   </body>

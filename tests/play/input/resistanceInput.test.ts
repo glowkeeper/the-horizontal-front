@@ -28,4 +28,9 @@ describe("resistance input", () => {
       repeat: false,
     })).toEqual({ kind: "restart" });
   });
+
+  it("maps Enter to accepting the episode outcome", () => {
+    expect(getResistanceControlAction({ code: "Enter", repeat: false }))
+      .toEqual({ kind: "continue" });
+  });
 });

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "the-monday-uprising",
+  "title": "The Monday Uprising",
+  "briefing": {
+    "headline": "MONDAY. DAWN.",
+    "body": "Management has declared the working week open. The bed remains under horizontal control. Hold the line."
+  },
+  "episodes": [
+    {
+      "id": "the-alarm",
+      "file": "the-alarm.json"
+    }
+  ],
+  "debriefing": {
+    "headline": "THE MONDAY UPRISING",
+    "body": "The line held wherever resistance was possible. Rest now. Management is already scheduling the lessons-learned meeting.",
+    "scoreLabel": "EPISODES HELD"
+  }
+}

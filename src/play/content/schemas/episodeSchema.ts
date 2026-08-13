@@ -1,4 +1,7 @@
 import { z } from "zod";
+import { contentIdSchema } from "./gameSchema";
+
+const shortCopy = z.string().trim().min(1).max(120);
 
 const rhythmStepSchema = z
   .object({
@@ -47,19 +50,26 @@ const presentationSchema = z
 
 const resultSchema = z
   .object({
-    headline: z.string().trim().min(1),
+    headline: shortCopy,
+    feedback: shortCopy,
   })
   .strict();
+
+const confrontationCopySchema = z.object({
+  headline: shortCopy,
+  instructionsStatus: z.string().trim().min(1).max(300),
+}).strict();
 
 export const episodeSchema = z
   .object({
     schemaVersion: z.literal(1),
-    id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+    id: contentIdSchema,
     title: z.string().trim().min(1),
     confrontation: z
       .object({
         resistance: resistanceConfigSchema,
         presentation: presentationSchema,
+        copy: confrontationCopySchema,
       })
       .strict(),
     results: z

@@ -11,14 +11,13 @@ export type ResistanceLayout = {
   animateForcedVerticalisation(): void;
 };
 
-type Presentation = Episode["confrontation"]["presentation"];
-
 export function createResistanceLayout(
   scene: Phaser.Scene,
-  presentation: Presentation,
+  episode: Episode,
 ): ResistanceLayout {
+  const presentation = episode.confrontation.presentation;
   switch (presentation.layout) {
     case "bed-head-right":
-      return createBedHeadRightLayout(scene, presentation);
+      return createBedHeadRightLayout(scene, episode);
   }
 }
