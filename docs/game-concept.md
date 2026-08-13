@@ -181,6 +181,10 @@ The game's logo and art direction should be original.
 
 Every successful action needs satisfying feedback: mattress movement, duvet snaps, meter recovery, character effort, and escalating music. Corporate attacks could arrive through notification chimes, video-call tones, office alarms, and motivational voice lines.
 
+The default audio direction is original procedural synthesis rather than sampled effects. Duvet pulls, rhythm ticks, notification chirps, warning alarms, victory and failure stings, and fluorescent office hum can be generated mathematically and tuned with the gameplay. This provides especially clear provenance and may remain suitable for production if the resulting sound design is strong enough.
+
+The Orange Fella does not need intelligible recorded dialogue. He can rumble, bluster and punctuate scenes through an original, unintelligible synthesised voice while speech bubbles carry his actual words. This makes him sound like noisy managerial power without cloning or impersonating a real person. It also keeps politically important dialogue readable.
+
 Mobile vibration should be optional. Sound, colour, and motion cues should never be the sole way critical information is communicated.
 
 ## Accessibility and comfort

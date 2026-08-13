@@ -99,6 +99,42 @@ Avoid class hierarchies, service containers, unnecessary design patterns and pre
 - Failure should remain funny, dramatic and sad rather than becoming empty slapstick.
 - Do not introduce a conventional currency, grind, upgrade economy, daily streak or retention machinery without explicit discussion; their absence is part of the satire.
 
+## Artwork production
+
+AI-generated artwork may be used for prototypes and may be considered for production, but “generated” or “original-looking” must never be treated as a guarantee of uniqueness, copyright protection or non-infringement.
+
+Follow this production-conscious workflow:
+
+1. Start from an original project art brief. Do not request imitation of a living artist or named entertainment property.
+2. Keep the Orange Fella a fictional political and corporate archetype rather than reproducing a real person's face.
+3. Review every generated asset for recognisable characters, logos, branding, signatures, watermarks and suspiciously specific similarities.
+4. Apply meaningful human art direction through selection, iteration, editing, repainting, compositing and adaptation to the project's visual system.
+5. Preserve provenance: prompts, source generations, generation date and tool, edits, licences, contributors and replacement status.
+6. Record every asset in an asset manifest, distinguishing prototype placeholders from production-approved material.
+7. Prefer human-created or substantially human-refined work for identity-critical assets, particularly the logo, protagonist and recurring boss.
+8. Ensure layered assets are deliberately prepared for their role in cut-out animation; do not ship accidental generation artefacts or flattened images where separate parts are required.
+9. Do not claim that generated work is human-made. Make any disclosure required by applicable law, storefront rules or project policy.
+10. Before a consequential commercial release, review prominent AI-assisted assets for intellectual-property, likeness and trademark risk and obtain professional advice where appropriate.
+
+The maintainer owns output as between the maintainer and the generation service only to the extent provided by the applicable service terms and law. Similar output may be produced for others, and copyrightability varies by jurisdiction. Treat these limitations as part of production risk management.
+
+## Audio production
+
+Procedural synthesis is the default direction for prototype audio and may remain the production direction when the results are good enough.
+
+- Generate sound effects mathematically in project-owned code rather than relying on samples where practical.
+- Initial targets include duvet pulls, rhythm ticks, notification chirps, warning alarms, victory and failure stings, and fluorescent office hum.
+- Keep synthesis parameters explicit and reproducible so sounds can be tuned alongside gameplay.
+- Do not incorporate unlicensed samples, recordings, melodies or other third-party audio into procedural output.
+- Treat any externally sourced sound as a licensed asset and record its creator, source, licence, attribution requirements and permitted uses in the asset manifest.
+- Avoid imitating a named musician, performer, politician or other identifiable person's voice or musical style.
+
+The Orange Fella should communicate through an original, unintelligible synthesised rumble or bluster. Speech bubbles carry the actual words. His vocal sound may convey timing, mood, interruption and comic emphasis, but it must not clone or closely reproduce a real person's voice.
+
+This approach is both an aesthetic choice and a provenance choice: the boss becomes a noisy embodiment of managerial power rather than a voiced impersonation, while all politically important dialogue remains readable and accessible.
+
+If a human composer, performer or sound designer later contributes production audio, use a written agreement covering game and marketing use, commercial distribution, platforms, territories, duration, modification, looping, attribution, ownership or licence terms, and any permitted generative-AI use.
+
 ## Files and imports
 
 - Keep global page styles under `src/styles/`.

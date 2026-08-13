@@ -9,9 +9,10 @@ The Horizontal Front will be built as a web-first 2D game using:
 - **Vite** for local development and production builds.
 - **HTML and CSS** for the page shell, accessibility controls and non-game interface where appropriate.
 - **JSON validated against TypeScript schemas** for episodes, confrontations and cartoon compositions.
-- **A static web release first**, with Progressive Web App support considered when useful.
+- **A static, offline-capable web release first**, with a Progressive Web App manifest and service worker used to cache the files required for play.
 - **Capacitor later**, if and when the same game is prepared for iOS and Android stores.
-- **No backend initially.** Device-local settings and progress can use browser storage.
+- **No application backend.** Device-local settings and progress can use browser storage.
+- **No tracking or monetisation.** The deployed game does not require analytics, advertising, payments or player accounts.
 
 The first release target is a responsive, landscape-oriented browser game with touch, keyboard and pointer support.
 
@@ -183,6 +184,16 @@ The game will be implemented and tested in the browser first. The same responsiv
 
 If native distribution becomes worthwhile, Capacitor can package the web build for iOS and Android and expose native features such as haptics. Native wrappers should not fork the game rules or episode content.
 
+## Hosting, offline use and distribution
+
+The canonical public site is **[thehorizontalfront.org](https://thehorizontalfront.org)**. Production builds consist only of static HTML, CSS, JavaScript, episode data and media assets, so they can be served by an ordinary static host without application servers, accounts or remote databases.
+
+The browser release must remain usable without a network connection after its required files have been cached. The offline boundary includes the page shell, game code, episode data and the artwork and audio needed to play. Features should not acquire a runtime dependency on third-party APIs, remote fonts, analytics services or content delivery that would make the game fail when disconnected. Updates may of course require a connection to download a new static release.
+
+The repository and distributable project materials are intended to form part of the digital commons. Software will be distributed as free/open-source code, and the licences chosen for code, writing, artwork and audio should support inspection, sharing, study and adaptation. The exact licences remain an open decision; this document does not prematurely assign one licence to materials with different authorship or provenance.
+
+No tracking or monetisation is part of the architecture. The game should not collect behavioural analytics, profile players, serve advertising, sell access or include purchases. Device-local settings and progress stay on the device and should not be transmitted elsewhere.
+
 ## Initial exclusions
 
 The first version does not require:
@@ -196,7 +207,7 @@ The first version does not require:
 - Separate native game implementations.
 - A general-purpose visual game editor.
 
-These exclusions keep the technical system aligned with the project's deliberate simplicity. They can be reconsidered only when a concrete requirement justifies them.
+These exclusions keep the technical system aligned with the project's deliberate simplicity. They can be reconsidered only when a concrete requirement justifies them and the change does not weaken the static, offline-capable, non-tracking and non-commercial commitments above.
 
 ## Technical principles
 
@@ -208,4 +219,6 @@ These exclusions keep the technical system aligned with the project's deliberate
 6. **Time-based calculations must not depend on frame rate.**
 7. **The browser is the first and canonical runtime.**
 8. **Native packaging must not create a second implementation.**
-9. **Add infrastructure only in response to a demonstrated need.**
+9. **Static releases remain playable offline after their required files are cached.**
+10. **No feature depends on tracking, advertising, payments or accounts.**
+11. **Add infrastructure only in response to a demonstrated need.**
