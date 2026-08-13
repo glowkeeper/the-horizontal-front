@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   advanceResistance, applyResistanceInput, createResistance,
-  getDramaticIntensity, getNextRhythmCue,
+  getDramaticIntensity, getNextRhythmCue, getRhythmGuide,
 } from "../../../src/play/engine/resistance";
 import type {
   Resistance, ResistanceConfig, ResistanceSide,
@@ -33,6 +33,11 @@ const config: ResistanceConfig = {
     { action: "tap", side: "right", atMs: 1_000, releaseAtMs: null, timingWindowMs: 100, phaseIndex: 0 },
     { action: "hold", side: "left", atMs: 2_500, releaseAtMs: 3_000, timingWindowMs: 100, phaseIndex: 1 },
   ],
+  guideEvents: [
+    { action: "tap", side: "left", atMs: 500, endsAtMs: 600, phaseIndex: 0 },
+    { action: "tap", side: "right", atMs: 1_000, endsAtMs: 1_100, phaseIndex: 0 },
+    { action: "hold", side: "left", atMs: 2_500, endsAtMs: 3_000, phaseIndex: 1 },
+  ],
 };
 
 describe("resistance engine", () => {
@@ -51,6 +56,41 @@ describe("resistance engine", () => {
     expect(once.state.duvetSafety).toBeCloseTo(0.32);
   });
 
+  it("orders passive pressure and expired cues independently of update frequency", () => {
+    const once = advanceResistance(createResistance(config), 3_500);
+    let stepped = createResistance(config);
+    for (let atMs = 100; atMs <= 3_500; atMs += 100) {
+      stepped = advanceResistance(stepped, atMs);
+    }
+    expect(stepped.state.duvetSafety).toBeCloseTo(once.state.duvetSafety);
+    expect(stepped.state.rhythmMomentum).toBeCloseTo(once.state.rhythmMomentum);
+    expect(stepped.state.nextRhythmStep).toBe(once.state.nextRhythmStep);
+    expect(stepped.state.outcome).toBe(once.state.outcome);
+  });
+
+  it("pauses pressure and dramatic movement during READY and REST", () => {
+    const paused: ResistanceConfig = {
+      ...config,
+      cues: [],
+      guideEvents: [
+        { action: "count-in", atMs: 0, endsAtMs: 500, phaseIndex: 0 },
+        { action: "rest", atMs: 1_000, endsAtMs: 1_500, phaseIndex: 0 },
+      ],
+    };
+    const duringReady = advanceResistance(createResistance(paused), 250);
+    expect(duringReady.state.duvetSafety).toBeCloseTo(0.8);
+    expect(duringReady.state.dramaticIntensity).toBeCloseTo(0);
+
+    const atRestStart = advanceResistance(duringReady, 1_000);
+    const duringRest = advanceResistance(atRestStart, 1_250);
+    expect(duringRest.state.duvetSafety).toBeCloseTo(atRestStart.state.duvetSafety);
+    expect(duringRest.state.dramaticIntensity).toBeCloseTo(
+      atRestStart.state.dramaticIntensity,
+    );
+    expect(advanceResistance(duringRest, 1_500).state.duvetSafety)
+      .toBeCloseTo(atRestStart.state.duvetSafety);
+  });
+
   it("interpolates the authored dramatic curve", () => {
     expect(getDramaticIntensity(config, 1_000)).toBeCloseTo(0.2);
     expect(getDramaticIntensity(config, 3_000)).toBeCloseTo(0.7);
@@ -60,6 +100,23 @@ describe("resistance engine", () => {
     expect(getNextRhythmCue(createResistance(config))).toMatchObject({
       action: "tap", side: "left", atMs: 500, step: 0,
     });
+  });
+
+  it("exposes guide events without turning rests into scored cues", () => {
+    const guided: ResistanceConfig = {
+      ...config,
+      guideEvents: [
+        { action: "count-in", atMs: 0, endsAtMs: 500, phaseIndex: 0 },
+        ...config.guideEvents,
+        { action: "rest", atMs: 1_100, endsAtMs: 1_500, phaseIndex: 0 },
+      ],
+    };
+    expect(getRhythmGuide(createResistance(guided))).toMatchObject([
+      { action: "count-in", timing: "now" },
+      { action: "tap", side: "left", timing: "next" },
+      { action: "tap", side: "right", timing: "then" },
+    ]);
+    expect(guided.cues).toHaveLength(config.cues.length);
   });
 
   it("rewards an accurately timed tap", () => {
@@ -134,7 +191,12 @@ describe("resistance engine", () => {
   });
 
   it("fails at the precise time phase pressure removes safety", () => {
-    const dangerous = { ...config, startingSafety: 0.1 };
+    const dangerous = {
+      ...config,
+      startingSafety: 0.1,
+      cues: [],
+      guideEvents: [],
+    };
     const result = advanceResistance(createResistance(dangerous), 2_000);
     expect(result.state.outcome).toBe("forced-verticalisation");
     expect(result.state.elapsedMs).toBeCloseTo(1_000);

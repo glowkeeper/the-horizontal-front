@@ -45,7 +45,14 @@ describe("catalogued resistance composition", () => {
         { id: "pressure", startsAtMs: 10_000, endsAtMs: 18_000 },
         { id: "crisis", startsAtMs: 18_000, endsAtMs: 23_000 },
       ]);
-    expect(config.cues.some(({ atMs }) => atMs === 11_750)).toBe(true);
+    expect(config.guideEvents.some(({ action }) => action === "rest")).toBe(true);
+    const opening = config.guideEvents.filter(({ action }) => action === "count-in");
+    expect(opening).toEqual([expect.objectContaining({ atMs: 0, phaseIndex: 0 })]);
+    expect(opening[0].endsAtMs).toBe(
+      config.cues[0].atMs - config.cues[0].timingWindowMs,
+    );
+    expect(config.guideEvents.some((event) =>
+      event.action === "rest" && event.phaseIndex > 0)).toBe(true);
     expect(config.cues.every((cue, index) => index === 0 || cue.atMs >= config.cues[index - 1].atMs))
       .toBe(true);
   });
@@ -116,6 +123,21 @@ describe("catalogued resistance composition", () => {
     let resisted = createResistance(config);
     for (const [index, cue] of config.cues.entries()) {
       if (index % 7 === 6) continue;
+      resisted = applyResistanceInput(resisted, {
+        side: cue.side,
+        action: "press",
+        atMs: cue.atMs,
+      });
+    }
+    resisted = advanceResistance(resisted, config.durationMs);
+    expect(resisted.state.outcome).toBe("victory");
+  });
+
+  it("allows the opening episode to recover after several consecutive misses", () => {
+    const config = game.entryEpisode.confrontation.resistance;
+    let resisted = createResistance(config);
+    for (const [index, cue] of config.cues.entries()) {
+      if (index >= 7 && index <= 10) continue;
       resisted = applyResistanceInput(resisted, {
         side: cue.side,
         action: "press",

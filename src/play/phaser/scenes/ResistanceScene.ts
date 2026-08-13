@@ -16,11 +16,13 @@ import {
   applyResistanceInput,
   createResistance,
   getNextRhythmCue,
+  getRhythmGuide,
 } from "../../engine/resistance";
 import type {
   Resistance,
   ResistanceSide,
   RhythmJudgement,
+  RhythmGuideItem,
 } from "../../engine/types";
 import { getResistanceControlAction } from "../../input/resistanceInput";
 import { createTextStyles, getThemeColour } from "../../theme/theme";
@@ -51,8 +53,12 @@ export class ResistanceScene extends Phaser.Scene {
 
   private leftCue!: Phaser.GameObjects.Arc;
   private rightCue!: Phaser.GameObjects.Arc;
+  private leftCueLabel!: Phaser.GameObjects.Text;
+  private rightCueLabel!: Phaser.GameObjects.Text;
   private feedback!: Phaser.GameObjects.Text;
-  private nextCue!: Phaser.GameObjects.Text;
+  private cueLabel!: Phaser.GameObjects.Text;
+  private timingTarget!: Phaser.GameObjects.Arc;
+  private timingApproach!: Phaser.GameObjects.Arc;
   private timeRemaining!: Phaser.GameObjects.Text;
   private result!: Phaser.GameObjects.Text;
   private transitioning = false;
@@ -165,13 +171,13 @@ export class ResistanceScene extends Phaser.Scene {
       )
       .setStrokeStyle(controls.strokeWidth, colours.resistanceRed);
 
-    this.add
+    this.leftCueLabel = this.add
       .text(anchors.leftControl.x, anchors.leftControl.y, game.mechanics.resistance.leftControl, {
         ...createTextStyles().notice,
         fontSize: "15px",
       })
       .setOrigin(0.5);
-    this.add
+    this.rightCueLabel = this.add
       .text(anchors.rightControl.x, anchors.rightControl.y, game.mechanics.resistance.rightControl, {
         ...createTextStyles().notice,
         fontSize: "15px",
@@ -179,19 +185,34 @@ export class ResistanceScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.feedback = this.add
-      .text(anchors.feedback.x, anchors.feedback.y, game.mechanics.resistance.initialFeedback, {
+      .text(anchors.feedback.x, anchors.feedback.y, "", {
         ...createTextStyles().status,
         fontSize: "19px",
       })
-      .setOrigin(0.5);
+      .setOrigin(0.5)
+      .setVisible(false);
 
-    this.nextCue = this.add
-      .text(anchors.nextCue.x, anchors.nextCue.y, "", {
-        ...createTextStyles().notice,
-        color: getThemeColour("resistanceRed"),
-        fontSize: "20px",
-      })
-      .setOrigin(0.5);
+    const cueY = anchors.feedback.y - controls.cueOffsetY;
+    this.timingTarget = this.add.circle(
+      anchors.feedback.x,
+      cueY,
+      controls.timingTargetRadius,
+    )
+      .setFillStyle(colours.paperWhite, 0)
+      .setStrokeStyle(controls.timingRingStrokeWidth, colours.inkCharcoal);
+    this.timingApproach = this.add.circle(
+      anchors.feedback.x,
+      cueY,
+      controls.timingApproachRadius,
+    )
+      .setFillStyle(colours.paperWhite, 0)
+      .setStrokeStyle(controls.timingRingStrokeWidth, colours.inkCharcoal);
+    this.cueLabel = this.add.text(anchors.feedback.x, cueY, "", {
+      ...createTextStyles().notice,
+      align: "center",
+      fixedWidth: controls.cueLabelWidth,
+      fontSize: "18px",
+    }).setOrigin(0.5);
   }
 
   private bindInput(): void {
@@ -246,6 +267,7 @@ export class ResistanceScene extends Phaser.Scene {
   private renderResistance(): void {
     const state = this.resistance.state;
     const cue = getNextRhythmCue(this.resistance);
+    const [guide] = getRhythmGuide(this.resistance, 1);
 
     if (
       state.lastRhythmJudgement?.kind === "miss"
@@ -267,40 +289,61 @@ export class ResistanceScene extends Phaser.Scene {
       { seconds: (remainingMs / 1_000).toFixed(1) },
     ));
 
-    this.leftCue.setScale(1);
-    this.rightCue.setScale(1);
     this.leftCue.setFillStyle(this.colours().paperWhite);
     this.rightCue.setFillStyle(this.colours().paperWhite);
+    this.leftCue.setAlpha(0.5);
+    this.rightCue.setAlpha(0.5);
+    this.leftCueLabel
+      .setAlpha(0.55)
+      .setColor(getThemeColour("inkCharcoal"))
+      .setText(game.mechanics.resistance.leftControl);
+    this.rightCueLabel
+      .setAlpha(0.55)
+      .setColor(getThemeColour("inkCharcoal"))
+      .setText(game.mechanics.resistance.rightControl);
+    this.leftCue.setStrokeStyle(
+      this.layout.content.controls.strokeWidth,
+      this.colours().resistanceRed,
+    );
+    this.rightCue.setStrokeStyle(
+      this.layout.content.controls.strokeWidth,
+      this.colours().resistanceRed,
+    );
+    this.renderCentralCue(guide);
 
-    if (cue) {
+    if (
+      cue
+      && guide
+      && (guide.action === "tap" || guide.action === "hold")
+      && guide.side === cue.side
+    ) {
       const cueAtMs = state.activeHold?.step === cue.step
         ? (cue.releaseAtMs ?? cue.atMs)
         : cue.atMs;
-      const distanceMs = Math.abs(cueAtMs - state.elapsedMs);
-      const isNow = distanceMs
-        <= cue.timingWindowMs;
-      const pulse = Math.max(
-        0,
-        1 - distanceMs / Math.max(1, cue.timingWindowMs * 3),
-      );
+      const isNow = Math.abs(cueAtMs - state.elapsedMs) <= cue.timingWindowMs;
       const expectedCue = cue.side === "left" ? this.leftCue : this.rightCue;
-      if (isNow) {
-        expectedCue.setFillStyle(this.colours().managementGold);
-      }
-      expectedCue.setScale(1 + pulse * this.layout.content.controls.pulseScale);
-      this.nextCue.setText(
-        isNow
-          ? formatCopy(
-            cue.action === "hold" && state.activeHold
-              ? game.mechanics.resistance.release
-              : game.mechanics.resistance.now,
-            {
-              side: cue.side.toUpperCase(),
-            },
-          )
-          : "",
-      );
-
+      const expectedLabel = cue.side === "left"
+        ? this.leftCueLabel
+        : this.rightCueLabel;
+      expectedCue
+        .setAlpha(1)
+        .setFillStyle(
+          isNow
+            ? this.colours().resistanceRed
+            : this.colours().managementGold,
+        )
+        .setStrokeStyle(
+          this.layout.content.controls.activeStrokeWidth,
+          this.colours().inkCharcoal,
+        );
+      expectedLabel
+        .setAlpha(1)
+        .setColor(getThemeColour(isNow ? "paperWhite" : "inkCharcoal"))
+        .setText(isNow
+          ? game.mechanics.resistance.cueHitNow
+          : cue.side === "left"
+            ? game.mechanics.resistance.leftControl
+            : game.mechanics.resistance.rightControl);
       if (isNow && cue.step !== this.lastAnnouncedNowStep) {
         this.lastAnnouncedNowStep = cue.step;
 
@@ -310,6 +353,7 @@ export class ResistanceScene extends Phaser.Scene {
           && state.lastRhythmJudgement.step === cue.step
         ) {
           this.feedback
+            .setVisible(true)
             .setColor(getThemeColour("inkCharcoal"))
             .setText(formatCopy(cue.action === "hold"
               ? game.mechanics.resistance.hold
@@ -319,6 +363,47 @@ export class ResistanceScene extends Phaser.Scene {
         }
       }
     }
+  }
+
+  private renderCentralCue(guide: RhythmGuideItem | undefined): void {
+    const visible = guide !== undefined;
+    this.cueLabel.setVisible(visible);
+    this.timingTarget.setVisible(visible);
+    this.timingApproach.setVisible(visible);
+    if (!guide) return;
+
+    const hasControlTarget = guide.action === "tap" || guide.action === "hold";
+    const target = hasControlTarget
+      ? guide.side === "left"
+        ? this.layout.content.anchors.leftControl
+        : this.layout.content.anchors.rightControl
+      : {
+          x: this.layout.content.anchors.feedback.x,
+          y: this.layout.content.anchors.feedback.y
+            - this.layout.content.controls.cueOffsetY,
+        };
+    this.timingTarget.setPosition(target.x, target.y);
+    this.timingApproach.setPosition(target.x, target.y);
+    this.cueLabel
+      .setVisible(!hasControlTarget)
+      .setText(formatCueItem(guide));
+    const targetAtMs = guide.action === "count-in"
+      ? guide.endsAtMs
+      : guide.action === "hold" && this.resistance.state.activeHold
+        ? guide.endsAtMs
+        : guide.atMs;
+    const controls = this.layout.content.controls;
+    const progress = Phaser.Math.Clamp(
+      1 - (targetAtMs - this.resistance.state.elapsedMs)
+        / controls.timingApproachDurationMs,
+      0,
+      1,
+    );
+    this.timingApproach.setRadius(Phaser.Math.Linear(
+      controls.timingApproachRadius,
+      controls.timingTargetRadius,
+      progress,
+    ));
   }
 
   private renderJudgement(
@@ -339,6 +424,7 @@ export class ResistanceScene extends Phaser.Scene {
       yoyo: true,
     });
     this.feedback.setScale(1.12);
+    this.feedback.setVisible(true);
     this.tweens.add({
       targets: this.feedback,
       scaleX: 1,
@@ -349,14 +435,14 @@ export class ResistanceScene extends Phaser.Scene {
 
     if (judgement.kind === "hit") {
       this.feedback
-        .setColor(getThemeColour("resistanceRed"))
+        .setColor(getThemeColour("workLightBlue"))
         .setText(formatCopy(game.mechanics.resistance.hit, {
           side: judgement.expectedSide.toUpperCase(),
         }));
       return;
     }
 
-    this.feedback.setColor(getThemeColour("inkCharcoal"));
+    this.feedback.setColor(getThemeColour("resistanceRed"));
 
     if (judgement.reason === "wrong-side") {
       this.feedback.setText(formatCopy(game.mechanics.resistance.wrongSide, {
@@ -386,9 +472,19 @@ export class ResistanceScene extends Phaser.Scene {
 
   private finishConfrontation(): void {
     this.finished = true;
-    this.nextCue.setText("");
-    this.leftCue.setScale(1).setFillStyle(this.colours().paperWhite);
-    this.rightCue.setScale(1).setFillStyle(this.colours().paperWhite);
+    this.cueLabel.setVisible(false);
+    this.timingTarget.setVisible(false);
+    this.timingApproach.setVisible(false);
+    this.leftCue.setFillStyle(this.colours().paperWhite);
+    this.rightCue.setFillStyle(this.colours().paperWhite);
+    this.leftCue.setAlpha(1);
+    this.rightCue.setAlpha(1);
+    this.leftCueLabel
+      .setAlpha(1)
+      .setColor(getThemeColour("inkCharcoal"));
+    this.rightCueLabel
+      .setAlpha(1)
+      .setColor(getThemeColour("inkCharcoal"));
     const victory = this.resistance.state.outcome === "victory";
     const resultContent = victory
       ? this.episode.results.victory
@@ -403,6 +499,7 @@ export class ResistanceScene extends Phaser.Scene {
       )
       .setVisible(true);
     this.feedback.setText(resultContent.feedback);
+    this.feedback.setVisible(true);
     if (victory) {
       this.layout.animateVictory();
     } else {
@@ -488,4 +585,21 @@ function pointerSide(pointer: Phaser.Input.Pointer, centreX: number): Resistance
 function isEpisodeReference(value: unknown, expectedId: string): boolean {
   return typeof value === "object" && value !== null
     && "id" in value && (value as { id?: unknown }).id === expectedId;
+}
+
+function formatCueItem(item: RhythmGuideItem): string {
+  switch (item.action) {
+    case "rest":
+      return game.mechanics.resistance.cueRest;
+    case "count-in":
+      return game.mechanics.resistance.cueCountIn;
+    case "hold":
+      return formatCopy(game.mechanics.resistance.cueHold, {
+        side: item.side.toUpperCase(),
+      });
+    case "tap":
+      return formatCopy(game.mechanics.resistance.cueTap, {
+        side: item.side.toUpperCase(),
+      });
+  }
 }

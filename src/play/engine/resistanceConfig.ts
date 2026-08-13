@@ -35,6 +35,15 @@ export function assertValidResistanceConfig(config: ResistanceConfig): void {
     }
     previousAt = cue.atMs;
   }
+  for (const [index, event] of config.guideEvents.entries()) {
+    if (event.atMs < 0 || event.endsAtMs <= event.atMs
+      || event.endsAtMs > config.durationMs) {
+      throw new Error(`guideEvents[${index}] must fit inside durationMs`);
+    }
+    if (!config.phases[event.phaseIndex]) {
+      throw new Error(`guideEvents[${index}] has an invalid phaseIndex`);
+    }
+  }
 }
 
 function assertPositive(name: string, value: number): void {

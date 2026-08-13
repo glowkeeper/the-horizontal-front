@@ -97,7 +97,7 @@ describe("game content loading", () => {
     const episode = loadTestEpisode(episodeContent);
     const resistance = createResistance(episode.confrontation.resistance);
     expect(resistance.config).toBe(episode.confrontation.resistance);
-    expect(resistance.state.duvetSafety).toBe(0.78);
+    expect(resistance.state.duvetSafety).toBe(0.85);
   });
 
   it("rejects unknown episode fields and overlapping rhythm windows", () => {

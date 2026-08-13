@@ -23,6 +23,21 @@ export type ScoredRhythmCue =
       readonly releaseAtMs: number;
     });
 
+export type RhythmGuideEvent =
+  | {
+      readonly action: "tap" | "hold";
+      readonly side: ResistanceSide;
+      readonly atMs: number;
+      readonly endsAtMs: number;
+      readonly phaseIndex: number;
+    }
+  | {
+      readonly action: "rest" | "count-in";
+      readonly atMs: number;
+      readonly endsAtMs: number;
+      readonly phaseIndex: number;
+    };
+
 export type ResistancePhase = {
   readonly id: string;
   readonly startsAtMs: number;
@@ -45,6 +60,7 @@ export type ResistanceConfig = {
   readonly startingSafety: number;
   readonly phases: readonly ResistancePhase[];
   readonly cues: readonly ScoredRhythmCue[];
+  readonly guideEvents: readonly RhythmGuideEvent[];
 };
 
 export type ResistanceOutcome = "active" | "victory" | "forced-verticalisation";
@@ -90,3 +106,7 @@ export type Resistance = {
 };
 
 export type RhythmCue = ScoredRhythmCue & { readonly step: number };
+
+export type RhythmGuideItem = RhythmGuideEvent & {
+  readonly timing: "now" | "next" | "then";
+};

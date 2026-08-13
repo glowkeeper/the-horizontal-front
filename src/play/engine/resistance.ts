@@ -6,7 +6,7 @@ import type {
   ResistancePhase,
   ResistanceState,
   RhythmCue,
-  RhythmJudgement,
+  RhythmGuideItem,
   ScoredRhythmCue,
 } from "./types";
 
@@ -34,42 +34,80 @@ export function advanceResistance(resistance: Resistance, toMs: number): Resista
   if (resistance.state.outcome !== "active" || toMs === resistance.state.elapsedMs) return resistance;
 
   const effectiveToMs = Math.min(toMs, resistance.config.durationMs);
-  const lost = integratePressure(resistance.config.phases, resistance.state.elapsedMs, effectiveToMs);
-  if (lost >= resistance.state.duvetSafety) {
-    const failureAtMs = findFailureTime(resistance.config.phases, resistance.state.elapsedMs, resistance.state.duvetSafety);
-    return withState(resistance, {
-      ...resistance.state,
-      duvetSafety: 0,
-      elapsedMs: failureAtMs,
-      dramaticIntensity: getDramaticIntensity(resistance.config, failureAtMs),
-      outcome: "forced-verticalisation",
-    });
+  let cursorMs = resistance.state.elapsedMs;
+  let duvetSafety = resistance.state.duvetSafety;
+  let rhythmMomentum = resistance.state.rhythmMomentum;
+  let nextRhythmStep = resistance.state.nextRhythmStep;
+  let activeHold = resistance.state.activeHold;
+  let lastRhythmJudgement = resistance.state.lastRhythmJudgement;
+
+  while (nextRhythmStep < resistance.config.cues.length) {
+    const cue = resistance.config.cues[nextRhythmStep];
+    const deadline = activeHold?.step === nextRhythmStep
+      && cue.action === "hold"
+      ? cue.releaseAtMs + cue.timingWindowMs
+      : cue.atMs + cue.timingWindowMs;
+    if (deadline >= effectiveToMs) break;
+
+    const pressureLoss = integratePressure(resistance.config, cursorMs, deadline);
+    if (pressureLoss >= duvetSafety) {
+      return pressureFailure(resistance, cursorMs, deadline, duvetSafety, {
+        rhythmMomentum,
+        nextRhythmStep,
+        activeHold,
+        lastRhythmJudgement,
+      });
+    }
+    duvetSafety -= pressureLoss;
+    cursorMs = deadline;
+
+    const phase = resistance.config.phases[cue.phaseIndex];
+    duvetSafety = clamp01(duvetSafety - phase.safetyPenaltyPerMiss);
+    rhythmMomentum = clamp01(rhythmMomentum - phase.momentumLoss);
+    lastRhythmJudgement = {
+      kind: "miss",
+      reason: "expired",
+      expectedSide: cue.side,
+      actualSide: null,
+      step: nextRhythmStep,
+      action: cue.action,
+    };
+    nextRhythmStep += 1;
+    activeHold = null;
+    if (duvetSafety === 0) {
+      return withState(resistance, {
+        ...resistance.state,
+        duvetSafety: 0,
+        rhythmMomentum,
+        nextRhythmStep,
+        activeHold,
+        elapsedMs: deadline,
+        dramaticIntensity: getDramaticIntensity(resistance.config, deadline),
+        outcome: "forced-verticalisation",
+        lastRhythmJudgement,
+      });
+    }
   }
 
-  const safetyAfterPressure = resistance.state.duvetSafety - lost;
-  const expired = expireCues(resistance, effectiveToMs, safetyAfterPressure);
-  if (expired.failureAtMs !== null) {
-    return withState(resistance, {
-      ...resistance.state,
-      duvetSafety: 0,
-      rhythmMomentum: clamp01(resistance.state.rhythmMomentum - expired.momentumLoss),
-      nextRhythmStep: expired.nextStep,
-      activeHold: null,
-      elapsedMs: expired.failureAtMs,
-      dramaticIntensity: getDramaticIntensity(resistance.config, expired.failureAtMs),
-      outcome: "forced-verticalisation",
-      lastRhythmJudgement: expired.lastJudgement,
+  const finalPressureLoss = integratePressure(resistance.config, cursorMs, effectiveToMs);
+  if (finalPressureLoss >= duvetSafety) {
+    return pressureFailure(resistance, cursorMs, effectiveToMs, duvetSafety, {
+      rhythmMomentum,
+      nextRhythmStep,
+      activeHold,
+      lastRhythmJudgement,
     });
   }
+  duvetSafety -= finalPressureLoss;
   const nextState: ResistanceState = {
     ...resistance.state,
-    duvetSafety: clamp01(safetyAfterPressure - expired.safetyPenalty),
-    rhythmMomentum: clamp01(resistance.state.rhythmMomentum - expired.momentumLoss),
-    nextRhythmStep: expired.nextStep,
-    activeHold: expired.activeHold,
+    duvetSafety: clamp01(duvetSafety),
+    rhythmMomentum,
+    nextRhythmStep,
+    activeHold,
     elapsedMs: effectiveToMs,
     dramaticIntensity: getDramaticIntensity(resistance.config, effectiveToMs),
-    lastRhythmJudgement: expired.lastJudgement ?? resistance.state.lastRhythmJudgement,
+    lastRhythmJudgement,
   };
   return withState(resistance, effectiveToMs === resistance.config.durationMs
     ? { ...nextState, outcome: "victory" }
@@ -108,11 +146,46 @@ export function getNextRhythmCue(resistance: Resistance): RhythmCue | null {
   return cue ? { ...cue, step } : null;
 }
 
+export function getRhythmGuide(
+  resistance: Resistance,
+  length = 3,
+): readonly RhythmGuideItem[] {
+  if (resistance.state.outcome !== "active" || length <= 0) return [];
+  const elapsedMs = resistance.state.elapsedMs;
+  const visible = resistance.config.guideEvents
+    .filter((event) => event.endsAtMs > elapsedMs)
+    .slice(0, length);
+  let futureIndex = 0;
+  return visible.map((event) => {
+    if (event.atMs <= elapsedMs) return { ...event, timing: "now" as const };
+    const timing = futureIndex === 0 ? "next" as const : "then" as const;
+    futureIndex += 1;
+    return { ...event, timing };
+  });
+}
+
+export function isResistancePaused(resistance: Resistance): boolean {
+  return resistance.config.guideEvents.some((event) =>
+    isPauseEvent(event)
+    && event.atMs <= resistance.state.elapsedMs
+    && event.endsAtMs > resistance.state.elapsedMs);
+}
+
 export function getDramaticIntensity(config: ResistanceConfig, atMs: number): number {
   const phase = getPhase(config.phases, Math.min(atMs, config.durationMs));
-  const progress = phase.endsAtMs === phase.startsAtMs
+  const activeDuration = getUnpausedDuration(
+    config,
+    phase.startsAtMs,
+    phase.endsAtMs,
+  );
+  const elapsedActiveDuration = getUnpausedDuration(
+    config,
+    phase.startsAtMs,
+    Math.min(atMs, phase.endsAtMs),
+  );
+  const progress = activeDuration === 0
     ? 1
-    : clamp01((atMs - phase.startsAtMs) / (phase.endsAtMs - phase.startsAtMs));
+    : clamp01(elapsedActiveDuration / activeDuration);
   return linear(phase.presentationIntensity.from, phase.presentationIntensity.to, progress);
 }
 
@@ -143,6 +216,7 @@ function hit(resistance: Resistance, cue: ScoredRhythmCue, step: number, side: "
   const phase = resistance.config.phases[cue.phaseIndex];
   const momentum = clamp01(resistance.state.rhythmMomentum + phase.momentumGain * accuracy);
   const recovery = phase.recoveryPerAction * (0.5 + accuracy * 0.5)
+    * (0.35 + momentum * 0.65)
     * (1 + momentum * phase.momentumRecoveryBonus);
   return withState(resistance, {
     ...resistance.state,
@@ -176,67 +250,87 @@ function miss(resistance: Resistance, cue: ScoredRhythmCue, step: number, reason
   });
 }
 
-function expireCues(
-  resistance: Resistance,
-  toMs: number,
-  availableSafety: number,
-) {
-  let nextStep = resistance.state.nextRhythmStep;
-  let activeHold = resistance.state.activeHold;
-  let momentumLoss = 0;
-  let safetyPenalty = 0;
-  let failureAtMs: number | null = null;
-  let lastJudgement: RhythmJudgement | null = null;
-  while (nextStep < resistance.config.cues.length) {
-    const cue = resistance.config.cues[nextStep];
-    const deadline = activeHold && activeHold.step === nextStep
-      && cue.action === "hold"
-      ? cue.releaseAtMs + cue.timingWindowMs
-      : cue.atMs + cue.timingWindowMs;
-    if (deadline >= toMs) break;
-    const phase = resistance.config.phases[cue.phaseIndex];
-    momentumLoss += phase.momentumLoss;
-    safetyPenalty += phase.safetyPenaltyPerMiss;
-    lastJudgement = {
-      kind: "miss", reason: "expired", expectedSide: cue.side, actualSide: null,
-      step: nextStep, action: cue.action,
-    };
-    nextStep += 1;
-    activeHold = null;
-    if (safetyPenalty >= availableSafety) {
-      failureAtMs = deadline;
-      break;
-    }
-  }
-  return {
-    nextStep,
-    activeHold,
-    momentumLoss,
-    safetyPenalty,
-    failureAtMs,
-    lastJudgement,
-  };
-}
-
-function integratePressure(phases: readonly ResistancePhase[], fromMs: number, toMs: number): number {
-  return phases.reduce((total, phase) => {
-    const overlap = Math.max(0, Math.min(toMs, phase.endsAtMs) - Math.max(fromMs, phase.startsAtMs));
-    return total + phase.pressurePerSecond * overlap / MILLISECONDS_PER_SECOND;
+function integratePressure(config: ResistanceConfig, fromMs: number, toMs: number): number {
+  return config.phases.reduce((total, phase) => {
+    const start = Math.max(fromMs, phase.startsAtMs);
+    const end = Math.min(toMs, phase.endsAtMs);
+    if (end <= start) return total;
+    const activeDuration = getUnpausedDuration(config, start, end);
+    return total + phase.pressurePerSecond * activeDuration / MILLISECONDS_PER_SECOND;
   }, 0);
 }
 
-function findFailureTime(phases: readonly ResistancePhase[], fromMs: number, safety: number): number {
-  let remaining = safety;
-  for (const phase of phases) {
-    const start = Math.max(fromMs, phase.startsAtMs);
-    if (start >= phase.endsAtMs) continue;
-    const capacity = phase.pressurePerSecond * (phase.endsAtMs - start) / MILLISECONDS_PER_SECOND;
-    if (phase.pressurePerSecond > 0 && capacity >= remaining) {
-      return start + remaining / phase.pressurePerSecond * MILLISECONDS_PER_SECOND;
+function pressureFailure(
+  resistance: Resistance,
+  fromMs: number,
+  toMs: number,
+  safety: number,
+  progress: Pick<ResistanceState,
+    "rhythmMomentum" | "nextRhythmStep" | "activeHold" | "lastRhythmJudgement">,
+): Resistance {
+  const failureAtMs = findFailureTime(
+    resistance.config,
+    fromMs,
+    toMs,
+    safety,
+  );
+  return withState(resistance, {
+    ...resistance.state,
+    ...progress,
+    duvetSafety: 0,
+    elapsedMs: failureAtMs,
+    dramaticIntensity: getDramaticIntensity(resistance.config, failureAtMs),
+    outcome: "forced-verticalisation",
+  });
+}
+
+function findFailureTime(
+  config: ResistanceConfig,
+  fromMs: number,
+  toMs: number,
+  safety: number,
+): number {
+  let low = fromMs;
+  let high = toMs;
+  for (let iteration = 0; iteration < 48; iteration += 1) {
+    const middle = (low + high) / 2;
+    if (integratePressure(config, fromMs, middle) >= safety) {
+      high = middle;
+    } else {
+      low = middle;
     }
-    remaining -= capacity;
   }
-  return phases.at(-1)?.endsAtMs ?? fromMs;
+  return high;
+}
+
+function getUnpausedDuration(
+  config: ResistanceConfig,
+  fromMs: number,
+  toMs: number,
+): number {
+  if (toMs <= fromMs) return 0;
+  const pauses = config.guideEvents
+    .filter(isPauseEvent)
+    .map((event) => ({
+      start: Math.max(fromMs, event.atMs),
+      end: Math.min(toMs, event.endsAtMs),
+    }))
+    .filter(({ start, end }) => end > start)
+    .sort((left, right) => left.start - right.start);
+  let pausedDuration = 0;
+  let pauseEnd = fromMs;
+  for (const pause of pauses) {
+    const start = Math.max(pause.start, pauseEnd);
+    if (pause.end > start) pausedDuration += pause.end - start;
+    pauseEnd = Math.max(pauseEnd, pause.end);
+  }
+  return toMs - fromMs - pausedDuration;
+}
+
+function isPauseEvent(
+  event: ResistanceConfig["guideEvents"][number],
+): boolean {
+  return event.action === "rest" || event.action === "count-in";
 }
 
 function getPhase(phases: readonly ResistancePhase[], atMs: number): ResistancePhase {

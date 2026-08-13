@@ -1,4 +1,8 @@
-import type { ResistanceConfig, ScoredRhythmCue } from "../engine/types";
+import type {
+  ResistanceConfig,
+  RhythmGuideEvent,
+  ScoredRhythmCue,
+} from "../engine/types";
 import {
   dramaticCurveSchema,
   mechanicCatalogueSchema,
@@ -85,6 +89,7 @@ export function compileResistanceConfig(
   );
   let startsAtMs = 0;
   const cues: ScoredRhythmCue[] = [];
+  const guideEvents: RhythmGuideEvent[] = [];
   const phases = curve.phases.map((phase, phaseIndex) => {
     const rhythm = resolveOwnedDefinition(
       "rhythm",
@@ -93,7 +98,14 @@ export function compileResistanceConfig(
       scope.shared.rhythms,
       scope.rhythms,
     );
-    compilePhaseCues(rhythm, phase, phaseIndex, startsAtMs, cues);
+    compilePhaseCues(
+      rhythm,
+      phase,
+      phaseIndex,
+      startsAtMs,
+      cues,
+      guideEvents,
+    );
     const compiled = {
       id: phase.id,
       startsAtMs,
@@ -110,13 +122,33 @@ export function compileResistanceConfig(
     return compiled;
   });
   cues.sort((left, right) => left.atMs - right.atMs);
+  guideEvents.sort((left, right) => left.atMs - right.atMs);
+  const alignedGuideEvents = alignPausesWithInputWindows(guideEvents, cues);
   return {
     durationMs: startsAtMs,
     resolutionDurationMs: curve.resolutionDurationMs,
     startingSafety: curve.startingSafety,
     phases,
     cues,
+    guideEvents: alignedGuideEvents,
   };
+}
+
+function alignPausesWithInputWindows(
+  guideEvents: readonly RhythmGuideEvent[],
+  cues: readonly ScoredRhythmCue[],
+): RhythmGuideEvent[] {
+  return guideEvents.flatMap((event) => {
+    if (event.action !== "rest" && event.action !== "count-in") return [event];
+    const nextCue = cues.find((cue) =>
+      cue.atMs >= event.atMs && cue.atMs <= event.endsAtMs);
+    if (!nextCue) return [event];
+    const endsAtMs = Math.min(
+      event.endsAtMs,
+      nextCue.atMs - nextCue.timingWindowMs,
+    );
+    return endsAtMs > event.atMs ? [{ ...event, endsAtMs }] : [];
+  });
 }
 
 function resolveOwnedDefinition<T>(
@@ -162,15 +194,30 @@ function compilePhaseCues(
   phaseIndex: number,
   phaseStartMs: number,
   target: ScoredRhythmCue[],
+  guideTarget: RhythmGuideEvent[],
 ): void {
   const phaseEndMs = phaseStartMs + phase.durationMs;
   const cycleMs = rhythm.cycleBeats * phase.beatIntervalMs;
   const firstCycleMs = phaseStartMs + phase.leadInBeats * phase.beatIntervalMs;
+  if (firstCycleMs > phaseStartMs) {
+    guideTarget.push({
+      action: phaseIndex === 0 ? "count-in" : "rest",
+      atMs: phaseStartMs,
+      endsAtMs: firstCycleMs,
+      phaseIndex,
+    });
+  }
   for (let cycleStartMs = firstCycleMs; cycleStartMs < phaseEndMs; cycleStartMs += cycleMs) {
     for (const event of rhythm.events) {
-      if (event.action === "rest") continue;
       const atMs = cycleStartMs + event.atBeat * phase.beatIntervalMs;
       if (atMs >= phaseEndMs) continue;
+      if (event.action === "rest") {
+        const endsAtMs = atMs + event.durationBeats * phase.beatIntervalMs;
+        if (endsAtMs <= phaseEndMs) {
+          guideTarget.push({ action: "rest", atMs, endsAtMs, phaseIndex });
+        }
+        continue;
+      }
       const base = {
         side: event.side,
         atMs,
@@ -179,11 +226,21 @@ function compilePhaseCues(
       };
       if (event.action === "tap") {
         target.push({ ...base, action: "tap", releaseAtMs: null });
+        guideTarget.push({
+          action: "tap", side: event.side, atMs,
+          endsAtMs: atMs + phase.timingWindowMs,
+          phaseIndex,
+        });
         continue;
       }
       const releaseAtMs = atMs + event.durationBeats * phase.beatIntervalMs;
       if (releaseAtMs > phaseEndMs) continue;
       target.push({ ...base, action: "hold", releaseAtMs });
+      guideTarget.push({
+        action: "hold", side: event.side, atMs,
+        endsAtMs: releaseAtMs,
+        phaseIndex,
+      });
     }
   }
 }

@@ -160,7 +160,13 @@ export const resistanceLayoutSchema = z.object({
   controls: z.object({
     radius: positiveSizeSchema,
     strokeWidth: z.number().nonnegative(),
-    pulseScale: z.number().min(0).max(1),
+    activeStrokeWidth: positiveSizeSchema,
+    cueLabelWidth: positiveSizeSchema,
+    cueOffsetY: positiveSizeSchema,
+    timingTargetRadius: positiveSizeSchema,
+    timingApproachRadius: positiveSizeSchema,
+    timingRingStrokeWidth: positiveSizeSchema,
+    timingApproachDurationMs: z.number().int().positive(),
   }).strict(),
   motion: z.object({
     danger: z.object({

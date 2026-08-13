@@ -37,7 +37,9 @@ On desktop:
 - Clicking the left and right sides remains available.
 - The same authored pattern is presented through keyboard, pointer, and touch controls.
 
-The reusable rhythm catalogue expresses accents through timing and side composition, explicit rests, sustained holds, waltz groupings, syncopation, changing patterns and rhythms framed as absurd corporate initiatives. Confrontations select these capabilities through their catalogued dramatic curves. A synthetic musical piece may teach and enforce the rhythm when its beat clock is shared with the game rules. Visual pulses, animation, and optional haptics should express the same timing so music is never the sole critical cue.
+The reusable rhythm catalogue expresses accents through timing and side composition, explicit rests, sustained holds, waltz groupings, syncopation, changing patterns and rhythms framed as absurd corporate initiatives. Confrontations select these capabilities through their catalogued dramatic curves. A synthetic musical piece may teach and enforce the rhythm when its beat clock is shared with the game rules. Control-local timing targets, animation, and optional haptics should express the same timing so music is never the sole critical cue.
+
+The first episode teaches one phrase before applying pressure: alternating left and right, then an explicit breath. Its later phases repeat that learned phrase rather than introducing syncopation during crisis. More complex catalogue rhythms belong in episodes whose composition visibly introduces and rehearses them.
 
 This creates something that can feel demanding while still requiring coordination. Difficulty can increase through:
 

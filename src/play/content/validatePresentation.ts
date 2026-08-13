@@ -34,6 +34,34 @@ export function assertSensiblePresentation(
     ) {
       throw new Error(`${name} must fit within the design canvas`);
     }
+    const approachRadius = layout.controls.timingApproachRadius
+      + layout.controls.timingRingStrokeWidth;
+    if (
+      control.x - approachRadius < 0
+      || control.x + approachRadius > width
+      || control.y - approachRadius < 0
+      || control.y + approachRadius > height
+    ) {
+      throw new Error(`${name} timing approach must fit within the design canvas`);
+    }
+  }
+  const markerHalfWidth = layout.controls.cueLabelWidth / 2;
+  const markerTop = feedback.y - layout.controls.cueOffsetY
+    - layout.controls.timingApproachRadius;
+  if (
+    feedback.x - markerHalfWidth < 0
+    || feedback.x + markerHalfWidth > width
+    || markerTop < 0
+  ) {
+    throw new Error("central rhythm cue must fit within the design canvas");
+  }
+  if (
+    layout.controls.activeStrokeWidth < layout.controls.strokeWidth
+    || layout.controls.timingTargetRadius
+      <= layout.controls.radius + layout.controls.activeStrokeWidth
+    || layout.controls.timingApproachRadius <= layout.controls.timingTargetRadius
+  ) {
+    throw new Error("rhythm cue sizes must surround the control and express an approach");
   }
 
   if (bedFromFoot.x <= 0) {

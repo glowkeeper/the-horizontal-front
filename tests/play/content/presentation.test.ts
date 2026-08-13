@@ -106,6 +106,45 @@ describe("presentation content", () => {
     )).toThrow(/leftControl must fit/);
   });
 
+  it("rejects a timing approach ring clipped by the canvas", () => {
+    expect(() => assertSensiblePresentation(
+      {
+        ...layout,
+        anchors: {
+          ...layout.anchors,
+          leftControl: { x: 70, y: layout.anchors.leftControl.y },
+        },
+      },
+      skin,
+      assetIds,
+    )).toThrow(/leftControl timing approach must fit/);
+  });
+
+  it("rejects a central rhythm cue which does not fit", () => {
+    expect(() => assertSensiblePresentation(
+      {
+        ...layout,
+        controls: { ...layout.controls, cueLabelWidth: 1_400 },
+      },
+      skin,
+      assetIds,
+    )).toThrow(/central rhythm cue must fit/);
+  });
+
+  it("rejects timing rings without a visible approach", () => {
+    expect(() => assertSensiblePresentation(
+      {
+        ...layout,
+        controls: {
+          ...layout.controls,
+          timingApproachRadius: layout.controls.timingTargetRadius,
+        },
+      },
+      skin,
+      assetIds,
+    )).toThrow(/surround the control and express an approach/);
+  });
+
   it("rejects reversed lift and downhill motion", () => {
     expect(() => assertSensiblePresentation(
       {

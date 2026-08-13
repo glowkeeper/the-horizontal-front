@@ -17,11 +17,21 @@
     "result": { "x": 640, "y": 245 },
     "restart": { "x": 640, "y": 330 },
     "nextCue": { "x": 640, "y": 145 },
-    "leftControl": { "x": 410, "y": 630 },
-    "rightControl": { "x": 870, "y": 630 },
+    "leftControl": { "x": 410, "y": 610 },
+    "rightControl": { "x": 870, "y": 610 },
     "feedback": { "x": 640, "y": 630 }
   },
-  "controls": { "radius": 55, "strokeWidth": 7, "pulseScale": 0.32 },
+  "controls": {
+    "radius": 55,
+    "strokeWidth": 7,
+    "activeStrokeWidth": 12,
+    "cueLabelWidth": 180,
+    "cueOffsetY": 100,
+    "timingTargetRadius": 70,
+    "timingApproachRadius": 100,
+    "timingRingStrokeWidth": 5,
+    "timingApproachDurationMs": 900
+  },
   "motion": {
     "danger": { "bedAngleDegrees": -18, "duvetX": -300, "sleeperX": -130, "workLightAlpha": 0.62 },
     "rest": { "workLightAlpha": 0.08 },
