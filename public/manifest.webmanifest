@@ -2,7 +2,7 @@
   "name": "The Horizontal Front",
   "short_name": "Horizontal Front",
   "description": "Seize the Means of Relaxation.",
-  "start_url": "/",
+  "start_url": "/play/",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000"

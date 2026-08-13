@@ -35,3 +35,14 @@ This repository currently contains the working design documents and an early tec
 See [docs/game-concept.md](docs/game-concept.md) for the working design brief.
 
 The chosen technical direction is documented in [docs/technical-architecture.md](docs/technical-architecture.md).
+
+## Public site
+
+The static Vite build has separate entry points for the public site and the game:
+
+- `/` introduces the game and its digital-commons commitments.
+- `/play/` is the only page that loads Phaser.
+- `/commons/` explains the commitments in plain language.
+- The charter, governance, identity, contribution and licensing routes are generated at build time from their canonical Markdown files.
+
+Run `npm run dev` for local development. `npm run build` generates the public documents, verifies the charter and privacy constraints, builds every route, prepares the complete offline cache and confirms that public pages do not load the Phaser bundle.

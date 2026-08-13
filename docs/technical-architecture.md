@@ -16,6 +16,14 @@ The Horizontal Front will be built as a web-first 2D game using:
 
 The first release target is a responsive, landscape-oriented browser game with touch, keyboard and pointer support.
 
+## Static public shell
+
+The release is a Vite multi-page site rather than a single canvas page. Semantic HTML and shared CSS own public navigation, project information, accessibility information and document presentation. The `/play/` entry alone imports Phaser; visiting the landing, commons or governance pages must not download the game bundle.
+
+The canonical charter, governance, identity, contribution and licensing Markdown files are rendered into public HTML at build time. They must not be manually copied into a second set of public documents that can drift from the repository record. A concise `/commons/` page provides the approachable overview and links to those complete generated documents.
+
+This shell does not introduce a UI framework. Vite builds the static HTML entry points and their small TypeScript modules directly. The service-worker finalisation step derives its precache list from the actual production output so every public document, licence, shared asset and game file remains available offline after installation.
+
 ## Why Phaser fits
 
 The game is an interactive two-dimensional political cartoon. Its principal elements are layered images, limited character animation, speech bubbles, sound, responsive input and a continuously changing gameplay state.

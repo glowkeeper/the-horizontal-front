@@ -8,9 +8,12 @@
   },
   "scripts": {
     "check:policy": "node scripts/check-project-policy.mjs",
+    "check:static": "node scripts/check-static-build.mjs",
+    "generate:site": "node scripts/generate-site-pages.mjs",
     "test": "vitest run",
-    "dev": "vite",
-    "build": "npm run check:policy && tsc --noEmit && vite build",
+    "dev": "npm run generate:site && vite",
+    "preview": "vite preview",
+    "build": "npm run generate:site && npm run check:policy && tsc --noEmit && vite build && node scripts/finalize-static-build.mjs && npm run check:static",
     "test:watch": "vitest"
   },
   "repository": {
@@ -31,6 +34,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "marked": "^16.4.2",
     "typescript": "^7.0.2",
     "vite": "^8.2.1",
     "vitest": "^4.1.10"

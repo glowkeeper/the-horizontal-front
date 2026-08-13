@@ -5,21 +5,39 @@
 }
 
 html,
-body,
-#app {
+.game-page,
+.game-page #app {
   width: 100%;
   min-height: 100%;
   margin: 0;
 }
 
-body {
+.game-page {
+  background: #000000;
   overflow: hidden;
 }
 
-#app {
+.game-page #app {
   display: grid;
   place-items: center;
   min-height: 100dvh;
+}
+
+.game-exit {
+  position: fixed;
+  z-index: 1;
+  top: 0.75rem;
+  left: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ffffff;
+  color: #ffffff;
+  font: 600 0.875rem/1.2 system-ui, sans-serif;
+  text-decoration: none;
+}
+
+.game-exit:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 3px;
 }
 
 #game {

@@ -2,35 +2,61 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"
-    />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, viewport-fit=cover"
-    />
-
-    <meta
-      name="description"
-      content="The Horizontal Front — Seize the Means of Relaxation."
-    />
-    <meta name="theme-color" content="#000000" />
-
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="A free, open-source game about collective power, mutual aid and resistance to hierarchical systems." />
+    <meta name="theme-color" content="#111111" />
     <link rel="manifest" href="/manifest.webmanifest" />
-
     <title>The Horizontal Front</title>
   </head>
-
   <body>
-    <main id="app">
-      <div
-        id="game"
-        role="application"
-        aria-label="The Horizontal Front game"
-      ></div>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="site-header">
+      <a class="site-name" href="/">The Horizontal Front</a>
+      <nav aria-label="Primary navigation">
+        <a href="/play/">Play</a>
+        <a href="/commons/">The Commons</a>
+        <a href="https://github.com/glowkeeper/the-horizontal-front">Source</a>
+      </nav>
+    </header>
+    <main id="main-content" class="site-main">
+      <section class="hero" aria-labelledby="page-title">
+        <p class="eyebrow">Seize the Means of Relaxation.</p>
+        <h1 id="page-title">The Horizontal Front</h1>
+        <p class="brief">A free, open-source game about collective power, mutual aid and resistance to hierarchical systems.</p>
+        <p class="lede">Fight to remain in bed while an authoritarian Orange Fella tries to force you into work. The contradiction is the game: exhausting, repetitive labour in defence of doing absolutely nothing.</p>
+        <div class="actions">
+          <a class="primary-action" href="/play/">Hold the line</a>
+          <a href="/commons/">How the commons works</a>
+        </div>
+      </section>
+      <section aria-labelledby="accountable-to-players">
+        <h2 id="accountable-to-players">Accountable to players, not investors</h2>
+        <ul class="commitment-grid">
+          <li><strong>Free to play</strong><span>No price, advertising, purchases or paid advantages.</span></li>
+          <li><strong>No surveillance</strong><span>No tracking, analytics or transmission of player data.</span></li>
+          <li><strong>Free and open source</strong><span>Copyleft code and share-alike cultural work.</span></li>
+          <li><strong>Playable offline</strong><span>The complete static release is cached on your device.</span></li>
+          <li><strong>Open participation</strong><span>Public decisions, proposals and charter challenges.</span></li>
+          <li><strong>Protected from enclosure</strong><span>The canonical project cannot become a paywall or extraction platform.</span></li>
+        </ul>
+      </section>
+      <section class="statement" aria-labelledby="commons-statement">
+        <h2 id="commons-statement">Developed as a digital commons</h2>
+        <p>The Horizontal Front is freely accessible, community-supported and governed by a public charter. Its software, writing, documentation and original cultural materials may be studied, shared and adapted under reciprocal licences.</p>
+        <p><a href="/charter/">Read the project charter</a> or <a href="/contribute/">take part in the project</a>.</p>
+      </section>
     </main>
-
-    <script type="module" src="/src/main.ts"></script>
+    <footer class="site-footer">
+      <p>Free to play. No ads. No tracking. No purchases.</p>
+      <nav aria-label="Project information">
+        <a href="/charter/">Charter</a>
+        <a href="/governance/">Governance</a>
+        <a href="/identity/">Identity</a>
+        <a href="/contribute/">Contribute</a>
+        <a href="/licences/">Licences</a>
+      </nav>
+    </footer>
+    <script type="module" src="/src/site.ts"></script>
   </body>
 </html>

@@ -101,11 +101,14 @@ for (const dependencyName of Object.keys(directDependencies)) {
 
 const runtimePaths = [
   join(projectRoot, "index.html"),
+  join(projectRoot, "play/index.html"),
+  join(projectRoot, "commons/index.html"),
   ...(await listFiles(join(projectRoot, "src"))),
   ...(await listFiles(join(projectRoot, "public"))),
 ].filter((path) => [".css", ".html", ".js", ".json", ".ts", ".webmanifest"].includes(extname(path)));
 
 const remoteUrlPattern = /\bhttps?:\/\//i;
+const remoteEmbeddedResourcePattern = /(?:src|action)=["']https?:\/\/|@import\s+["']https?:\/\/|url\(\s*["']?https?:\/\//i;
 const outboundApiPatterns = [
   /\bfetch\s*\(/,
   /\bXMLHttpRequest\b/,
@@ -117,10 +120,14 @@ const outboundApiPatterns = [
 for (const path of runtimePaths) {
   const source = await readFile(path, "utf8");
   const displayPath = relative(projectRoot, path);
+  const containsRemoteRuntimeResource =
+    extname(path) === ".html"
+      ? remoteEmbeddedResourcePattern.test(source)
+      : remoteUrlPattern.test(source);
 
   requirePolicy(
-    !remoteUrlPattern.test(source),
-    `${displayPath} contains a remote HTTP(S) URL. Runtime files must remain self-contained.`,
+    !containsRemoteRuntimeResource,
+    `${displayPath} embeds a remote runtime resource. Pages may link outward, but the application must remain self-contained.`,
   );
 
   if (displayPath.startsWith("src/")) {
@@ -134,6 +141,7 @@ for (const path of runtimePaths) {
 }
 
 const indexHtml = await readFile(join(projectRoot, "index.html"), "utf8");
+const playHtml = await readFile(join(projectRoot, "play/index.html"), "utf8");
 const mainSource = await readFile(join(projectRoot, "src/main.ts"), "utf8");
 
 requirePolicy(
@@ -145,8 +153,22 @@ requirePolicy(
   "index.html must retain its restrictive Content Security Policy.",
 );
 requirePolicy(
+  indexHtml.includes("A free, open-source game about collective power") &&
+    indexHtml.includes('href="/commons/"'),
+  "The public landing page must lead with the strong brief and link to The Commons.",
+);
+requirePolicy(
+  indexHtml.includes('src="/src/site.ts"') &&
+    !indexHtml.includes('src="/src/main.ts"'),
+  "The public landing page must use the lightweight site entry and must not load Phaser.",
+);
+requirePolicy(
+  playHtml.includes('src="/src/main.ts"'),
+  "The /play/ page must retain the isolated Phaser entry.",
+);
+requirePolicy(
   mainSource.includes('import "./registerServiceWorker"'),
-  "src/main.ts must register the production service worker.",
+  "The Phaser entry must register the production service worker.",
 );
 
 if (failures.length > 0) {

@@ -1,10 +1,13 @@
 const CACHE_PREFIX = "horizontal-front-";
-const CACHE_NAME = `${CACHE_PREFIX}v1`;
-const APP_SHELL = ["/", "/manifest.webmanifest"];
+const CACHE_NAME = `${CACHE_PREFIX}${"__BUILD_VERSION__"}`;
+const APP_SHELL = "__PRECACHE_ASSETS__";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)),
+    caches
+      .open(CACHE_NAME)
+      .then((cache) => cache.addAll(APP_SHELL))
+      .then(() => self.skipWaiting()),
   );
 });
 
@@ -35,27 +38,8 @@ self.addEventListener("fetch", (event) => {
   }
 
   event.respondWith(
-    fetch(request)
-      .then(async (response) => {
-        if (response.ok) {
-          const cache = await caches.open(CACHE_NAME);
-          await cache.put(request, response.clone());
-        }
-
-        return response;
-      })
-      .catch(async () => {
-        const cachedResponse = await caches.match(request);
-
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-
-        if (request.mode === "navigate") {
-          return caches.match("/");
-        }
-
-        return Response.error();
-      }),
+    caches
+      .match(request, { ignoreSearch: true })
+      .then((cached) => cached ?? fetch(request)),
   );
 });

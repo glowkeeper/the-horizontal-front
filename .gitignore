@@ -4,6 +4,13 @@ node_modules/
 # Production builds
 dist/
 
+# Generated public-document entry points
+charter/
+governance/
+identity/
+contribute/
+licences/
+
 # Test output
 coverage/
 
