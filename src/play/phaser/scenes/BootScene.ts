@@ -41,7 +41,7 @@ export class BootScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.add
-      .text(centerX, centerY + 160, "The Horizontal Front is coming soon. ✊ 🛏️", textStyles.status)
+      .text(centerX, centerY + 160, "The Horizontal Front is coming soon ✊ 🛏️", textStyles.status)
       .setOrigin(0.5);
   }
 }

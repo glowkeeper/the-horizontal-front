@@ -223,7 +223,7 @@ requirePolicy(
 requirePolicy(
   bootScene.includes("THE MONDAY UPRISING") &&
     bootScene.includes("Management has been notified of absolutely nothing.") &&
-    bootScene.includes("The Horizontal Front is coming soon."),
+    bootScene.includes("The Horizontal Front is coming soon ✊ 🛏️"),
   "The pre-release Phaser scene must retain the approved coming-soon notice.",
 );
 requirePolicy(
