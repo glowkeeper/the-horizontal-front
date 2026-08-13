@@ -50,11 +50,11 @@ If the project begins receiving material funds, it should publish funding source
 
 New maintainers may be appointed after a public proposal describing their responsibilities, access and demonstrated alignment with the charter. Administrative access should be limited to what each role requires and reviewed when roles change.
 
-A future transfer of the repository, domain, trademarks, funds or other controlled assets must preserve the charter and be recorded publicly. Where practical, control should be shared so that no inactive or compromised individual can silently enclose the project.
+A future transfer of the repository, domain, official identity, funds or other controlled assets must preserve the charter and be recorded publicly. Where practical, control should be shared so that no inactive or compromised individual can silently enclose the project.
 
 ## Future institutional stewardship
 
-The project does not currently need a legal entity or fiscal sponsor. If it later holds meaningful funds, copyrights, trademarks, infrastructure or community responsibility, an appropriate nonprofit, cooperative or fiscal steward may provide useful continuity and asset protection.
+The project does not currently need a legal entity or fiscal sponsor. If it later holds meaningful funds, copyrights, identity rights, infrastructure or community responsibility, an appropriate nonprofit, cooperative or fiscal steward may provide useful continuity and asset protection.
 
 That is a future option, not a present commitment. Any arrangement must preserve community accountability, transparent finances, project autonomy and the charter's anti-enclosure protections.
 

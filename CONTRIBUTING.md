@@ -36,8 +36,8 @@ npm run build
 
 The build includes the automated project-policy check. Run focused unit tests for engine rules and validate episode content when those areas change.
 
-## Licensing while selection is pending
+## Licensing contributions
 
-The project intends to choose copyleft licences for software and appropriate share-alike licences for cultural materials, but the exact licences are not yet decided. Do not add a licence header, change package licence metadata or assume contribution terms until that decision has been recorded.
+Software contributions are submitted under `AGPL-3.0-or-later`. Original writing, documentation, artwork, music, sound and other cultural contributions are submitted under `CC-BY-SA-4.0`, unless an explicit asset record establishes a compatible exception.
 
-Contributions submitted before licence selection may need explicit confirmation from their contributors before a future licence can cover them. Keep authorship and asset provenance clear.
+By intentionally submitting work for inclusion, you agree that it may be distributed under the applicable project licence and represent that you have the necessary rights to contribute it. You retain copyright in your contribution. Read [LICENSE.md](LICENSE.md) and keep authorship and asset provenance clear.

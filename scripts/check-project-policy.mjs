@@ -34,11 +34,39 @@ const packageJson = JSON.parse(
 
 requirePolicy(
   packageJson.private === true,
-  "package.json must remain private until the project licences are chosen.",
+  "package.json must remain private because this project is distributed as a static application, not an npm package.",
 );
 requirePolicy(
-  packageJson.license === "UNLICENSED",
-  'package.json must use "UNLICENSED" until explicit licences are chosen.',
+  packageJson.license === "AGPL-3.0-or-later",
+  'package.json must retain the selected "AGPL-3.0-or-later" software licence.',
+);
+
+const [agplText, creativeCommonsText, licensingGuide, identityPolicy] =
+  await Promise.all([
+    readFile(join(projectRoot, "LICENSES/AGPL-3.0-or-later.txt"), "utf8"),
+    readFile(join(projectRoot, "LICENSES/CC-BY-SA-4.0.txt"), "utf8"),
+    readFile(join(projectRoot, "LICENSE.md"), "utf8"),
+    readFile(join(projectRoot, "IDENTITY.md"), "utf8"),
+  ]);
+
+requirePolicy(
+  agplText.includes("GNU AFFERO GENERAL PUBLIC LICENSE") &&
+    agplText.includes("Version 3, 19 November 2007"),
+  "The official AGPL-3.0 licence text must remain present.",
+);
+requirePolicy(
+  creativeCommonsText.includes("Attribution-ShareAlike 4.0 International"),
+  "The official CC BY-SA 4.0 licence text must remain present.",
+);
+requirePolicy(
+  licensingGuide.includes("AGPL-3.0-or-later") &&
+    licensingGuide.includes("CC-BY-SA-4.0"),
+  "LICENSE.md must retain the software and cultural-work licensing boundary.",
+);
+requirePolicy(
+  identityPolicy.includes("The project will not seek patents") &&
+    identityPolicy.includes("does not currently intend to register a trademark"),
+  "IDENTITY.md must retain the no-patent and non-registration commitments.",
 );
 
 const prohibitedDependencyFragments = [

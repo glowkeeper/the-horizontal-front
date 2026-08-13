@@ -35,11 +35,11 @@ The protected commitments may be strengthened but not removed, narrowed or overr
 
 This rule governs the canonical project's identity and stewardship. It does not attempt to restrict rights that free/open-source licences grant to independent recipients or forks.
 
-## Licensing status
+## Licensing
 
-The project is committed to free/open-source distribution, with copyleft software licensing and share-alike licensing for cultural materials as the intended direction. The exact licences for code, writing, artwork and audio are the next separate decision and have not yet been selected.
+Project software is licensed under the GNU Affero General Public License version 3 or later. Original writing, documentation, artwork, music, sound and other cultural material are licensed under Creative Commons Attribution-ShareAlike 4.0 unless a file or asset record identifies a necessary exception.
 
-Until those licences are added, the repository grants no permissions beyond applicable law. No contributor or automated tool may infer or assign a licence from this charter.
+The scope, attribution rules and full licence texts are recorded in [LICENSE.md](LICENSE.md). These copyleft and share-alike foundations may not be replaced with proprietary or non-reciprocal terms for the canonical project.
 
 ## Status and precedence
 

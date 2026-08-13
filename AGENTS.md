@@ -85,7 +85,8 @@ These are project constraints:
 - Keep development open to community participation through an accessible issue tracker, contribution guidance, a public roadmap and a clear way to propose changes.
 - Do not sell the project, enclose it behind a paywall or convert it into an advertising or data-extraction platform. Record these protections in a public governance charter before they become operationally relevant.
 - Keep settings and progress on the player's device; do not add authentication, cloud saves or transmission of player data.
-- The exact licences for code, writing, artwork and audio remain undecided. Do not assume or assign licences without an explicit maintainer decision.
+- Apply `AGPL-3.0-or-later` to project software and `CC-BY-SA-4.0` to original cultural and documentary work, following the boundaries and exceptions in `LICENSE.md`.
+- Preserve the commons-oriented identity policy in `IDENTITY.md`. Do not propose patents, identity enclosure or restrictions on good-faith forks, criticism and cultural participation.
 
 Read `README.md` and the hosting, offline-use and distribution section of `docs/technical-architecture.md` before changing delivery, storage, network access or dependency behaviour.
 

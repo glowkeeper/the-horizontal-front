@@ -13,7 +13,8 @@ List the checks you ran and their results.
 - [ ] This change introduces no tracking, behavioural analytics or player-data transmission.
 - [ ] This change preserves static hosting and offline-capable play without accounts or permanent remote services.
 - [ ] I considered accessibility, translation and modest-device support where relevant.
-- [ ] Dependencies and assets have clear provenance and are compatible with the project's free/open-source direction.
+- [ ] Software changes are compatible with `AGPL-3.0-or-later`; cultural and documentary changes are compatible with `CC-BY-SA-4.0`; dependencies and assets have clear provenance.
+- [ ] This change does not misuse the official project identity or restrict good-faith forks, criticism or cultural participation.
 - [ ] This change does not weaken community accountability or anti-enclosure protections.
 - [ ] I have identified any material product, architecture, funding or governance decision in the linked issue.
 

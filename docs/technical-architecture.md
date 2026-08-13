@@ -190,7 +190,7 @@ The canonical public site is **[thehorizontalfront.org](https://thehorizontalfro
 
 The browser release must remain usable without a network connection after its required files have been cached. The offline boundary includes the page shell, game code, episode data and the artwork and audio needed to play. Features should not acquire a runtime dependency on third-party APIs, remote fonts, analytics services or content delivery that would make the game fail when disconnected. Updates may of course require a connection to download a new static release.
 
-The repository and distributable project materials are intended to form part of the digital commons. Software will be distributed as free/open-source code, and the licences chosen for code, writing, artwork and audio should support inspection, sharing, study and adaptation. The exact licences remain an open decision; this document does not prematurely assign one licence to materials with different authorship or provenance.
+The repository and distributable project materials form part of the digital commons. Project software uses `AGPL-3.0-or-later`; original cultural and documentary material uses `CC-BY-SA-4.0`, subject to the boundaries and provenance exceptions in [the licensing guide](../LICENSE.md).
 
 No tracking or monetisation is part of the architecture. The game should not collect behavioural analytics, profile players, serve advertising, sell access or include purchases. Device-local settings and progress stay on the device and should not be transmitted elsewhere.
 

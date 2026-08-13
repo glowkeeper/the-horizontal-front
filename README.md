@@ -24,9 +24,9 @@ These principles are intended to make the brief above materially true:
 - **Anti-enclosure governance:** adopt a public governance charter committing the project not to be sold, enclosed behind a paywall or converted into an advertising or data-extraction platform.
 - **Static and offline-capable:** once the required files have been cached, play should not depend on an account, application server, network connection or commercial platform remaining available.
 
-The exact licences for code, writing, artwork and audio have not yet been chosen. Copyleft software licensing and share-alike licensing for cultural materials are the intended direction, but the needs and provenance of each category must be considered before specific licences are selected. Until licences are added to the repository, this statement records the project's intentions rather than granting permissions beyond those provided by applicable law.
+Project software is licensed under **AGPL-3.0-or-later**. Original writing, documentation, artwork, music, sound and other cultural material are licensed under **CC BY-SA 4.0**, subject to recorded third-party and provenance exceptions. See [LICENSE.md](LICENSE.md) for the precise boundaries and full licence texts.
 
-The binding commitments and decision process are recorded in the [project charter](PROJECT_CHARTER.md) and [governance document](GOVERNANCE.md). See [CONTRIBUTING.md](CONTRIBUTING.md) to propose or review a change against them.
+The binding commitments and decision process are recorded in the [project charter](PROJECT_CHARTER.md) and [governance document](GOVERNANCE.md). The [community identity policy](IDENTITY.md) protects clarity about the canonical project without enclosing good-faith use, criticism or forks. See [CONTRIBUTING.md](CONTRIBUTING.md) to propose or review a change.
 
 ## Project status
 
