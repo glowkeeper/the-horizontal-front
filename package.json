@@ -7,9 +7,10 @@
     "doc": "docs"
   },
   "scripts": {
+    "check:policy": "node scripts/check-project-policy.mjs",
     "test": "vitest run",
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "npm run check:policy && tsc --noEmit && vite build",
     "test:watch": "vitest"
   },
   "repository": {
@@ -18,12 +19,13 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "UNLICENSED",
+  "private": true,
   "type": "module",
   "bugs": {
     "url": "https://github.com/glowkeeper/the-horizontal-front/issues"
   },
-  "homepage": "https://github.com/glowkeeper/the-horizontal-front#readme",
+  "homepage": "https://thehorizontalfront.org",
   "dependencies": {
     "phaser": "^4.2.1",
     "zod": "^4.4.3"

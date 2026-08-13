@@ -1,4 +1,5 @@
 import "./styles/global.css";
+import "./registerServiceWorker";
 
 import { createGame } from "./phaser/createGame";
 

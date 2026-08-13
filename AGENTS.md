@@ -21,6 +21,8 @@ These instructions apply to every AI coding assistant working in this repository
 
 The Horizontal Front is a satirical, rhythm-based 2D web and mobile game about working extremely hard to remain in bed while an authoritarian Orange Fella tries to force the player into work.
 
+It is a free, open-source game about collective power, mutual aid and resistance to hierarchical systems. Develop it as a digital commons: freely accessible, community-supported and accountable to its players rather than investors or advertisers.
+
 The game is political satire about capitalism, exploitative work culture, compulsory productivity and corporate absurdity. Its central demand is simple:
 
 > Let me remain in bed.
@@ -79,6 +81,9 @@ These are project constraints:
 - Distribute the software and distributable project materials as free/open-source work forming part of the digital commons.
 - Keep the release static and offline-capable. Once its required files are cached, play must not depend on an application backend, account, remote database, third-party API or commercial platform remaining available.
 - Do not add player tracking, behavioural analytics, advertising, payments, paid access, in-game purchases or other monetisation.
+- Voluntary donations, grants or supporter contributions may fund the project only without purchasing access, gameplay advantages or control. Disclose material funding sources and major project expenses.
+- Keep development open to community participation through an accessible issue tracker, contribution guidance, a public roadmap and a clear way to propose changes.
+- Do not sell the project, enclose it behind a paywall or convert it into an advertising or data-extraction platform. Record these protections in a public governance charter before they become operationally relevant.
 - Keep settings and progress on the player's device; do not add authentication, cloud saves or transmission of player data.
 - The exact licences for code, writing, artwork and audio remain undecided. Do not assume or assign licences without an explicit maintainer decision.
 

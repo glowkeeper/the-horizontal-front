@@ -3,6 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <meta
       name="viewport"
       content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
@@ -11,6 +15,9 @@
       name="description"
       content="The Horizontal Front — Seize the Means of Relaxation."
     />
+    <meta name="theme-color" content="#000000" />
+
+    <link rel="manifest" href="/manifest.webmanifest" />
 
     <title>The Horizontal Front</title>
   </head>
