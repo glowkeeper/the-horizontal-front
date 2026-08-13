@@ -16,7 +16,7 @@ The goal is not unlimited mechanical variety. It is a **small vocabulary with ri
 
 The initial mechanical vocabulary might contain:
 
-- Alternate rhythm.
+- Follow an authored rhythm.
 - Tap a sequence.
 - Press and hold.
 - Hold two controls.
@@ -38,6 +38,16 @@ Rapid rhythm → hold an email while continuing → two simultaneous demands
 ```
 
 Nothing new is programmed, but the dramatic shape changes.
+
+## Rhythm as a source of variety
+
+Rhythm is a core rule rather than decorative music laid over a tapping game. An episode may select from a small documented vocabulary of reusable rhythm patterns and parameters. The first prototype needs only a repeating left-right alternation, but later engine capabilities may support accents, rests, strong and weak beats, syncopation, or changes between established patterns.
+
+The engine judges player input against the required pattern and timing. Successful performance builds rhythmic momentum, which strengthens resistance and helps recover the duvet. Poorly timed or incorrect input loses momentum. The same engine clock should drive judgement and the audio, visual, and optional haptic cues that communicate the rhythm.
+
+Rhythm data must remain finite and readable. It must not grow into a musical programming language, arbitrary sequencer, or executable notation hidden inside episode JSON. Any expansion should follow the same capability test as other mechanics: it should serve several plausible episodes, remain simple to explain, and combine safely with existing resistance rules.
+
+Difficulty should come from pattern, timing, composition, interruptions, and pressure rather than primarily from ever-higher input rates. This is both a design principle and a physical-accessibility constraint.
 
 ## Repetition is meaningful
 

@@ -120,8 +120,8 @@ For example:
 ```ts
 type ResistanceState = {
   duvetSafety: number;
-  previousSide: "left" | "right" | null;
   rhythmMomentum: number;
+  nextRhythmStep: number;
   elapsedMs: number;
 };
 
@@ -133,20 +133,20 @@ type ResistanceInput = {
 function applyResistanceInput(
   state: ResistanceState,
   input: ResistanceInput,
+  rhythm: RhythmPattern,
 ): ResistanceState {
-  const alternated = state.previousSide !== input.side;
-
-  return {
-    ...state,
-    previousSide: input.side,
-    rhythmMomentum: alternated
-      ? Math.min(1, state.rhythmMomentum + 0.1)
-      : Math.max(0, state.rhythmMomentum - 0.05),
-  };
+  // Judge the side and timing against the next authored rhythm step,
+  // then update momentum and duvet resistance.
 }
 ```
 
 This logic can be tested without starting Phaser or opening a browser. Mobile touch, desktop keyboard and pointer input can all produce the same `ResistanceInput` value.
+
+Rhythm is part of the domain model, not an effect owned by Phaser or the audio system. The functional engine should judge normalised input against an authored pattern and explicit timing windows. The first pattern is a repeating left-right alternation, while future reusable capabilities may introduce accents, rests, syncopation, or changes between documented patterns.
+
+One elapsed-time clock should drive rhythm judgement and the cues that communicate it. Phaser and the audio adapter may render sound, animation, visual pulses, and optional haptics, but they should derive those cues from engine timing rather than maintaining competing clocks. This keeps input results deterministic and lets equivalent audio and visual presentations describe the same required rhythm.
+
+Rhythm complexity should be able to increase without requiring an ever-higher input rate. The rule system must remain suitable for reduced-input mappings and must not assume that keyboard, pointer, and touch inputs impose identical physical effort.
 
 ## Architectural boundary
 

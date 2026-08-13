@@ -19,15 +19,15 @@ Successful inputs pull the duvet back up and restore warmth. This communicates d
 
 A small accessibility indicator could still exist, but the duvet should be the primary interface.
 
-## Fast rhythm, not arbitrary mashing
+## Authored rhythm, not arbitrary mashing
 
-I think the core input should be a **rapid alternating rhythm** rather than completely unstructured tapping.
+The core input should be an **authored rhythm** rather than completely unstructured tapping. A rapid alternating pattern is a clear starting point, not the limit of the mechanic.
 
 On mobile:
 
 - Alternate left and right thumbs on corresponding duvet zones.
-- A clean rhythm produces stronger pulls.
-- Frantic tapping still works, but less efficiently.
+- Inputs that match the required pattern and timing produce stronger pulls.
+- Unstructured tapping works poorly because timing and pattern accuracy matter.
 - Boss attacks temporarily change the rhythm or require different gestures.
 
 On desktop:
@@ -35,18 +35,23 @@ On desktop:
 - Alternate `A` and `L`, or left and right arrows.
 - The duvet visibly shifts with each side.
 - Clicking the left and right sides remains available.
-- The rhythm can accelerate as the boss applies more pressure.
+- The same authored pattern is presented through keyboard, pointer, and touch controls.
 
-This creates something that feels frantic while still requiring coordination. Difficulty can increase through:
+Later confrontations may use accents, rests, strong and weak beats, syncopation, changing patterns, or rhythms framed as absurd corporate initiatives. A synthetic musical piece may teach and enforce the rhythm when its beat clock is shared with the game rules. Visual pulses, animation, and optional haptics should express the same timing so music is never the sole critical cue.
 
-- Faster required rhythm.
+This creates something that can feel demanding while still requiring coordination. Difficulty can increase through:
+
+- More complex or changing rhythms.
+- Tighter but still fair timing expectations.
 - Less recovery per successful beat.
 - Stronger pulling from the boss.
 - More disruptive corporate attacks.
 - Longer attack combinations.
 - Shorter recovery windows.
 
-That is probably preferable to adaptive difficulty. Each confrontation can have an authored pressure curve, so overcoming a hard level feels meaningful.
+Difficulty should not primarily become a race toward higher input rates. Complex patterns should usually exchange speed for listening, anticipation, memory, or coordination. This preserves variety, reinforces the rhythm-and-resistance identity, and reduces the risk of repetitive strain. Missing a beat should weaken resistance rather than provoke an unsafe burst of frantic recovery.
+
+Each confrontation can have an authored pressure and rhythm curve, so overcoming a hard level feels meaningful without relying on adaptive difficulty or relentless acceleration.
 
 ## Rewards without productivity ideology
 

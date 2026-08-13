@@ -6,7 +6,7 @@
 
 The Horizontal Front is a satirical arcade game for web and mobile. The player is trying to remain safely in bed while their boss applies increasing pressure to tip the bed, expose them from beneath the duvet, and force them into work.
 
-To resist, the player must tap, click, or alternate keys rapidly. The irony is the heart of the game: the player has to work extremely hard to avoid work.
+To resist, the player must perform rhythmic patterns through taps, clicks, or keys. The irony is the heart of the game: the player has to work extremely hard to avoid work.
 
 The satire targets exploitative work culture, compulsory productivity, corporate euphemisms, and executive power. The boss is a fictional, Trumpesque tycoon archetype rather than a direct depiction of a real person: orange-tinted, golden-haired, power-tied, vain, loud, and absurdly self-important.
 
@@ -26,7 +26,7 @@ Possible opening copy:
 1. A level begins with the player safely in bed.
 2. The boss continuously tips the bed and pulls the duvet away from the player.
 3. Successful rhythmic inputs pull the duvet back toward safety.
-4. Corporate attacks periodically interrupt the basic tapping rhythm.
+4. Corporate attacks periodically interrupt, complicate, or replace the current rhythm.
 5. Pressure increases throughout the level.
 6. The final ten seconds become a frantic morning offensive.
 7. Survive for roughly 30 seconds to clear the level. Lose the duvet completely and the player is tipped out of bed.
@@ -39,7 +39,11 @@ The duration, pressure curve, and recovery per input all require playtesting. Th
 
 Normal tapping represents pulling the duvet back, gripping the mattress, or otherwise resisting the boss. The game should reward rhythm and sustained effort without demanding unsafe or inaccessible input speeds.
 
-Difficulty should be calibrated per input method. Five taps per second on a touchscreen does not necessarily represent the same effort as five alternating keyboard presses. The experience should feel equivalently frantic across devices rather than using identical numerical thresholds.
+The first prototype uses a simple alternating left-right pattern, but alternation is only the first member of a broader rhythm system. Later confrontations may use strong and weak beats, rests, accents, syncopation, changing patterns, or deliberately awkward managerial rhythms. Difficulty should come from listening, anticipation, coordination, interruptions, and pattern changes as well as pressure. It should not primarily scale by demanding ever more inputs per second.
+
+The required rhythm, player input, procedural audio, visual pulses, and optional haptic cues should share one timing source. Music can therefore teach and enforce a pattern rather than merely accompany it. Critical timing must never be communicated by music alone: equivalent visual cues must support deaf and hard-of-hearing players, while clear audio cues should support players who cannot rely on the visual presentation.
+
+Difficulty should be calibrated per input method. Five taps per second on a touchscreen does not necessarily represent the same effort as five alternating keyboard presses. The experience should feel equivalently demanding across devices rather than using identical numerical thresholds. Complex rhythms should usually trade physical speed for cognitive or coordinative difficulty, and reduced-input options should preserve the rhythmic idea without requiring unsafe repetition.
 
 ## Corporate attacks
 
@@ -69,7 +73,7 @@ The controls reverse temporarily. The normal resistance input now assists the bo
 
 ### Return to office mandate
 
-This is the climactic end-of-level attack. During the last ten seconds the bed tips faster, office alarms flash, and the boss launches an all-out productivity offensive. The player must tap or alternate furiously to survive.
+This is the climactic end-of-level attack. During the last ten seconds management pressure intensifies, office alarms flash, and the boss launches an all-out productivity offensive. The required rhythm may become more insistent or disruptive, but the finale should not depend only on increasing the physical input rate.
 
 ### Promotion opportunity
 
@@ -94,7 +98,7 @@ The game should use one responsive codebase and one set of rules, with controls 
 ### Mobile
 
 - Tap anywhere on the mattress to resist.
-- Alternate thumbs for rapid tapping.
+- Alternate thumbs in time with the resistance rhythm.
 - Press and hold notifications to dismiss them.
 - Use two fingers for Team Player.
 - Tap highlighted areas for Quick Call.
@@ -110,7 +114,7 @@ Device shaking and physical tilt should not be required. They are unreliable, in
 - Use numbered keys or clicking for Quick Call.
 - Hold two keys simultaneously for Team Player.
 
-Alternating keys should feel like an old arcade game. Repeatedly hammering one key may provide less resistance than alternating correctly, encouraging a two-handed rhythm.
+Alternating keys should initially feel like an old arcade game. Input is judged against the required pattern and timing rather than rewarded simply for arriving quickly.
 
 ### Attack mapping
 
