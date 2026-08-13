@@ -100,6 +100,7 @@ Phaser is infrastructure, not the domain model.
 - Prefer plain data, discriminated unions, pure functions and explicit state transitions.
 - Prefer composition over inheritance.
 - Pass dependencies through ordinary function arguments where practical.
+- Resolve avoidable API awkwardness when it first appears rather than carrying it into later integration. Prefer domain values that keep related state, configuration and invariants together, make invalid combinations difficult to express and remain simple at the call site.
 - Keep Phaser objects out of the functional game engine.
 - Normalise touch, keyboard and pointer events into the same game input types.
 - Base timing and movement on elapsed time, never frame counts.

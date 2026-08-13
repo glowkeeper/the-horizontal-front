@@ -125,22 +125,26 @@ type ResistanceState = {
   elapsedMs: number;
 };
 
+type Resistance = {
+  readonly config: ResistanceConfig;
+  readonly state: ResistanceState;
+};
+
 type ResistanceInput = {
   side: "left" | "right";
   atMs: number;
 };
 
 function applyResistanceInput(
-  state: ResistanceState,
+  resistance: Resistance,
   input: ResistanceInput,
-  rhythm: RhythmPattern,
-): ResistanceState {
+): Resistance {
   // Judge the side and timing against the next authored rhythm step,
   // then update momentum and duvet resistance.
 }
 ```
 
-This logic can be tested without starting Phaser or opening a browser. Mobile touch, desktop keyboard and pointer input can all produce the same `ResistanceInput` value.
+The `Resistance` value keeps the fixed configuration and changing state of one confrontation together. Public transitions therefore cannot accidentally receive a different configuration on each call. This logic can be tested without starting Phaser or opening a browser. Mobile touch, desktop keyboard and pointer input can all produce the same `ResistanceInput` value.
 
 Rhythm is part of the domain model, not an effect owned by Phaser or the audio system. The functional engine should judge normalised input against an authored pattern and explicit timing windows. The first pattern is a repeating left-right alternation, while future reusable capabilities may introduce accents, rests, syncopation, or changes between documented patterns.
 
