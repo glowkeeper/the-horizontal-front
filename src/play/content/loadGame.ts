@@ -1,5 +1,6 @@
 import { loadEpisode } from "./loadEpisode";
-import type { Episode } from "./schemas/episodeSchema";
+import type { Episode } from "./loadEpisode";
+import type { MechanicLibrary } from "./loadMechanics";
 import {
   campaignSchema,
   gameSchema,
@@ -60,6 +61,7 @@ export function loadGame(
   gameContent: unknown,
   campaignModules: ContentModules,
   episodeModules: ContentModules,
+  mechanics: MechanicLibrary,
 ): Game {
   const game = gameSchema.parse(gameContent);
   assertNoDuplicates("campaign", game.campaigns);
@@ -97,7 +99,7 @@ export function loadGame(
       if (rawEpisode === undefined) {
         throw new Error(`Missing episode file: ${episodePath}`);
       }
-      const episode = loadEpisode(rawEpisode);
+      const episode = loadEpisode(rawEpisode, mechanics);
       if (episode.id !== entry.id) {
         throw new Error(`Episode ID mismatch for ${episodePath}: expected ${entry.id}`);
       }

@@ -18,7 +18,7 @@ import {
   resistanceSkinSchema,
 } from "../../../src/play/content/schemas/presentationSchema";
 import { assertSensiblePresentation } from "../../../src/play/content/validatePresentation";
-import { game } from "../../../src/play/content/game";
+import { game, mechanics } from "../../../src/play/content/game";
 
 const layout = resistanceLayoutSchema.parse(layoutContent);
 const skin = resistanceSkinSchema.parse(skinContent);
@@ -51,6 +51,21 @@ describe("presentation content", () => {
       sharedSkin,
       assetIds,
     )).not.toThrow();
+  });
+
+  it("does not fall back between shared and episode skin ownership", () => {
+    const wrongSource = loadEpisode({
+      ...episodeContent,
+      confrontation: {
+        ...episodeContent.confrontation,
+        presentation: {
+          ...episodeContent.confrontation.presentation,
+          skin: { source: "shared", id: "the-alarm-bedroom" },
+        },
+      },
+    }, mechanics);
+    expect(() => loadPresentation(wrongSource))
+      .toThrow(/Missing shared presentation skin/);
   });
 
   it("rejects non-positive primitive dimensions", () => {
@@ -159,7 +174,7 @@ describe("presentation content", () => {
             y: -56,
             width: 440,
             height: 120,
-            asset: "missing-duvet-art",
+            asset: { source: "episode", id: "missing-duvet-art" },
           },
         },
       },
@@ -181,7 +196,7 @@ describe("presentation content", () => {
                 y: -85,
                 width: 136,
                 height: 136,
-                asset: "missing-management-head",
+                asset: { source: "episode", id: "missing-management-head" },
               }
             : part),
       },
@@ -204,7 +219,7 @@ describe("presentation content", () => {
       "another-episode",
       skin,
       presentationAssets,
-    )).toThrow(/owned by another episode/);
+    )).toThrow(/not owned by episode/);
   });
 
   it("rejects duplicate semantic IDs in the asset catalog", () => {

@@ -8,7 +8,7 @@ const motion = resistanceLayoutSchema.parse(layoutContent).motion;
 
 describe("resistance presentation", () => {
   it("keeps a safe bed level and the duvet over the sleeper", () => {
-    expect(getResistancePresentation(1, motion)).toEqual({
+    expect(getResistancePresentation(1, 0, motion)).toEqual({
       bedAngleDegrees: -0,
       duvetPullX: 0,
       sleeperSlideX: -0,
@@ -17,7 +17,7 @@ describe("resistance presentation", () => {
   });
 
   it("lifts the head, separates the duvet, and slides the sleeper at danger", () => {
-    expect(getResistancePresentation(0, motion)).toEqual({
+    expect(getResistancePresentation(0, 1, motion)).toEqual({
       bedAngleDegrees: -18,
       duvetPullX: -300,
       sleeperSlideX: -130,
@@ -26,11 +26,16 @@ describe("resistance presentation", () => {
   });
 
   it("clamps presentation input to the safety range", () => {
-    expect(getResistancePresentation(2, motion)).toEqual(
-      getResistancePresentation(1, motion),
+    expect(getResistancePresentation(2, -1, motion)).toEqual(
+      getResistancePresentation(1, 0, motion),
     );
-    expect(getResistancePresentation(-1, motion)).toEqual(
-      getResistancePresentation(0, motion),
+    expect(getResistancePresentation(-1, 2, motion)).toEqual(
+      getResistancePresentation(0, 1, motion),
     );
+  });
+
+  it("caps authored intensity below maximum physical danger", () => {
+    expect(getResistancePresentation(1, 1, motion).bedAngleDegrees)
+      .toBe(motion.danger.bedAngleDegrees * 0.5);
   });
 });

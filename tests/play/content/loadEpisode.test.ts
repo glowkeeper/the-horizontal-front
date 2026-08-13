@@ -2,10 +2,10 @@ import { describe, expect, it } from "vitest";
 
 import campaignContent from "../../../src/play/content/campaigns/the-monday-uprising.json";
 import episodeContent from "../../../src/play/content/episodes/the-alarm.json";
-import { game } from "../../../src/play/content/game";
+import { game, mechanics } from "../../../src/play/content/game";
 import gameContent from "../../../src/play/content/game.json";
 import { loadEpisode } from "../../../src/play/content/loadEpisode";
-import { loadGame } from "../../../src/play/content/loadGame";
+import { loadGame, type ContentModules } from "../../../src/play/content/loadGame";
 import { createResistance } from "../../../src/play/engine/resistance";
 import { contentIdSchema } from "../../../src/play/content/schemas/gameSchema";
 import { findPlaceholderIdSegment } from "../../../src/play/content/contentRules.mjs";
@@ -14,6 +14,12 @@ const campaignModules = {
   "./campaigns/the-monday-uprising.json": campaignContent,
 };
 const episodeModules = { "./episodes/the-alarm.json": episodeContent };
+const loadTestGame = (
+  content: unknown,
+  campaigns: ContentModules = campaignModules,
+  episodes: ContentModules = episodeModules,
+) => loadGame(content, campaigns, episodes, mechanics);
+const loadTestEpisode = (content: unknown) => loadEpisode(content, mechanics);
 
 describe("game content loading", () => {
   it("loads the ordered game, campaign and episode hierarchy", () => {
@@ -24,13 +30,13 @@ describe("game content loading", () => {
   });
 
   it("requires campaign briefing and debriefing copy", () => {
-    expect(() => loadGame(gameContent, {
+    expect(() => loadTestGame(gameContent, {
       "./campaigns/the-monday-uprising.json": {
         ...campaignContent,
         briefing: { ...campaignContent.briefing, body: "" },
       },
     }, episodeModules)).toThrow();
-    expect(() => loadGame(gameContent, {
+    expect(() => loadTestGame(gameContent, {
       "./campaigns/the-monday-uprising.json": {
         ...campaignContent,
         debriefing: { ...campaignContent.debriefing, scoreLabel: "" },
@@ -39,12 +45,12 @@ describe("game content loading", () => {
   });
 
   it("requires validated global interface copy and its placeholders", () => {
-    expect(() => loadGame(
+    expect(() => loadTestGame(
       { ...gameContent, interface: { ...gameContent.interface, campaignsHeading: "" } },
       campaignModules,
       episodeModules,
     )).toThrow();
-    expect(() => loadGame(
+    expect(() => loadTestGame(
       {
         ...gameContent,
         interface: { ...gameContent.interface, campaignsStatus: "No selection" },
@@ -55,14 +61,14 @@ describe("game content loading", () => {
   });
 
   it("requires episode-authored confrontation copy and finite templates", () => {
-    expect(() => loadEpisode({
+    expect(() => loadTestEpisode({
       ...episodeContent,
       confrontation: {
         ...episodeContent.confrontation,
         copy: { ...episodeContent.confrontation.copy, headline: "" },
       },
     })).toThrow();
-    expect(() => loadGame({
+    expect(() => loadTestGame({
       ...gameContent,
       mechanics: {
         resistance: { ...gameContent.mechanics.resistance, now: "NOW" },
@@ -71,42 +77,41 @@ describe("game content loading", () => {
   });
 
   it("loads The Alarm as validated playable content", () => {
-    const episode = loadEpisode(episodeContent);
+    const episode = loadTestEpisode(episodeContent);
     expect(episode.id).toBe("the-alarm");
-    expect(episode.confrontation.resistance.rhythm.steps).toEqual([
-      { side: "left" },
-      { side: "right" },
+    expect(episode.confrontation.dramaticCurve).toEqual({
+      source: "episode",
+      id: "alarm-escalation",
+    });
+    expect(episode.confrontation.resistance.phases.map(({ id }) => id)).toEqual([
+      "orientation", "establishment", "pressure", "crisis",
     ]);
     expect(episode.confrontation.presentation).toEqual({
-      layout: "bed-head-right",
-      skin: "the-alarm-bedroom",
+      layout: { source: "shared", id: "bed-head-right" },
+      skin: { source: "episode", id: "the-alarm-bedroom" },
       managementAction: "lift-head",
     });
   });
 
   it("supplies resistance configuration directly to the engine", () => {
-    const episode = loadEpisode(episodeContent);
+    const episode = loadTestEpisode(episodeContent);
     const resistance = createResistance(episode.confrontation.resistance);
     expect(resistance.config).toBe(episode.confrontation.resistance);
-    expect(resistance.state.duvetSafety).toBe(0.75);
+    expect(resistance.state.duvetSafety).toBe(0.78);
   });
 
   it("rejects unknown episode fields and overlapping rhythm windows", () => {
-    expect(() => loadEpisode({ ...episodeContent, executableScript: "tipBed()" }))
+    expect(() => loadTestEpisode({ ...episodeContent, executableScript: "tipBed()" }))
       .toThrow();
-    expect(() => loadEpisode({
+    expect(() => loadTestEpisode({
       ...episodeContent,
       confrontation: {
         ...episodeContent.confrontation,
-        resistance: {
-          ...episodeContent.confrontation.resistance,
-          rhythm: {
-            ...episodeContent.confrontation.resistance.rhythm,
-            timingWindowMs: 250,
+          resistance: {
+            dramaticCurve: { source: "shared", id: "unknown-curve" },
           },
-        },
       },
-    })).toThrow(/must be less than half beatIntervalMs/);
+    })).toThrow(/unknown shared dramatic curve/);
   });
 
   it("rejects numeric sequence segments without rejecting ordinary words", () => {
@@ -130,7 +135,7 @@ describe("game content loading", () => {
   });
 
   it("requires reference filenames to exactly match their IDs", () => {
-    expect(() => loadGame(
+    expect(() => loadTestGame(
       {
         ...gameContent,
         campaigns: [{ id: "the-monday-uprising", file: "monday.json" }],
@@ -141,18 +146,18 @@ describe("game content loading", () => {
   });
 
   it("rejects missing and unlisted campaign files", () => {
-    expect(() => loadGame(gameContent, {}, episodeModules))
+    expect(() => loadTestGame(gameContent, {}, episodeModules))
       .toThrow(/Missing campaign file/);
-    expect(() => loadGame(gameContent, {
+    expect(() => loadTestGame(gameContent, {
       ...campaignModules,
       "./campaigns/forgotten.json": campaignContent,
     }, episodeModules)).toThrow(/Unlisted campaign files/);
   });
 
   it("rejects missing and unlisted episode files", () => {
-    expect(() => loadGame(gameContent, campaignModules, {}))
+    expect(() => loadTestGame(gameContent, campaignModules, {}))
       .toThrow(/Missing episode file/);
-    expect(() => loadGame(gameContent, campaignModules, {
+    expect(() => loadTestGame(gameContent, campaignModules, {
       ...episodeModules,
       "./episodes/forgotten.json": episodeContent,
     })).toThrow(/Unlisted episode files/);
@@ -164,7 +169,7 @@ describe("game content loading", () => {
       id: "management-retaliates",
       title: "Management Retaliates",
     };
-    expect(() => loadGame(
+    expect(() => loadTestGame(
       {
         ...gameContent,
         campaigns: [
@@ -181,13 +186,13 @@ describe("game content loading", () => {
   });
 
   it("rejects identity disagreement at each content boundary", () => {
-    expect(() => loadGame(gameContent, {
+    expect(() => loadTestGame(gameContent, {
       "./campaigns/the-monday-uprising.json": {
         ...campaignContent,
         id: "monday-revolt",
       },
     }, episodeModules)).toThrow(/Campaign ID mismatch/);
-    expect(() => loadGame(gameContent, campaignModules, {
+    expect(() => loadTestGame(gameContent, campaignModules, {
       "./episodes/the-alarm.json": { ...episodeContent, id: "the-siren" },
     })).toThrow(/Episode ID mismatch/);
   });

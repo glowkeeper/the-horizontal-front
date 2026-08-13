@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "id": "sustained-grip",
+  "cycleBeats": 4,
+  "events": [
+    { "action": "hold", "side": "left", "atBeat": 0, "durationBeats": 2 },
+    { "action": "hold", "side": "right", "atBeat": 2, "durationBeats": 2 }
+  ]
+}

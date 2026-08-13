@@ -2,28 +2,86 @@
   "schemaVersion": 1,
   "id": "the-alarm",
   "title": "The Alarm",
+  "definitions": {
+    "rhythms": [],
+    "dramaticCurves": [
+      {
+        "schemaVersion": 1,
+        "id": "alarm-escalation",
+        "startingSafety": 0.78,
+        "resolutionDurationMs": 3000,
+        "phases": [
+          {
+            "id": "orientation",
+            "durationMs": 4000,
+            "rhythm": { "source": "shared", "id": "straight-alternation" },
+            "beatIntervalMs": 900,
+            "timingWindowMs": 320,
+            "leadInBeats": 1,
+            "pressurePerSecond": 0.018,
+            "recoveryPerAction": 0.035,
+            "safetyPenaltyPerMiss": 0.03,
+            "momentumGain": 0.14,
+            "momentumLoss": 0.10,
+            "momentumRecoveryBonus": 0.4,
+            "presentationIntensity": { "from": 0, "to": 0.12 }
+          },
+          {
+            "id": "establishment",
+            "durationMs": 6000,
+            "rhythm": { "source": "shared", "id": "straight-alternation" },
+            "beatIntervalMs": 800,
+            "timingWindowMs": 270,
+            "leadInBeats": 0,
+            "pressurePerSecond": 0.028,
+            "recoveryPerAction": 0.038,
+            "safetyPenaltyPerMiss": 0.045,
+            "momentumGain": 0.12,
+            "momentumLoss": 0.13,
+            "momentumRecoveryBonus": 0.45,
+            "presentationIntensity": { "from": 0.12, "to": 0.32 }
+          },
+          {
+            "id": "pressure",
+            "durationMs": 8000,
+            "rhythm": { "source": "shared", "id": "syncopated-counterpull" },
+            "beatIntervalMs": 700,
+            "timingWindowMs": 235,
+            "leadInBeats": 1,
+            "pressurePerSecond": 0.042,
+            "recoveryPerAction": 0.043,
+            "safetyPenaltyPerMiss": 0.065,
+            "momentumGain": 0.11,
+            "momentumLoss": 0.16,
+            "momentumRecoveryBonus": 0.5,
+            "presentationIntensity": { "from": 0.32, "to": 0.68 }
+          },
+          {
+            "id": "crisis",
+            "durationMs": 5000,
+            "rhythm": { "source": "shared", "id": "deliberate-rests" },
+            "beatIntervalMs": 600,
+            "timingWindowMs": 190,
+            "leadInBeats": 0,
+            "pressurePerSecond": 0.055,
+            "recoveryPerAction": 0.052,
+            "safetyPenaltyPerMiss": 0.09,
+            "momentumGain": 0.10,
+            "momentumLoss": 0.20,
+            "momentumRecoveryBonus": 0.55,
+            "presentationIntensity": { "from": 0.68, "to": 1 }
+          }
+        ]
+      }
+    ]
+  },
   "confrontation": {
     "resistance": {
-      "durationMs": 25000,
-      "startingSafety": 0.75,
-      "pressurePerSecond": 0.035,
-      "recoveryPerBeat": 0.04,
-      "momentumGain": 0.12,
-      "momentumLoss": 0.18,
-      "momentumRecoveryBonus": 0.5,
-      "rhythm": {
-        "steps": [
-          { "side": "left" },
-          { "side": "right" }
-        ],
-        "leadInBeats": 4,
-        "beatIntervalMs": 500,
-        "timingWindowMs": 200
-      }
+      "dramaticCurve": { "source": "episode", "id": "alarm-escalation" }
     },
     "presentation": {
-      "layout": "bed-head-right",
-      "skin": "the-alarm-bedroom",
+      "layout": { "source": "shared", "id": "bed-head-right" },
+      "skin": { "source": "episode", "id": "the-alarm-bedroom" },
       "managementAction": "lift-head"
     },
     "copy": {

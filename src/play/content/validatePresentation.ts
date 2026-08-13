@@ -82,8 +82,8 @@ export function assertSensiblePresentation(
     skin.bed.duvet,
     ...skin.managementParts,
   ]) {
-    if (part.shape === "image" && !assetIds.has(part.asset)) {
-      throw new Error(`unknown presentation asset: ${part.asset}`);
+    if (part.shape === "image" && !assetIds.has(part.asset.id)) {
+      throw new Error(`unknown presentation asset: ${part.asset.id}`);
     }
   }
 

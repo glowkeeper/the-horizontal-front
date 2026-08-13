@@ -15,11 +15,17 @@ type Motion = {
   readonly rest: { readonly workLightAlpha: number };
 };
 
+const MAXIMUM_AUTHORED_DANGER_FLOOR = 0.5;
+
 export function getResistancePresentation(
   duvetSafety: number,
+  dramaticIntensity: number,
   motion: Motion,
 ): ResistancePresentation {
-  const danger = 1 - clamp01(duvetSafety);
+  const danger = Math.max(
+    1 - clamp01(duvetSafety),
+    clamp01(dramaticIntensity) * MAXIMUM_AUTHORED_DANGER_FLOOR,
+  );
 
   return {
     bedAngleDegrees: motion.danger.bedAngleDegrees * danger,

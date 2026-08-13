@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { assetFilePattern } from "../contentRules.mjs";
+import { ownedContentReferenceSchema } from "./ownershipSchema";
 
 const colourRoleSchema = z.enum([
   "duvetCream",
@@ -61,7 +62,7 @@ const imagePartSchema = z.object({
   originX: unitIntervalSchema.optional(),
   originY: unitIntervalSchema.optional(),
   angleDegrees: z.number().min(-360).max(360).optional(),
-  asset: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+  asset: ownedContentReferenceSchema,
 }).strict();
 
 export const shapePartSchema = z.discriminatedUnion("shape", [

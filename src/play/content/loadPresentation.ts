@@ -1,4 +1,4 @@
-import type { Episode } from "./schemas/episodeSchema";
+import type { Episode } from "./loadEpisode";
 import {
   resistanceLayoutSchema,
   resistanceSkinSchema,
@@ -35,32 +35,23 @@ function loadLayout(id: string): ResistanceLayoutContent {
   return layout;
 }
 
-function loadSkin(episodeId: string, id: string): {
+function loadSkin(
+  episodeId: string,
+  reference: Episode["confrontation"]["presentation"]["skin"],
+): {
   readonly content: ResistanceSkin;
   readonly owner: "shared" | string;
 } {
-  const candidates = [
-    {
-      path: `./presentation/skins/episodes/${episodeId}/${id}.json`,
-      owner: episodeId,
-    },
-    {
-      path: `./presentation/skins/shared/${id}.json`,
-      owner: "shared" as const,
-    },
-  ];
-  const matches = candidates.filter(({ path }) => skinModules[path] !== undefined);
-  if (matches.length === 0) {
-    throw new Error(`Missing presentation skin: ${id}`);
+  const owner = reference.source === "shared" ? "shared" : episodeId;
+  const path = reference.source === "shared"
+    ? `./presentation/skins/shared/${reference.id}.json`
+    : `./presentation/skins/episodes/${episodeId}/${reference.id}.json`;
+  if (skinModules[path] === undefined) {
+    throw new Error(`Missing ${reference.source} presentation skin: ${reference.id}`);
   }
-  if (matches.length > 1) {
-    throw new Error(`Ambiguous presentation skin for ${episodeId}: ${id}`);
-  }
-
-  const [{ path, owner }] = matches;
   const content = resistanceSkinSchema.parse(skinModules[path]);
-  if (content.id !== id) {
-    throw new Error(`Skin ID mismatch: expected ${id}`);
+  if (content.id !== reference.id) {
+    throw new Error(`Skin ID mismatch: expected ${reference.id}`);
   }
   return { content, owner };
 }
@@ -83,25 +74,26 @@ export function assertAssetOwnership(
 
   for (const part of parts) {
     if (part.shape !== "image") continue;
-    const asset = assetsById.get(part.asset);
+    const asset = assetsById.get(part.asset.id);
     if (asset === undefined) continue;
 
     const shared = asset.file.startsWith("shared/");
     const ownedByEpisode = asset.file.startsWith(`episodes/${episodeId}/`);
     if (skinOwner === "shared" && !shared) {
-      throw new Error(`shared skin ${skin.id} cannot use episode asset ${part.asset}`);
+      throw new Error(`shared skin ${skin.id} cannot use episode asset ${part.asset.id}`);
     }
-    if (!shared && !ownedByEpisode) {
-      throw new Error(
-        `skin ${skin.id} cannot use asset ${part.asset} owned by another episode`,
-      );
+    if (part.asset.source === "shared" && !shared) {
+      throw new Error(`asset ${part.asset.id} is marked shared but is episode-owned`);
+    }
+    if (part.asset.source === "episode" && !ownedByEpisode) {
+      throw new Error(`asset ${part.asset.id} is not owned by episode ${episodeId}`);
     }
   }
 }
 
 export function loadPresentation(episode: Episode): LoadedPresentation {
   const selection = episode.confrontation.presentation;
-  const layout = loadLayout(selection.layout);
+  const layout = loadLayout(selection.layout.id);
   const { content: skin, owner } = loadSkin(episode.id, selection.skin);
 
   if (skin.layout !== layout.id) {

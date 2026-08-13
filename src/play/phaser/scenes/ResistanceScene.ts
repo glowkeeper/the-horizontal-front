@@ -3,8 +3,7 @@ import Phaser from "phaser";
 import type { Campaign } from "../../content/loadGame";
 import { formatCopy } from "../../content/formatCopy";
 import { game } from "../../content/game";
-import { loadEpisode } from "../../content/loadEpisode";
-import type { Episode } from "../../content/schemas/episodeSchema";
+import type { Episode } from "../../content/loadEpisode";
 import {
   acceptCampaignOutcome,
   assertCampaignRunMatches,
@@ -57,6 +56,7 @@ export class ResistanceScene extends Phaser.Scene {
   private timeRemaining!: Phaser.GameObjects.Text;
   private result!: Phaser.GameObjects.Text;
   private transitioning = false;
+  private outcomeActionsAvailable = false;
 
   public constructor() {
     super({ key: "ResistanceScene" });
@@ -64,9 +64,14 @@ export class ResistanceScene extends Phaser.Scene {
 
   public init(data: ResistanceSceneData): void {
     this.campaign = data.campaign;
-    this.episode = loadEpisode(data.episode);
     this.run = data.run;
     assertCampaignRunMatches(this.run, this.campaign.episodes.length);
+    const episodeIndex = getCurrentCampaignEpisodeIndex(this.run);
+    if (episodeIndex === null) throw new Error("Cannot start resistance for a completed campaign");
+    this.episode = this.campaign.episodes[episodeIndex];
+    if (!isEpisodeReference(data.episode, this.episode.id)) {
+      throw new Error(`Resistance scene episode must be ${this.episode.id}`);
+    }
   }
 
   public create(): void {
@@ -76,6 +81,7 @@ export class ResistanceScene extends Phaser.Scene {
     this.confrontationTimeMs = 0;
     this.finished = false;
     this.transitioning = false;
+    this.outcomeActionsAvailable = false;
     this.lastReportedExpiredStep = -1;
     this.lastAnnouncedNowStep = -1;
 
@@ -196,14 +202,18 @@ export class ResistanceScene extends Phaser.Scene {
       Phaser.Input.Keyboard.KeyCodes.RIGHT,
     ]);
     keyboard?.on("keydown", (event: KeyboardEvent) => {
-      const action = getResistanceControlAction(event);
+      const action = getResistanceControlAction(event, "press");
       if (action?.kind === "resist") {
-        this.handleResistanceInput(action.side);
+        this.handleResistanceInput(action.side, action.action);
       } else if (action?.kind === "restart") {
         this.restartConfrontation();
       } else if (action?.kind === "continue") {
         this.acceptOutcomeAndContinue();
       }
+    });
+    keyboard?.on("keyup", (event: KeyboardEvent) => {
+      const action = getResistanceControlAction(event, "release");
+      if (action?.kind === "resist") this.handleResistanceInput(action.side, action.action);
     });
 
     this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
@@ -211,19 +221,21 @@ export class ResistanceScene extends Phaser.Scene {
         return;
       }
 
-      this.handleResistanceInput(
-        pointer.worldX < this.cameras.main.centerX ? "left" : "right",
-      );
+      this.handleResistanceInput(pointerSide(pointer, this.cameras.main.centerX), "press");
+    });
+    this.input.on("pointerup", (pointer: Phaser.Input.Pointer) => {
+      if (!this.finished) this.handleResistanceInput(pointerSide(pointer, this.cameras.main.centerX), "release");
     });
   }
 
-  private handleResistanceInput(side: ResistanceSide): void {
+  private handleResistanceInput(side: ResistanceSide, action: "press" | "release"): void {
     if (this.finished) {
       return;
     }
 
     this.resistance = applyResistanceInput(this.resistance, {
       side,
+      action,
       atMs: this.confrontationTimeMs,
     });
     this.renderJudgement(
@@ -244,7 +256,7 @@ export class ResistanceScene extends Phaser.Scene {
       this.renderJudgement(state.lastRhythmJudgement);
     }
 
-    this.layout.render(state.duvetSafety);
+    this.layout.render(state.duvetSafety, state.dramaticIntensity);
 
     const remainingMs = Math.max(
       0,
@@ -261,12 +273,15 @@ export class ResistanceScene extends Phaser.Scene {
     this.rightCue.setFillStyle(this.colours().paperWhite);
 
     if (cue) {
-      const distanceMs = Math.abs(cue.atMs - state.elapsedMs);
+      const cueAtMs = state.activeHold?.step === cue.step
+        ? (cue.releaseAtMs ?? cue.atMs)
+        : cue.atMs;
+      const distanceMs = Math.abs(cueAtMs - state.elapsedMs);
       const isNow = distanceMs
-        <= this.resistance.config.rhythm.timingWindowMs;
+        <= cue.timingWindowMs;
       const pulse = Math.max(
         0,
-        1 - distanceMs / this.resistance.config.rhythm.beatIntervalMs,
+        1 - distanceMs / Math.max(1, cue.timingWindowMs * 3),
       );
       const expectedCue = cue.side === "left" ? this.leftCue : this.rightCue;
       if (isNow) {
@@ -275,9 +290,14 @@ export class ResistanceScene extends Phaser.Scene {
       expectedCue.setScale(1 + pulse * this.layout.content.controls.pulseScale);
       this.nextCue.setText(
         isNow
-          ? formatCopy(game.mechanics.resistance.now, {
+          ? formatCopy(
+            cue.action === "hold" && state.activeHold
+              ? game.mechanics.resistance.release
+              : game.mechanics.resistance.now,
+            {
               side: cue.side.toUpperCase(),
-            })
+            },
+          )
           : "",
       );
 
@@ -291,7 +311,9 @@ export class ResistanceScene extends Phaser.Scene {
         ) {
           this.feedback
             .setColor(getThemeColour("inkCharcoal"))
-            .setText(formatCopy(game.mechanics.resistance.tap, {
+            .setText(formatCopy(cue.action === "hold"
+              ? game.mechanics.resistance.hold
+              : game.mechanics.resistance.tap, {
               side: cue.side.toUpperCase(),
             }));
         }
@@ -350,6 +372,13 @@ export class ResistanceScene extends Phaser.Scene {
       return;
     }
 
+    if (judgement.reason === "released-early") {
+      this.feedback.setText(formatCopy(game.mechanics.resistance.releasedEarly, {
+        side: judgement.expectedSide.toUpperCase(),
+      }));
+      return;
+    }
+
     this.feedback.setText(formatCopy(game.mechanics.resistance.missed, {
       side: judgement.expectedSide.toUpperCase(),
     }));
@@ -357,6 +386,9 @@ export class ResistanceScene extends Phaser.Scene {
 
   private finishConfrontation(): void {
     this.finished = true;
+    this.nextCue.setText("");
+    this.leftCue.setScale(1).setFillStyle(this.colours().paperWhite);
+    this.rightCue.setScale(1).setFillStyle(this.colours().paperWhite);
     const victory = this.resistance.state.outcome === "victory";
     const resultContent = victory
       ? this.episode.results.victory
@@ -371,6 +403,23 @@ export class ResistanceScene extends Phaser.Scene {
       )
       .setVisible(true);
     this.feedback.setText(resultContent.feedback);
+    if (victory) {
+      this.layout.animateVictory();
+    } else {
+      this.layout.animateForcedVerticalisation();
+    }
+
+    announce(formatCopy(game.interface.resolutionStatus, {
+      outcome: resultContent.headline,
+      feedback: resultContent.feedback,
+    }));
+    this.time.delayedCall(this.resistance.config.resolutionDurationMs, () => {
+      this.createOutcomeActions(resultContent.headline, resultContent.feedback);
+    });
+  }
+
+  private createOutcomeActions(outcome: string, feedback: string): void {
+    if (this.transitioning) return;
     const { restart } = this.layout.content.anchors;
     createButton(this, restart.x - 220, restart.y, 360, game.interface.retryEpisode, () => {
       this.restartConfrontation();
@@ -378,21 +427,12 @@ export class ResistanceScene extends Phaser.Scene {
     createButton(this, restart.x + 220, restart.y, 360, game.interface.acceptOutcome, () => {
       this.acceptOutcomeAndContinue();
     });
-
-    if (victory) {
-      this.layout.animateVictory();
-    } else {
-      this.layout.animateForcedVerticalisation();
-    }
-
-    announce(formatCopy(game.interface.resultStatus, {
-      outcome: resultContent.headline,
-      feedback: resultContent.feedback,
-    }));
+    this.outcomeActionsAvailable = true;
+    announce(formatCopy(game.interface.resultStatus, { outcome, feedback }));
   }
 
   private restartConfrontation(): void {
-    if (this.finished && !this.transitioning) {
+    if (this.finished && this.outcomeActionsAvailable && !this.transitioning) {
       this.transitioning = true;
       this.scene.restart({
         campaign: this.campaign,
@@ -404,7 +444,7 @@ export class ResistanceScene extends Phaser.Scene {
 
   private acceptOutcomeAndContinue(): void {
     const outcome = this.resistance.state.outcome;
-    if (!this.finished || this.transitioning || outcome === "active") return;
+    if (!this.finished || !this.outcomeActionsAvailable || this.transitioning || outcome === "active") return;
     this.transitioning = true;
 
     const run = acceptCampaignOutcome(this.run, outcome);
@@ -439,4 +479,13 @@ export class ResistanceScene extends Phaser.Scene {
     return Phaser.Display.Color.HexStringToColor(getThemeColour(role)).color;
   }
 
+}
+
+function pointerSide(pointer: Phaser.Input.Pointer, centreX: number): ResistanceSide {
+  return pointer.worldX < centreX ? "left" : "right";
+}
+
+function isEpisodeReference(value: unknown, expectedId: string): boolean {
+  return typeof value === "object" && value !== null
+    && "id" in value && (value as { id?: unknown }).id === expectedId;
 }

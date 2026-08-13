@@ -1,49 +1,23 @@
 import { z } from "zod";
 import { contentIdSchema } from "./gameSchema";
+import {
+  episodeMechanicDefinitionsSchema,
+} from "./mechanicsSchema";
+import { ownedContentReferenceSchema } from "./ownershipSchema";
 
 const shortCopy = z.string().trim().min(1).max(120);
 
-const rhythmStepSchema = z
-  .object({
-    side: z.enum(["left", "right"]),
-  })
-  .strict();
-
-const rhythmPatternSchema = z
-  .object({
-    steps: z.array(rhythmStepSchema).min(1),
-    leadInBeats: z.number().int().positive(),
-    beatIntervalMs: z.number().int().positive(),
-    timingWindowMs: z.number().int().nonnegative(),
-  })
-  .strict()
-  .superRefine((rhythm, context) => {
-    if (rhythm.timingWindowMs * 2 >= rhythm.beatIntervalMs) {
-      context.addIssue({
-        code: "custom",
-        message: "must be less than half beatIntervalMs",
-        path: ["timingWindowMs"],
-      });
-    }
-  });
-
-const resistanceConfigSchema = z
-  .object({
-    durationMs: z.number().int().positive(),
-    startingSafety: z.number().min(0).max(1),
-    pressurePerSecond: z.number().nonnegative(),
-    recoveryPerBeat: z.number().nonnegative(),
-    momentumGain: z.number().min(0).max(1),
-    momentumLoss: z.number().min(0).max(1),
-    momentumRecoveryBonus: z.number().nonnegative(),
-    rhythm: rhythmPatternSchema,
-  })
-  .strict();
+const resistanceCompositionSchema = z.object({
+  dramaticCurve: ownedContentReferenceSchema,
+}).strict();
 
 const presentationSchema = z
   .object({
-    layout: z.literal("bed-head-right"),
-    skin: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+    layout: z.object({
+      source: z.literal("shared"),
+      id: z.literal("bed-head-right"),
+    }).strict(),
+    skin: ownedContentReferenceSchema,
     managementAction: z.literal("lift-head"),
   })
   .strict();
@@ -65,9 +39,10 @@ export const episodeSchema = z
     schemaVersion: z.literal(1),
     id: contentIdSchema,
     title: z.string().trim().min(1),
+    definitions: episodeMechanicDefinitionsSchema.optional(),
     confrontation: z
       .object({
-        resistance: resistanceConfigSchema,
+        resistance: resistanceCompositionSchema,
         presentation: presentationSchema,
         copy: confrontationCopySchema,
       })
@@ -81,4 +56,4 @@ export const episodeSchema = z
   })
   .strict();
 
-export type Episode = z.infer<typeof episodeSchema>;
+export type EpisodeContent = z.infer<typeof episodeSchema>;

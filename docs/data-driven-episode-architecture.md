@@ -41,11 +41,13 @@ Nothing new is programmed, but the dramatic shape changes.
 
 ## Rhythm as a source of variety
 
-Rhythm is a core rule rather than decorative music laid over a tapping game. An episode may select from a small documented vocabulary of reusable rhythm patterns and parameters, including a countable lead-in before the first required input. The first prototype needs only a repeating left-right alternation, but later engine capabilities may support accents, rests, strong and weak beats, syncopation, or changes between established patterns.
+Rhythm is a core rule rather than decorative music laid over a tapping game. Episodes select dramatic curves; each curve composes reusable catalogue-owned rhythm patterns phase by phase. The implemented rhythm vocabulary contains timed left/right taps, explicit rests and sustained holds. Beat positions may be fractional, so the same finite notation expresses straight alternation, waltz groupings, syncopation, deliberate silence, press-and-release grips and call-and-response phrases.
+
+Rhythm files define a bounded cycle in beats. Each event is exactly one of `tap`, `hold` or `rest`. Tap and hold events name a side and beat position; holds also name their duration; rests explicitly reserve silence. A dramatic phase selects a shared or same-episode rhythm and supplies tempo, timing tolerance, lead-in, pressure, recovery, momentum and presentation intensity. The loader resolves those references into a finite timestamped score before play. The plain TypeScript engine never branches on a rhythm, curve or episode ID.
 
 The engine judges player input against the required pattern and timing. Successful performance builds rhythmic momentum, which strengthens resistance and helps recover the duvet. Poorly timed or incorrect input loses momentum. The same engine clock should drive judgement and the audio, visual, and optional haptic cues that communicate the rhythm.
 
-Rhythm data must remain finite and readable. It must not grow into a musical programming language, arbitrary sequencer, or executable notation hidden inside episode JSON. Any expansion should follow the same capability test as other mechanics: it should serve several plausible episodes, remain simple to explain, and combine safely with existing resistance rules.
+Rhythm data remains finite and readable. It has no expressions, callbacks, variables or general looping construct: repeating a bounded cycle for the duration of a phase is a single documented engine rule, not an embedded scripting language. Phase miss penalties are non-negative scalar data and default to zero when omitted. Any vocabulary expansion must serve several plausible episodes, remain simple to explain, and combine safely with existing resistance rules.
 
 Difficulty should come from pattern, timing, composition, interruptions, and pressure rather than primarily from ever-higher input rates. This is both a design principle and a physical-accessibility constraint.
 
@@ -87,34 +89,11 @@ Each episode has its own premise, escalation and punchline.
 
 Episodes need not schedule pressure and attacks identically. One may be a steady siege; another may begin suspiciously easily; another may contain repeated temptations, false endings or a late betrayal.
 
-```json
-{
-  "phases": [
-    {
-      "duration": 6,
-      "pressure": "low",
-      "mood": "suspiciously-calm"
-    },
-    {
-      "duration": 12,
-      "pressure": "high",
-      "attacks": ["quick-call", "urgent-email"]
-    },
-    {
-      "duration": 4,
-      "pressure": "none",
-      "bossLine": "Congratulations. The restructure is complete."
-    },
-    {
-      "duration": 8,
-      "pressure": "extreme",
-      "attacks": ["return-to-office"]
-    }
-  ]
-}
-```
+The first production curve, `alarm-escalation`, proves this composition with orientation, establishment, pressure and crisis phases followed by a separately timed resolution. Other curves may use any number of phases and may rise steadily, provide false relief, reverse their pressure or combine different catalogue rhythms. Phase IDs are author-facing descriptions only; they have no special engine behaviour.
 
-The engine understands phases, dialogue cues, pressure and attacks. The episode merely arranges them.
+`The Alarm` exercises straight alternation, syncopation and deliberate rests in live play. The shared catalogue also contains managerial waltz, sustained grip and call-and-response patterns as validated production vocabulary ready for an episode composition; their compiler and engine paths are covered by tests, but they are not claimed as play-tested content. Explicit rests reserve authored silence and prevent other events occupying that interval. They intentionally compile to no input cue: their runtime effect is the absence of an action while ordinary phase pressure continues.
+
+The crisis uses two conspicuous rests under maximum pressure. Its difficulty comes from having fewer recovery opportunities and from the cost of missed cues, not from accelerating input. This held-breath shape is intentional and supports the project's physical-safety rule that dramatic intensity must not mean ever-faster tapping.
 
 ### Mechanical composition
 
@@ -150,6 +129,20 @@ Episodes can be broadly ridiculous, quietly sinister, triumphantly rebellious, m
 ## Finite episode grammar
 
 The complete system should have an explicit, documented grammar that a non-programmer can understand.
+
+### Shared and episode-owned definitions
+
+Every reusable content family follows one ownership model:
+
+```text
+shared definition → shared definitions only
+episode definition → shared definitions or definitions owned by that episode
+episode definition → never another episode's private definitions
+```
+
+References make that choice explicit as `{ "source": "shared", "id": "..." }` or `{ "source": "episode", "id": "..." }`. An episode may define private rhythms, dramatic curves and any other mechanic family whose schema permits local authorship. Private IDs are scoped to that episode but may not shadow a shared ID; this prevents a reference changing meaning when content is moved or reused. Shared catalogues cannot depend on episode content, and loaders resolve local definitions only inside the episode currently being loaded.
+
+This is the default ownership contract for mechanics, audio compositions, animation sequences, dialogue structures and other reusable systems. Presentation obeys the same dependency direction through its shared and episode skin/asset namespaces. A family may deliberately support only shared definitions—for example a tightly controlled engine layout—but that restriction must be explicit in its schema rather than accidental in its loader.
 
 The authored root is `game.json`. It contains an ordered list of campaigns; each campaign JSON contains an ordered list of episodes. The first campaign and its first episode are the natural entry point. Stable IDs use descriptive lowercase kebab-case without numeric sequence segments, and each JSON filename must exactly match its ID. Episode IDs are globally unique across campaigns so saves, previews, presentation ownership and diagnostics never need a campaign-qualified identity.
 
@@ -187,6 +180,17 @@ campaigns/
   the-monday-uprising.json
 episodes/
   the-alarm.json
+mechanics/
+  catalog.json
+  rhythms/
+    straight-alternation.json
+    managerial-waltz.json
+    syncopated-counterpull.json
+    deliberate-rests.json
+    sustained-grip.json
+    call-and-response.json
+  dramatic-curves/
+    # shared curve JSON when a curve is genuinely reused
 ```
 
 ```text
@@ -196,15 +200,16 @@ An episode consists of:
 1 confrontation
 1 result
 
-A confrontation consists of:
-
-1–5 phases
+A confrontation explicitly selects either a shared dramatic curve or one defined by its episode. A curve consists of one or more ordered phases and a resolution duration. `The Alarm` owns `alarm-escalation` inside its episode JSON because that composition is part of the episode's authorship; its phases reuse shared rhythm vocabulary.
 
 A phase may define:
 
 - Duration
 - Boss pressure
-- Required rhythm
+- Catalogued rhythm ID
+- Beat interval, timing window and lead-in
+- Recovery and momentum parameters
+- Continuous presentation intensity
 - Available attacks
 - Dialogue interruption
 - Visual state
@@ -320,7 +325,7 @@ Cartoon scenes should use reusable layouts and semantic slots rather than making
 
 The layout determines responsive placement, scaling, text-safe areas and default layer order. The episode supplies poses, dialogue, props and small artistic offsets.
 
-An episode selects a documented layout and skin by stable ID; it does not contain asset file paths or the complete scene drawing. Layout JSON defines shared design-space anchors, pivots, slots and motion parameters. Skin JSON defines the visual parts occupying those slots through either the finite prototype-shape vocabulary or semantic image IDs resolved by a validated asset catalogue. Both skins and catalogue-owned files use `shared/` and `episodes/<episode-id>/` namespaces. Shared skins can use only shared assets. An episode-owned skin can use shared assets and assets owned by the same episode, and only that episode can select it. Shared Phaser adapters validate and interpret those files. This keeps ordinary composition and replacement artwork editable as data without turning episode JSON into a graphical programming language.
+An episode selects a documented layout and skin through explicit ownership references; it does not contain asset file paths or the complete scene drawing. Layout JSON defines shared design-space anchors, pivots, slots and motion parameters. Skin JSON defines the visual parts occupying those slots through either the finite prototype-shape vocabulary or explicitly owned semantic image references resolved by a validated asset catalogue. Both skins and catalogue-owned files use `shared/` and `episodes/<episode-id>/` namespaces. Shared skins can use only shared assets. An episode-owned skin can use shared assets and assets owned by the same episode, and only that episode can select it. Shared Phaser adapters validate and interpret those files. This keeps ordinary composition and replacement artwork editable as data without turning episode JSON into a graphical programming language.
 
 Each asset-catalogue entry is ordinary authored data. For example:
 

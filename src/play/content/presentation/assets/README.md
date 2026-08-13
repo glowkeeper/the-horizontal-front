@@ -3,11 +3,15 @@
 - Put artwork intentionally reusable across episodes under `shared/`.
 - Put episode-specific artwork under `episodes/<episode-id>/`.
 - Register every image and its provenance in `../asset-catalog.json`.
-- Reference the catalogue's semantic asset ID from skins; never put file paths in
+- Reference the catalogue's semantic asset ID from skins through explicit
+  `{ "source": "shared|episode", "id": "..." }` data; never put file paths in
   episodes or skins.
 
 Shared skins may use only shared assets. An episode-owned skin may use shared
 assets and assets owned by the same episode.
+
+The declared source must agree with the catalogue path; resolution never falls
+back from one ownership level to the other.
 
 A skin's authored image width and height describe the complete image frame,
 including intentional transparent padding—not only the opaque pixels.

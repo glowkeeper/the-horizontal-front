@@ -12,7 +12,15 @@ describe("resistance input", () => {
     expect(getResistanceControlAction({ code, repeat: false })).toEqual({
       kind: "resist",
       side,
+      action: "press",
     });
+  });
+
+  it("maps key release for sustained holds", () => {
+    expect(getResistanceControlAction(
+      { code: "KeyA", repeat: false },
+      "release",
+    )).toEqual({ kind: "resist", side: "left", action: "release" });
   });
 
   it("ignores key repeat so one press cannot consume several beats", () => {

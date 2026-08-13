@@ -16,6 +16,7 @@
     "retryEpisode": "TRY AGAIN",
     "acceptOutcome": "ACCEPT OUTCOME",
     "resultStatus": "{outcome}. {feedback} Press R or tap Try Again to retry, or Enter or tap Accept Outcome to continue.",
+    "resolutionStatus": "{outcome}. {feedback}",
     "replayCampaign": "PLAY CAMPAIGN AGAIN",
     "returnToCampaigns": "CAMPAIGNS",
     "debriefingStatus": "{headline}. {body} {scoreLabel}: {score}. Press R or Enter to play again, or Escape to return to Campaigns."
@@ -28,10 +29,13 @@
       "secondsRemaining": "{seconds} SECONDS",
       "now": "NOW: {side}",
       "tap": "TAP — {side}",
+      "hold": "HOLD — {side}",
+      "release": "RELEASE — {side}",
       "hit": "✓ HIT — {side}\nSOLIDARITY! ✊ 🛏️",
       "wrongSide": "✕ WRONG KEY — {side} NEEDED",
       "tooEarly": "✕ TOO EARLY — {side} ON NOW",
-      "missed": "✕ MISSED — {side}"
+      "missed": "✕ MISSED — {side}",
+      "releasedEarly": "✕ RELEASED TOO EARLY — {side}"
     }
   },
   "campaigns": [

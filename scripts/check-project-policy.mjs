@@ -43,7 +43,13 @@ async function findEmbeddedPlayerCopy(directory) {
 }
 
 async function listFiles(directory) {
-  const entries = await readdir(directory, { withFileTypes: true });
+  let entries;
+  try {
+    entries = await readdir(directory, { withFileTypes: true });
+  } catch (error) {
+    if (error?.code === "ENOENT") return [];
+    throw error;
+  }
   const files = [];
 
   for (const entry of entries) {
@@ -64,12 +70,19 @@ const packageJson = JSON.parse(
 );
 
 const gamePath = join(projectRoot, "src/play/content/game.json");
+const mechanicCataloguePath = join(
+  projectRoot,
+  "src/play/content/mechanics/catalog.json",
+);
 const assetCatalogPath = join(
   projectRoot,
   "src/play/content/presentation/asset-catalog.json",
 );
 const assetRoot = join(projectRoot, "src/play/content/presentation/assets");
 const gameData = JSON.parse(await readFile(gamePath, "utf8"));
+const mechanicCatalogueData = JSON.parse(
+  await readFile(mechanicCataloguePath, "utf8"),
+);
 const campaignData = await Promise.all(gameData.campaigns.map(async ({ file }) =>
   JSON.parse(await readFile(
     join(projectRoot, "src/play/content/campaigns", file),
@@ -88,6 +101,13 @@ const discoveredCampaignFiles = (await listFiles(campaignRoot)).map((file) =>
   relative(campaignRoot, file).split("\\").join("/"));
 const discoveredEpisodeFiles = (await listFiles(episodeRoot)).map((file) =>
   relative(episodeRoot, file).split("\\").join("/"));
+const mechanicRoot = join(projectRoot, "src/play/content/mechanics");
+const discoveredRhythmFiles = (await listFiles(join(mechanicRoot, "rhythms")))
+  .map((file) => relative(join(mechanicRoot, "rhythms"), file).split("\\").join("/"))
+  .filter((file) => file.endsWith(".json"));
+const discoveredCurveFiles = (await listFiles(join(mechanicRoot, "dramatic-curves")))
+  .map((file) => relative(join(mechanicRoot, "dramatic-curves"), file).split("\\").join("/"))
+  .filter((file) => file.endsWith(".json"));
 const embeddedPlayerCopy = await findEmbeddedPlayerCopy(
   join(projectRoot, "src/play"),
 );
@@ -125,6 +145,20 @@ requirePolicy(
 requirePolicy(
   episodeIds.size === episodeReferences.length,
   "Episode IDs must be globally unique across campaigns.",
+);
+requirePolicy(
+  referencesMatchIds(mechanicCatalogueData.rhythms)
+    && discoveredRhythmFiles.length === mechanicCatalogueData.rhythms.length
+    && discoveredRhythmFiles.every((file) =>
+      mechanicCatalogueData.rhythms.some((entry) => entry.file === file)),
+  "Every rhythm file must be listed exactly once with a matching durable ID in the mechanic catalogue.",
+);
+requirePolicy(
+  referencesMatchIds(mechanicCatalogueData.dramaticCurves)
+    && discoveredCurveFiles.length === mechanicCatalogueData.dramaticCurves.length
+    && discoveredCurveFiles.every((file) =>
+      mechanicCatalogueData.dramaticCurves.some((entry) => entry.file === file)),
+  "Every dramatic-curve file must be listed exactly once with a matching durable ID in the mechanic catalogue.",
 );
 for (const id of [
   gameData.id,
@@ -197,16 +231,20 @@ const skinRecords = await Promise.all(skinFiles.map(async (file) => {
     ...content.managementParts,
   ];
   for (const part of parts.filter(({ shape }) => shape === "image")) {
-    const asset = assetsById.get(part.asset);
+    const asset = assetsById.get(part.asset.id);
     requirePolicy(
       asset !== undefined,
-      `Presentation skin ${content.id} references unknown asset ${part.asset}.`,
+      `Presentation skin ${content.id} references unknown asset ${part.asset.id}.`,
     );
     if (asset === undefined) continue;
     const sharedAsset = asset.file.startsWith("shared/");
     requirePolicy(
       sharedAsset || (owner !== "shared" && asset.file.startsWith(`episodes/${owner}/`)),
       `Presentation skin ${content.id} references an asset outside its ownership boundary.`,
+    );
+    requirePolicy(
+      part.asset.source === (sharedAsset ? "shared" : "episode"),
+      `Presentation skin ${content.id} asset ${part.asset.id} must explicitly name its ownership source.`,
     );
   }
   return { path, content, owner };
@@ -220,9 +258,12 @@ for (const { id, file } of episodeReferences) {
     episode.id === id,
     `Episode file ${file} must contain the ID ${id}.`,
   );
-  const skinId = episode.confrontation.presentation.skin;
+  const skinReference = episode.confrontation.presentation.skin;
+  const skinId = skinReference.id;
   const matchingSkins = skinRecords.filter(({ content, owner }) =>
-    content.id === skinId && (owner === "shared" || owner === id));
+    content.id === skinId && owner === (
+      skinReference.source === "shared" ? "shared" : id
+    ));
   requirePolicy(
     matchingSkins.length === 1,
     `Episode ${id} must select exactly one shared or episode-owned skin named ${skinId}.`,

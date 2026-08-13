@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 
 import { loadPresentation } from "../../content/loadPresentation";
-import type { Episode } from "../../content/schemas/episodeSchema";
+import type { Episode } from "../../content/loadEpisode";
 import type {
   ResistanceLayoutContent,
   ShapePart,
@@ -79,8 +79,8 @@ export function createBedHeadRightLayout(
   return {
     content: layout,
 
-    render(duvetSafety): void {
-      const state = getResistancePresentation(duvetSafety, motion);
+    render(duvetSafety, dramaticIntensity): void {
+      const state = getResistancePresentation(duvetSafety, dramaticIntensity, motion);
       bedContainer.setRotation(Phaser.Math.DegToRad(state.bedAngleDegrees));
       duvet.setX(skin.bed.duvetRestingX + state.duvetPullX);
       sleeper.setX(skin.bed.sleeperRestingX + state.sleeperSlideX);
@@ -135,7 +135,7 @@ export function createBedHeadRightLayout(
 
 function createShape(scene: Phaser.Scene, part: ShapePart) {
   if (part.shape === "image") {
-    return scene.add.image(part.x, part.y, part.asset)
+    return scene.add.image(part.x, part.y, part.asset.id)
       .setDisplaySize(part.width, part.height)
       .setOrigin(part.originX ?? 0.5, part.originY ?? 0.5)
       .setRotation(Phaser.Math.DegToRad(part.angleDegrees ?? 0));

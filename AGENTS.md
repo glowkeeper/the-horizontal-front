@@ -14,7 +14,7 @@ These instructions apply to every AI coding assistant working in this repository
 - Do not replace understandable code with clever abstractions without discussing the benefit first.
 - Surface decisions that would constrain later design instead of hiding them in scaffolding.
 - Distinguish clearly between provisional bootstrap values and intentional product decisions.
-- Every prototype must exercise the intended production architecture. Provisional content, tuning and artwork are acceptable; disposable architectural shortcuts, episode-specific wiring and deferred boundaries are not. If the production boundary is known, implement it in the prototype.
+- Every prototype must exercise the intended production architecture. Provisional content, tuning and artwork are acceptable; disposable architectural shortcuts, episode-specific wiring and deferred boundaries are not. If a reusable boundary—such as catalogues, validation, ownership or composition—is part of the agreed design being tested, implement it now rather than describing it as later work.
 - Preserve the maintainer's existing naming, layout and stylistic preferences.
 - Ask before making a material product or architectural decision that has not already been settled in the documentation.
 
@@ -111,6 +111,7 @@ Avoid class hierarchies, service containers, unnecessary design patterns and pre
 
 ## Content and presentation
 
+- Apply the same two-level ownership model to every content family that supports reuse: `shared` definitions are globally reusable and may reference shared definitions only; `episode` definitions are private to their owning episode and may reference shared definitions or definitions owned by that same episode. References must state their source explicitly, local IDs must not shadow shared IDs, and content must never reach into another episode's private namespace. A content family that intentionally supports only one level must say so in its schema and documentation.
 - Canvas presentation belongs in shared semantic theme roles rather than ad hoc scene values.
 - Do not invent fonts, colours or visual branding while performing neutral scaffolding.
 - Reuse responsive cartoon layouts and semantic slots.

@@ -132,6 +132,7 @@ type Resistance = {
 
 type ResistanceInput = {
   side: "left" | "right";
+  action: "press" | "release";
   atMs: number;
 };
 
@@ -146,9 +147,15 @@ function applyResistanceInput(
 
 The `Resistance` value keeps the fixed configuration and changing state of one confrontation together. Public transitions therefore cannot accidentally receive a different configuration on each call. This logic can be tested without starting Phaser or opening a browser. Mobile touch, desktop keyboard and pointer input can all produce the same `ResistanceInput` value.
 
-Rhythm is part of the domain model, not an effect owned by Phaser or the audio system. The functional engine should judge normalised input against an authored pattern and explicit timing windows. The first pattern is a repeating left-right alternation, while future reusable capabilities may introduce accents, rests, syncopation, or changes between documented patterns.
+Rhythm is part of the domain model, not an effect owned by Phaser or the audio system. The functional engine judges normalised press and release input against the resolved score and explicit timing windows. The catalogue already proves straight alternation, waltz grouping, syncopation, explicit rests, sustained holds and call-and-response composition through the same reusable vocabulary.
 
-One elapsed-time clock should drive rhythm judgement and the cues that communicate it. Phaser and the audio adapter may render sound, animation, visual pulses, and optional haptics, but they should derive those cues from engine timing rather than maintaining competing clocks. This keeps input results deterministic and lets equivalent audio and visual presentations describe the same required rhythm.
+One elapsed-time clock drives rhythm judgement, dramatic phases and the cues that communicate them. At content-load time, the selected catalogued dramatic curve composes catalogued rhythm cycles into a finite timestamped score. Phaser and the audio adapter may render sound, animation, visual pulses, and optional haptics, but they derive those cues from that resolved engine timing rather than maintaining competing clocks. This keeps input results deterministic and lets equivalent audio and visual presentations describe the same required rhythm.
+
+The score vocabulary is deliberately finite: tap, hold and rest events positioned within bounded beat cycles. Holds are real press-and-release actions judged at both boundaries. Dramatic phases own tempo, timing tolerance, pressure, recovery, momentum and a continuous presentation-intensity range. Phase pressure is integrated across elapsed time, so results do not depend on frame rate. The resolution duration is distinct from interactive duration and prevents navigation controls appearing before the authored outcome has registered.
+
+Misses apply both a momentum loss and the phase's authored safety penalty. This makes indifferent or one-sided input materially worse than following the score while leaving each phase's stakes tunable in data. Rest events compile to intentional gaps rather than runtime objects; pressure continues through them.
+
+Presentation intensity supplies a capped dramatic floor rather than replacing the physical danger signal. Duvet safety remains the primary visual input, while authored intensity can raise the scene only halfway toward maximum danger. A highly successful player therefore still sees escalation without being shown the same maximum displacement as imminent failure.
 
 Rhythm complexity should be able to increase without requiring an ever-higher input rate. The rule system must remain suitable for reduced-input mappings and must not assume that keyboard, pointer, and touch inputs impose identical physical effort.
 
@@ -176,6 +183,8 @@ Browser canvas
 ```
 
 This boundary prevents Phaser-specific objects from leaking throughout the engine and makes the rules easier to understand, test and potentially reuse.
+
+Content resolution also has a uniform ownership boundary. The shared library is loaded first and cannot reference episode-owned material. Each episode loader then creates an isolated local scope from that episode's definitions. Explicit `{ source, id }` references resolve against either the shared library or that one local scope; duplicate local IDs, shared-ID shadowing, unresolved references and cross-episode access fail during loading. The resolved engine configuration contains no ownership lookup and no content IDs that alter behaviour.
 
 ## Scenes
 
@@ -211,7 +220,7 @@ The canvas navigation is adequate prototype input scaffolding, not the final acc
 
 Reusable scenes receive the validated episode as scene data; they do not import an episode file or choose an episode ID themselves. Episode presentation data selects a layout and skin. Validated layout JSON owns design-space anchors, pivots, interface slots and reusable motion parameters; validated skin JSON owns prototype primitive geometry or, later, semantic layered-asset references. Phaser code interprets this finite vocabulary and applies runtime state—it does not contain the authored composition coordinates.
 
-Artwork files are resolved through a validated asset catalog using stable semantic IDs. Skins may use either documented prototype shapes or image parts referencing those IDs; they never contain repository paths. Both skins and physical assets are organised by ownership under `shared/` or `episodes/<episode-id>/`. A shared skin may use only shared assets; an episode-owned skin may use shared assets and assets owned by that episode. An episode may select only a shared skin or one in its own namespace. Build-time recursive discovery and policy validation reject unsafe paths, unknown episode namespaces, missing files and unlisted files, and the generic boot scene preloads catalogued images before the selected presentation is instantiated.
+Artwork files are resolved through a validated asset catalog using stable semantic IDs. Skins may use either documented prototype shapes or image parts with explicit `{ source, id }` asset references; they never contain repository paths. Episodes likewise select layouts and skins through explicit ownership references. Both skins and physical assets are organised by ownership under `shared/` or `episodes/<episode-id>/`. A shared skin may use only shared assets; an episode-owned skin may use shared assets and assets owned by that episode. An episode may select only a shared skin or one in its own namespace. Build-time recursive discovery and policy validation reject unsafe paths, misleading ownership sources, unknown episode namespaces, missing files and unlisted files, and the generic boot scene preloads catalogued images before the selected presentation is instantiated.
 
 Presentation validation has two levels. Zod schemas enforce the finite structural vocabulary, types and numeric ranges. Semantic validation enforces relationships that schemas alone cannot express: coordinates and controls fit the design canvas, required part IDs exist and are unique, image references resolve, layout and skin are compatible, the bed head lies opposite its foot pivot, lift motion raises the correct end, and loose objects move downhill. A JSON file parsing successfully is not sufficient evidence that a composition is usable.
 
