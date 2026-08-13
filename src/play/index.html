@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="Play The Horizontal Front." />
+    <meta name="theme-color" content="#f3e8d0" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <title>Play — The Horizontal Front</title>
+  </head>
+  <body class="game-page">
+    <a class="game-exit" href="/">Return to the Front</a>
+    <main id="app">
+      <p id="game-status" class="visually-hidden">The Monday Uprising is being organised. Management has been notified of absolutely nothing. The Horizontal Front is coming soon.</p>
+      <div id="game" role="img" aria-label="The Horizontal Front coming-soon notice" aria-describedby="game-status"></div>
+    </main>
+    <script type="module" src="/src/play/main.ts"></script>
+  </body>
+</html>

@@ -24,6 +24,17 @@ The canonical charter, governance, identity, contribution and licensing Markdown
 
 This shell does not introduce a UI framework. Vite builds the static HTML entry points and their small TypeScript modules directly. The service-worker finalisation step derives its precache list from the actual production output so every public document, licence, shared asset and game file remains available offline after installation.
 
+The source tree makes this boundary visible:
+
+```text
+src/
+  play/      Game entry, engine, Phaser integration, theme adapter and styles
+  site/      Public-site entry, page templates and styles
+  shared/    Design tokens and browser infrastructure used by both
+```
+
+Vite still requires route-shaped HTML entry points at build time. The site generator creates those as ignored root intermediates from `src/site/pages`, `src/play/index.html` and the canonical project Markdown. Public URL layout therefore does not dictate source-code layout.
+
 ## Why Phaser fits
 
 The game is an interactive two-dimensional political cartoon. Its principal elements are layered images, limited character animation, speech bubbles, sound, responsive input and a continuously changing gameplay state.

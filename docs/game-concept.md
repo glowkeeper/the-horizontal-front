@@ -177,6 +177,19 @@ The boss should be a wholly fictional caricature of an authoritarian executive. 
 
 The game's logo and art direction should be original.
 
+### Starting colour system
+
+The first intentional palette establishes a semantic opposition between warmth, solidarity and resistance on one side, and cold work light and gaudy management authority on the other:
+
+- **Duvet cream (`#F3E8D0`)** — the warm foundational surface.
+- **Ink charcoal (`#201C19`)** — readable text and structural line work.
+- **Resistance red (`#B8322A`)** — collective action, primary emphasis and calls to resist.
+- **Work-light blue (`#3E6F8F`)** — corporate intrusion, danger and forced verticalisation.
+- **Management gold (`#C8952E`)** — vanity, executive spectacle and the Orange Fella's authority.
+- **Paper white (`#FFFDF7`)** — documents, cards and quiet readable surfaces.
+
+These are intentional starting roles rather than a claim that every final shade is settled. Public HTML and Phaser must consume the same shared design tokens for colour and typography so visual meaning does not drift between the site and game. Canvas-specific sizes and wrapping remain in the Phaser adapter because they respond to the fixed game coordinate system rather than the document layout.
+
 ## Audio and feedback
 
 Every successful action needs satisfying feedback: mattress movement, duvet snaps, meter recovery, character effort, and escalating music. Corporate attacks could arrive through notification chimes, video-call tones, office alarms, and motivational voice lines.

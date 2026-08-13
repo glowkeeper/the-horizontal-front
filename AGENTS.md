@@ -156,7 +156,8 @@ If a human composer, performer or sound designer later contributes production au
 
 ## Files and imports
 
-- Keep global page styles under `src/styles/`.
+- Keep public-site styles under `src/site/styles/` and game-specific styles under `src/play/styles/`.
+- Keep genuinely shared presentation values, including semantic colour, typography and spacing tokens, under `src/shared/theme/`.
 - Keep Phaser canvas theme values in a shared theme module.
 - Use extensionless relative TypeScript imports; Vite and TypeScript use bundler resolution.
 - Keep content separate from engine and Phaser integration code.

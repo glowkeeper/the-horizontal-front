@@ -1,7 +1,9 @@
+@import "../../shared/theme/tokens.css";
+
 :root {
-  color: #171717;
-  background: #f4f1e8;
-  font-family: system-ui, sans-serif;
+  color: var(--colour-ink-charcoal);
+  background: var(--colour-duvet-cream);
+  font-family: var(--font-interface);
   font-synthesis: none;
   line-height: 1.6;
 }
@@ -28,6 +30,7 @@ a {
 }
 
 a:hover {
+  color: var(--colour-resistance-red);
   text-decoration-thickness: 0.18em;
 }
 
@@ -42,8 +45,8 @@ a:focus-visible {
   top: 0.75rem;
   left: 0.75rem;
   padding: 0.6rem 0.8rem;
-  color: #ffffff;
-  background: #111111;
+  color: var(--colour-paper-white);
+  background: var(--colour-ink-charcoal);
   transform: translateY(-200%);
 }
 
@@ -65,7 +68,7 @@ a:focus-visible {
   justify-content: space-between;
   gap: 1.5rem;
   padding-block: 1.25rem;
-  border-bottom: 2px solid currentColor;
+  border-bottom: 0.35rem solid var(--colour-resistance-red);
 }
 
 .site-name {
@@ -83,13 +86,43 @@ nav [aria-current="page"] {
   font-weight: 800;
 }
 
-.site-main,
+.repository-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  border-bottom: 0.1em solid currentColor;
+  text-decoration: none;
+}
+
+.repository-link:hover {
+  border-bottom-width: 0.18em;
+  text-decoration: none;
+}
+
+.repository-link svg {
+  width: 1.2em;
+  height: 1.2em;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.site-main {
+  padding-block: var(--space-2xl);
+}
+
 .document-page {
-  padding-block: clamp(3rem, 7vw, 7rem);
+  padding-block: var(--space-xl);
 }
 
 .site-main > section + section {
-  margin-top: clamp(4rem, 8vw, 8rem);
+  margin-top: var(--space-2xl);
+}
+
+.site-main > section > * + * {
+  margin-top: var(--space-lg);
 }
 
 .hero {
@@ -101,22 +134,21 @@ nav [aria-current="page"] {
 }
 
 .eyebrow {
-  margin: 0 0 0.5rem;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  color: var(--colour-resistance-red);
 }
 
 h1,
 h2,
 h3,
 p {
-  margin-top: 0;
+  margin-block: 0;
 }
 
 h1 {
   max-width: 13ch;
-  margin-bottom: 1.25rem;
   font-size: clamp(3rem, 10vw, 7rem);
   line-height: 0.94;
   letter-spacing: -0.055em;
@@ -149,19 +181,23 @@ h3 {
   font-size: 1.15rem;
 }
 
+.hero > .eyebrow + h1 {
+  margin-top: var(--space-xs);
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 1rem 1.5rem;
-  margin-top: 2rem;
+  margin-top: var(--space-xl);
 }
 
 .primary-action {
   display: inline-block;
   padding: 0.8rem 1.1rem;
-  color: #ffffff;
-  background: #171717;
+  color: var(--colour-paper-white);
+  background: var(--colour-resistance-red);
   font-weight: 800;
   text-decoration: none;
 }
@@ -184,6 +220,7 @@ h3 {
 .document-links a {
   padding: 1.25rem;
   border: 2px solid currentColor;
+  background: var(--colour-paper-white);
 }
 
 .commitment-grid strong,
@@ -198,6 +235,10 @@ h3 {
   margin-bottom: 0.35rem;
 }
 
+.principle-list article > * + * {
+  margin-top: var(--space-xs);
+}
+
 .document-links a {
   text-decoration: none;
 }
@@ -205,12 +246,44 @@ h3 {
 .statement {
   max-width: 54rem;
   padding: clamp(1.5rem, 5vw, 3.5rem);
-  color: #ffffff;
-  background: #171717;
+  color: var(--colour-paper-white);
+  background: var(--colour-ink-charcoal);
+  border-top: 0.5rem solid var(--colour-management-gold);
 }
 
 .document-page {
   max-width: 52rem;
+}
+
+.document-page > * {
+  margin-block: 0;
+}
+
+.document-page > * + * {
+  margin-top: var(--space-md);
+}
+
+.document-page > h1 + h2 {
+  margin-top: var(--space-lg);
+}
+
+.document-page > h2:not(:first-child) {
+  margin-top: var(--space-2xl);
+}
+
+.document-page > h3:not(:first-child) {
+  margin-top: var(--space-xl);
+}
+
+.document-page > h2 + *,
+.document-page > h3 + * {
+  margin-top: var(--space-sm);
+}
+
+.document-page > .repository-anchor {
+  margin-top: var(--space-2xl);
+  padding-top: var(--space-lg);
+  border-top: 2px solid var(--colour-work-light-blue);
 }
 
 .document-page blockquote {
@@ -221,19 +294,19 @@ h3 {
 }
 
 .document-page li + li {
-  margin-top: 0.45rem;
+  margin-top: var(--space-xs);
 }
 
 .document-page code {
   padding: 0.1rem 0.3rem;
-  background: #e4dfd2;
+  background: var(--colour-paper-white);
 }
 
 .document-page pre {
   max-width: 100%;
   padding: 1rem;
   overflow-x: auto;
-  background: #e4dfd2;
+  background: var(--colour-paper-white);
 }
 
 .licence-text {
@@ -247,7 +320,7 @@ h3 {
   justify-content: space-between;
   gap: 1.5rem;
   padding-block: 1.5rem 2.5rem;
-  border-top: 2px solid currentColor;
+  border-top: 0.35rem solid var(--colour-work-light-blue);
   font-size: 0.9rem;
 }
 

@@ -100,9 +100,9 @@ for (const dependencyName of Object.keys(directDependencies)) {
 }
 
 const runtimePaths = [
-  join(projectRoot, "index.html"),
-  join(projectRoot, "play/index.html"),
-  join(projectRoot, "commons/index.html"),
+  join(projectRoot, "src/site/pages/home.html"),
+  join(projectRoot, "src/site/pages/commons.html"),
+  join(projectRoot, "src/play/index.html"),
   ...(await listFiles(join(projectRoot, "src"))),
   ...(await listFiles(join(projectRoot, "public"))),
 ].filter((path) => [".css", ".html", ".js", ".json", ".ts", ".webmanifest"].includes(extname(path)));
@@ -140,9 +140,32 @@ for (const path of runtimePaths) {
   }
 }
 
-const indexHtml = await readFile(join(projectRoot, "index.html"), "utf8");
-const playHtml = await readFile(join(projectRoot, "play/index.html"), "utf8");
-const mainSource = await readFile(join(projectRoot, "src/main.ts"), "utf8");
+const indexHtml = await readFile(
+  join(projectRoot, "src/site/pages/home.html"),
+  "utf8",
+);
+const commonsHtml = await readFile(
+  join(projectRoot, "src/site/pages/commons.html"),
+  "utf8",
+);
+const playHtml = await readFile(join(projectRoot, "src/play/index.html"), "utf8");
+const mainSource = await readFile(join(projectRoot, "src/play/main.ts"), "utf8");
+const sitePageGenerator = await readFile(
+  join(projectRoot, "scripts/generate-site-pages.mjs"),
+  "utf8",
+);
+const serviceWorkerRegistration = await readFile(
+  join(projectRoot, "src/shared/registerServiceWorker.ts"),
+  "utf8",
+);
+const themeTokens = await readFile(
+  join(projectRoot, "src/shared/theme/tokens.css"),
+  "utf8",
+);
+const bootScene = await readFile(
+  join(projectRoot, "src/play/phaser/scenes/BootScene.ts"),
+  "utf8",
+);
 
 requirePolicy(
   indexHtml.includes('rel="manifest" href="/manifest.webmanifest"'),
@@ -154,21 +177,63 @@ requirePolicy(
 );
 requirePolicy(
   indexHtml.includes("A free, open-source game about collective power") &&
-    indexHtml.includes('href="/commons/"'),
-  "The public landing page must lead with the strong brief and link to The Commons.",
+    indexHtml.includes('href="/commons/"') &&
+    indexHtml.match(/github\.com\/glowkeeper\/the-horizontal-front/g)?.length >= 3,
+  "The public landing page must lead with the strong brief and link to The Commons and public repository from its header, body and footer.",
 );
 requirePolicy(
-  indexHtml.includes('src="/src/site.ts"') &&
-    !indexHtml.includes('src="/src/main.ts"'),
+  commonsHtml.match(/github\.com\/glowkeeper\/the-horizontal-front/g)?.length >= 3,
+  "The Commons page must link to the public repository from its header, body and footer.",
+);
+requirePolicy(
+  sitePageGenerator.includes('class="repository-link"') &&
+    sitePageGenerator.includes('class="repository-anchor"') &&
+    sitePageGenerator.includes("GitHub repository"),
+  "Generated public documents must link to the repository in their navigation and explanatory text.",
+);
+requirePolicy(
+  indexHtml.includes('src="/src/site/main.ts"') &&
+    !indexHtml.includes('src="/src/play/main.ts"'),
   "The public landing page must use the lightweight site entry and must not load Phaser.",
 );
 requirePolicy(
-  playHtml.includes('src="/src/main.ts"'),
+  playHtml.includes('src="/src/play/main.ts"'),
   "The /play/ page must retain the isolated Phaser entry.",
 );
 requirePolicy(
-  mainSource.includes('import "./registerServiceWorker"'),
+  [
+    "--colour-duvet-cream",
+    "--colour-ink-charcoal",
+    "--colour-resistance-red",
+    "--colour-work-light-blue",
+    "--colour-management-gold",
+    "--colour-paper-white",
+  ].every((role) => themeTokens.includes(role)) &&
+    themeTokens.includes("--font-interface") &&
+    themeTokens.includes("--font-game") &&
+    themeTokens.includes("--space-md") &&
+    themeTokens.includes("--space-3xl"),
+  "The shared semantic colour, typography and spacing roles must remain defined in tokens.css.",
+);
+requirePolicy(
+  indexHtml.includes('<meta name="theme-color" content="#f3e8d0"') &&
+    playHtml.includes('<meta name="theme-color" content="#f3e8d0"'),
+  "The public site and game must use duvet cream for browser theme chrome.",
+);
+requirePolicy(
+  bootScene.includes("THE MONDAY UPRISING") &&
+    bootScene.includes("Management has been notified of absolutely nothing.") &&
+    bootScene.includes("The Horizontal Front is coming soon."),
+  "The pre-release Phaser scene must retain the approved coming-soon notice.",
+);
+requirePolicy(
+  mainSource.includes('import "../shared/registerServiceWorker"'),
   "The Phaser entry must register the production service worker.",
+);
+requirePolicy(
+  serviceWorkerRegistration.includes("clearDevelopmentServiceWorkers") &&
+    serviceWorkerRegistration.includes("registration.unregister()"),
+  "Development must clear stale project service workers so cached releases cannot mask current source.",
 );
 
 if (failures.length > 0) {

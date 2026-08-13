@@ -29,7 +29,7 @@ Anyone may raise a charter concern through the public issue tracker. Work that p
 
 ## Amendments
 
-Ordinary wording may be clarified through the public decision process in [GOVERNANCE.md](GOVERNANCE.md), provided the meaning of the protected commitments is not weakened.
+Ordinary wording may be clarified through the public [governance process](GOVERNANCE.md), provided the meaning of the protected commitments is not weakened.
 
 The protected commitments may be strengthened but not removed, narrowed or overridden. A project that permits paywalls, advertising, surveillance, investor or donor control, proprietary enclosure, or another direct contradiction is a successor using a different charter—not a continuation of the canonical Horizontal Front project.
 
@@ -39,7 +39,7 @@ This rule governs the canonical project's identity and stewardship. It does not 
 
 Project software is licensed under the GNU Affero General Public License version 3 or later. Original writing, documentation, artwork, music, sound and other cultural material are licensed under Creative Commons Attribution-ShareAlike 4.0 unless a file or asset record identifies a necessary exception.
 
-The scope, attribution rules and full licence texts are recorded in [LICENSE.md](LICENSE.md). These copyleft and share-alike foundations may not be replaced with proprietary or non-reciprocal terms for the canonical project.
+The scope, attribution rules and full licence texts are recorded in the [licensing guide](LICENSE.md). These copyleft and share-alike foundations may not be replaced with proprietary or non-reciprocal terms for the canonical project.
 
 ## Status and precedence
 

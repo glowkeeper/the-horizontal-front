@@ -40,4 +40,4 @@ The build includes the automated project-policy check. Run focused unit tests fo
 
 Software contributions are submitted under `AGPL-3.0-or-later`. Original writing, documentation, artwork, music, sound and other cultural contributions are submitted under `CC-BY-SA-4.0`, unless an explicit asset record establishes a compatible exception.
 
-By intentionally submitting work for inclusion, you agree that it may be distributed under the applicable project licence and represent that you have the necessary rights to contribute it. You retain copyright in your contribution. Read [LICENSE.md](LICENSE.md) and keep authorship and asset provenance clear.
+By intentionally submitting work for inclusion, you agree that it may be distributed under the applicable project licence and represent that you have the necessary rights to contribute it. You retain copyright in your contribution. Read the [licensing guide](LICENSE.md) and keep authorship and asset provenance clear.

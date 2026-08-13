@@ -6,6 +6,12 @@ import { marked } from "marked";
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
+const sourceEntryPages = [
+  { source: "src/site/pages/home.html", output: "index.html" },
+  { source: "src/site/pages/commons.html", output: "commons/index.html" },
+  { source: "src/play/index.html", output: "play/index.html" },
+];
+
 const documentPages = [
   {
     source: "PROJECT_CHARTER.md",
@@ -59,6 +65,8 @@ const internalLinks = new Map([
   ["LICENSES/CC-BY-SA-4.0.txt", "/licences/cc-by-sa/"],
 ]);
 
+const repositoryLink = `<a class="repository-link" href="https://github.com/glowkeeper/the-horizontal-front" aria-label="The Horizontal Front repository on GitHub"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3.3-.4 6.8-1.6 6.8-7A5.4 5.4 0 0 0 19.4 4 5 5 0 0 0 19.3.5S18.2.1 15 1.8a13.4 13.4 0 0 0-7 0C4.8.1 3.7.5 3.7.5A5 5 0 0 0 3.6 4a5.4 5.4 0 0 0-1.4 3.7c0 5.4 3.5 6.6 6.8 7A4.8 4.8 0 0 0 8 18v4"/><path d="M8 19c-3 .9-3-1.5-4-2"/></svg><span>GitHub</span></a>`;
+
 function escapeHtml(value) {
   return value
     .replaceAll("&", "&amp;")
@@ -86,10 +94,10 @@ function pageTemplate({ title, description, content, documentPage = false }) {
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="description" content="${escapeHtml(description)}" />
-    <meta name="theme-color" content="#111111" />
+    <meta name="theme-color" content="#f3e8d0" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <title>${escapeHtml(title)} — The Horizontal Front</title>
   </head>
@@ -100,11 +108,14 @@ function pageTemplate({ title, description, content, documentPage = false }) {
       <nav aria-label="Primary navigation">
         <a href="/play/">Play</a>
         <a href="/commons/">The Commons</a>
-        <a href="https://github.com/glowkeeper/the-horizontal-front">Source</a>
+        ${repositoryLink}
       </nav>
     </header>
     <main id="main-content" class="${documentPage ? "document-page" : "site-main"}">
       ${content}
+      <aside class="repository-anchor" aria-label="Public repository">
+        <p>This document, its history and the project’s public decision process are maintained in the <a href="https://github.com/glowkeeper/the-horizontal-front">GitHub repository</a>.</p>
+      </aside>
     </main>
     <footer class="site-footer">
       <p>Free to play. No ads. No tracking. No purchases.</p>
@@ -114,9 +125,10 @@ function pageTemplate({ title, description, content, documentPage = false }) {
         <a href="/identity/">Identity</a>
         <a href="/contribute/">Contribute</a>
         <a href="/licences/">Licences</a>
+        ${repositoryLink}
       </nav>
     </footer>
-    <script type="module" src="/src/site.ts"></script>
+    <script type="module" src="/src/site/main.ts"></script>
   </body>
 </html>
 `;
@@ -126,6 +138,11 @@ async function writePage(output, html) {
   const outputPath = join(projectRoot, output);
   await mkdir(dirname(outputPath), { recursive: true });
   await writeFile(outputPath, html);
+}
+
+for (const page of sourceEntryPages) {
+  const html = await readFile(join(projectRoot, page.source), "utf8");
+  await writePage(page.output, html);
 }
 
 for (const page of documentPages) {

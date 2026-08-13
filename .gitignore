@@ -5,11 +5,14 @@ node_modules/
 dist/
 
 # Generated public-document entry points
-charter/
-governance/
-identity/
-contribute/
-licences/
+/index.html
+/play/
+/commons/
+/charter/
+/governance/
+/identity/
+/contribute/
+/licences/
 
 # Test output
 coverage/

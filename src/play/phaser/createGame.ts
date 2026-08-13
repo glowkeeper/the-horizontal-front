@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 
-import { colours } from "../theme/theme";
+import { getThemeColour } from "../theme/theme";
 import { BootScene } from "./scenes/BootScene";
 
 const GAME_WIDTH = 1280;
@@ -15,7 +15,7 @@ export function createGame(container: HTMLElement): Phaser.Game {
     width: GAME_WIDTH,
     height: GAME_HEIGHT,
 
-    backgroundColor: colours.canvasBackground,
+    backgroundColor: getThemeColour("duvetCream"),
 
     scale: {
       mode: Phaser.Scale.FIT,

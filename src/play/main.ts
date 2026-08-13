@@ -1,5 +1,5 @@
-import "./styles/global.css";
-import "./registerServiceWorker";
+import "./styles/game.css";
+import "../shared/registerServiceWorker";
 
 import { createGame } from "./phaser/createGame";
 

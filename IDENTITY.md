@@ -10,7 +10,7 @@ This policy is a community covenant and a rule for project-controlled spaces and
 
 The canonical public home is `thehorizontalfront.org`. Official repositories, releases and community spaces must be identified from that site or from another channel recorded through the public governance process.
 
-Only releases and communications approved through [GOVERNANCE.md](GOVERNANCE.md) speak officially for the project. Control of a similar domain, account, package name or fork does not confer that status.
+Only releases and communications approved through the [governance process](GOVERNANCE.md) speak officially for the project. Control of a similar domain, account, package name or fork does not confer that status.
 
 ## Uses the project welcomes
 
@@ -47,4 +47,4 @@ The project does not currently intend to register a trademark. If demonstrable i
 
 ## Changing this policy
 
-Changes follow the material-decision process in `GOVERNANCE.md` and cannot narrow the freedoms granted by the project's licences or weaken the project charter.
+Changes follow the material-decision process in the [governance document](GOVERNANCE.md) and cannot narrow the freedoms granted by the project's licences or weaken the project charter.

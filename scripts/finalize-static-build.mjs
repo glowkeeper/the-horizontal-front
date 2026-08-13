@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { readFile, readdir, writeFile } from "node:fs/promises";
+import { readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { dirname, extname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -48,4 +48,18 @@ if (finalServiceWorker === originalServiceWorker) {
 }
 
 await writeFile(serviceWorkerPath, finalServiceWorker);
+
+for (const generatedEntry of [
+  "index.html",
+  "play",
+  "commons",
+  "charter",
+  "governance",
+  "identity",
+  "contribute",
+  "licences",
+]) {
+  await rm(join(projectRoot, generatedEntry), { recursive: true, force: true });
+}
+
 console.log(`Prepared offline cache ${version} with ${completePrecacheUrls.length} URLs.`);

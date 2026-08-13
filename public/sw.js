@@ -38,8 +38,18 @@ self.addEventListener("fetch", (event) => {
   }
 
   event.respondWith(
-    caches
-      .match(request, { ignoreSearch: true })
-      .then((cached) => cached ?? fetch(request)),
+    fetch(request).catch(async () => {
+      const cached = await caches.match(request, { ignoreSearch: true });
+
+      if (cached) {
+        return cached;
+      }
+
+      if (request.mode === "navigate") {
+        return caches.match("/");
+      }
+
+      return Response.error();
+    }),
   );
 });
