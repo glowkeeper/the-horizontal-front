@@ -98,6 +98,7 @@ function pageTemplate({ title, description, content, documentPage = false }) {
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="description" content="${escapeHtml(description)}" />
     <meta name="theme-color" content="#f3e8d0" />
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <title>${escapeHtml(title)} — The Horizontal Front</title>
   </head>

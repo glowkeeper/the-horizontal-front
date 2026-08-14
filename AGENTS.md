@@ -39,9 +39,11 @@ The game is political satire about capitalism, exploitative work culture, compul
 Read the relevant documents before changing product behaviour:
 
 - `docs/game-concept.md`
-- `docs/expanded-design-direction.md`
-- `docs/data-driven-episode-architecture.md`
+- `docs/design-decisions.md`
+- `docs/content-architecture.md`
+- `docs/episode-grammar-reference.md`
 - `docs/technical-architecture.md`
+- `docs/research/` when a change touches a researched interaction or accessibility decision
 
 Do not dilute the satire into a generic sleep, wellness or productivity game.
 

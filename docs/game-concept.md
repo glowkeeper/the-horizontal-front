@@ -27,13 +27,126 @@ Possible opening copy:
 2. The boss applies continuous pressure, but earned resistance suppresses its mechanical effect between beats.
 3. Successful rhythmic inputs strengthen that persistent resistance and pull the duvet back toward safety.
 4. Corporate attacks periodically interrupt, complicate, or replace the current rhythm.
-5. Pressure increases throughout the level.
-6. The final ten seconds become a frantic morning offensive.
+5. Pressure escalates through the episode's authored dramatic phases.
+6. The final crisis becomes a frantic morning offensive without relying only on faster input.
 7. Survive for roughly 30 seconds to clear the level. Lose the duvet completely and the player is tipped out of bed.
 
 The duvet and bed communicate danger directly: the duvet is progressively pulled down, the mattress tilts, the player becomes exposed, and cold work light invades the room. A small optional accessibility indicator may supplement this presentation, but a conventional Tilt Meter is not the primary interface.
 
 The authored pressure curve controls management's attack, not an unavoidable damage rate. Net safety loss is the unresisted fraction of that pressure: accurate performance must remain mechanically effective even when the authored rhythm is slow. The duration, pressure curve, resistance gains and recovery per input all require playtesting. Thirty seconds is the current starting point, not a final rule.
+
+## Finite vocabulary, rich combinations
+
+A deck of cards has only 52 pieces and a handful of actions, yet produces
+enormous variety. A comic strip repeatedly uses the same characters and panels,
+but remains interesting because its situations and writing change. The goal is
+not unlimited mechanical variety. It is a small vocabulary with rich
+combinations.
+
+The intended mechanical vocabulary includes:
+
+- Follow an authored rhythm.
+- Tap a sequence.
+- Press and hold.
+- Hold two controls.
+- Ignore a temptation.
+- Respond to reversed controls.
+- Endure increasing pressure.
+
+Episodes can combine these differently:
+
+```text
+Episode A
+Steady rhythm → Quick Call → frantic finale
+
+Episode B
+Slow heavy rhythm → tempting promotion → reversed controls
+
+Episode C
+Rapid rhythm → hold an email while continuing → two simultaneous demands
+```
+
+These are design possibilities, not a claim that every listed capability is
+currently accepted by the episode grammar. The authoritative implemented
+vocabulary remains the [episode grammar
+reference](episode-grammar-reference.md).
+
+## Repetition is meaningful
+
+The game should not become a collection of unrelated minigames. Some sameness is part of the satire:
+
+- The boss always wants more.
+- Corporate initiatives have different names but make the same demands.
+- The player repeatedly fights for the same basic human freedom.
+- Victory is temporary.
+- Capitalism endlessly rebrands repetition as transformation.
+
+The Orange Fella might announce, “This is a completely unprecedented productivity framework,” before launching essentially the same attack under a new logo. The player recognises the repetition even though the boss does not.
+
+## Sources of variety
+
+### Narrative
+
+The strongest variety should come from writing and political subject matter:
+
+- Mandatory wellbeing.
+- Return-to-office mandates.
+- AI productivity surveillance.
+- Layoffs after record profits.
+- Executive bonuses.
+- Performance reviews.
+- Corporate family rhetoric.
+- Employee engagement surveys.
+- Outsourcing.
+- Zero-hours contracts.
+- “Unlimited” holiday.
+- Workplace mindfulness.
+- A merger nobody wanted.
+
+Each episode has its own premise, escalation and punchline.
+
+### Dramatic structure
+
+Episodes need not schedule pressure and attacks identically. One may be a steady siege; another may begin suspiciously easily; another may contain repeated temptations, false endings or a late betrayal.
+
+The first production curve, `alarm-escalation`, proves this composition with orientation, establishment, pressure and crisis phases followed by a separately timed resolution. Other curves may use any number of phases and may rise steadily, provide false relief, reverse their pressure or combine different catalogue rhythms. Phase IDs are author-facing descriptions only; they have no special engine behaviour.
+
+`The Alarm` exercises straight alternation, sustained grips and the shared `three-and-rest` phrase in live play. Its orientation teaches alternating taps, establishment introduces alternating press-and-release holds, pressure permits one protected beat after every three actions, and crisis returns to continuous alternation. The shared catalogue also contains deliberate rests, managerial waltz, syncopated counterpull and call-and-response patterns as validated production vocabulary ready for other episode compositions; their compiler and engine paths are covered by tests, but they are not all claimed as play-tested content. Explicit rests reserve authored silence and prevent other events occupying that interval. They intentionally compile to no input cue and suspend pressure, safety movement and resistance changes for their effective interval.
+
+The compiled score and its visual, audio and optional haptic projections share one timing source. The authoritative pause, gate, hold, clipping and layout semantics are documented under [Rhythm timeline and presentation](technical-architecture.md#rhythm-timeline-and-presentation).
+
+The crisis is a continuous alternating final phrase with no protected internal rest. Its visual intensity and authored pressure reach maximum, but its mechanical pressure remains answerable: resistance earned before and during the phrase persists between its beats, and accurate final play can recover a threatened position. Urgency comes from committing to the phrase rather than from an unsafe leap in input rate.
+
+### Mechanical composition
+
+A small number of mechanics may interact:
+
+- Alternate while holding.
+- Follow a sequence while pressure continues.
+- Ignore a promotion while it obscures the play area.
+- Handle reversed controls during the morning offensive.
+- Maintain rhythm while notifications compete for attention.
+
+Supported combinations must be explicit engine capabilities. The data format must not become a hidden programming language.
+
+### Presentation
+
+The bedroom remains recognisable while its presentation changes:
+
+- Dawn, rain, a heatwave or winter darkness.
+- A video call projected onto the wall.
+- Office furniture invading the room.
+- Corporate banners covering personal possessions.
+- Multiple Orange Fellas appearing on screens.
+- A shareholder meeting outside the window.
+- The bedroom becoming increasingly office-like.
+- Management presenting the same initiative under a new colour scheme.
+
+Cartoon sequences provide more visual freedom than the gameplay stage needs.
+
+### Emotion
+
+Episodes can be broadly ridiculous, quietly sinister, triumphantly rebellious, melancholic, surreal, hopeful or angry. The same short framework can feel different depending on its narrative context, dialogue, music and result.
 
 ## Basic input
 
@@ -45,13 +158,18 @@ Accurate hits build persistent resistance strength. Authored pressure acts only 
 
 The required rhythm, player input, procedural audio, visual timing cues, and optional haptic cues should share one timing source. Music can therefore teach and enforce a pattern rather than merely accompany it. Critical timing must never be communicated by music alone: equivalent visual cues must support deaf and hard-of-hearing players, while clear audio cues should support players who cannot rely on the visual presentation.
 
-Complex rhythms must be taught before they are tested. During play, notes emerge from a clipped centre emitter and travel horizontally outward at one constant layout-authored speed through a compact gate at the actual left or right control. Tempo determines spacing, hold duration determines long-note length, and timing tolerance determines gate width. The gate's shaded width is the real early-to-late timing window: entering it permits input, its centre line is the ideal beat, and leaving it is too late. Position is the primary timing channel, opacity strengthens the approach, and the control explicitly says `HIT NOW` throughout the valid window. A hold is one continuous outlined note: press when its head crosses the gate, keep holding as the gate latches and the sustained portion changes colour, and release when its emphasized tail crosses. Long notes stream from the centre without entering the opposite lane; their visible geometry is clipped to the lane even when the authored hold is longer than the available screen width. An early release visibly breaks the note, an expired note escapes as a red crossed miss, and a successful input is absorbed in a brief burst. The centre also carries compact targetless instructions: one opening READY and authored REST intervals. Passive danger and its animation pause during both, so following an instruction never harms the player. Phrase previews, rehearsal, audio, and optional haptics may teach anticipation, but must reinforce this readable timing source rather than rescue an otherwise unreadable mechanic.
+Complex rhythms must be taught before they are tested. The implemented outward-moving guide makes timing visible at the left and right controls, represents hold duration geometrically and pauses danger during genuine READY and REST instructions. Its authoritative timing and presentation behaviour is documented under [Rhythm timeline and presentation](technical-architecture.md#rhythm-timeline-and-presentation).
 
 Difficulty should be calibrated per input method. Five taps per second on a touchscreen does not necessarily represent the same effort as five alternating keyboard presses. The experience should feel equivalently demanding across devices rather than using identical numerical thresholds. Complex rhythms should usually trade physical speed for cognitive or coordinative difficulty, and reduced-input options should preserve the rhythmic idea without requiring unsafe repetition.
 
 ## Corporate attacks
 
 Boss attacks briefly replace or complicate normal resistance. Each should be readable through animation and layout without requiring the player to study instructions.
+
+Quick Call and Urgent Email are the currently implemented interruption
+mechanics. Team Player, Performance Review and Promotion Opportunity are design
+directions rather than accepted episode vocabulary. Return to Office describes
+a dramatic crisis, not an interruption mechanic.
 
 ### Quick call?
 
@@ -75,25 +193,31 @@ The joke is that one employee is expected to do two people's work.
 
 The controls reverse temporarily. The normal resistance input now assists the boss, forcing the player to use the opposite side or control. A clear horizontal flip, colour change, and warning animation must signal the reversal fairly.
 
-### Return to office mandate
-
-This is the climactic end-of-level attack. During the last ten seconds management pressure intensifies, office alarms flash, and the boss launches an all-out productivity offensive. The required rhythm may become more insistent or disruptive, but the finale should not depend only on increasing the physical input rate.
-
 ### Promotion opportunity
 
 A shiny offer appears: **ACCEPT PROMOTION — +20% PAY!**
 
 Accepting grants a small immediate benefit but permanently increases the boss's strength through **More Responsibility**. Ignoring it is usually the strategically wiser choice. This should be tempting enough that accepting it feels like a meaningful mistake rather than an obvious trap.
 
-## Recommended first playable version
+## Return to office crisis
 
-The first prototype should prove the physical comedy and difficulty curve with only three attacks:
+Return to Office is a climactic dramatic phase rather than a separate attack.
+Management pressure intensifies, office alarms flash, and the boss launches an
+all-out productivity offensive. The required rhythm may become more insistent
+or disruptive, but the finale should not depend only on increasing the physical
+input rate.
+
+## First playable milestone
+
+The first playable prototype proves the physical comedy and difficulty curve
+with two interruptions and one crisis phase:
 
 1. **Quick Call** — accurate sequential tapping.
 2. **Urgent Email** — press and hold.
-3. **Return to Office** — the frantic finale.
+3. **Return to Office crisis** — the frantic finale expressed through the dramatic curve.
 
-Team Player, Performance Review, and Promotion Opportunity can enter in later levels after the core loop feels good.
+Team Player, Performance Review and Promotion Opportunity remain possible future
+capabilities and are not part of the implemented grammar.
 
 ## Web and mobile controls
 
@@ -101,8 +225,8 @@ The game should use one responsive codebase and one set of rules, with controls 
 
 ### Mobile
 
-- Tap anywhere on the mattress to resist.
-- Alternate thumbs in time with the resistance rhythm.
+- Tap the left and right resistance controls in time with the authored rhythm.
+- Alternate thumbs when the selected pattern calls for alternating sides.
 - Press and hold notifications to dismiss them.
 - Use two fingers for Team Player.
 - Tap highlighted areas for Quick Call.
@@ -120,16 +244,16 @@ Device shaking and physical tilt should not be required. They are unreliable, in
 
 Alternating keys should initially feel like an old arcade game. Input is judged against the required pattern and timing rather than rewarded simply for arriving quickly.
 
-### Attack mapping
+### Control mapping
 
-| Attack | Mobile | Desktop |
-| --- | --- | --- |
-| Quick Call | Tap highlighted excuses | Click them or use numbered keys |
-| Urgent Email | Press and hold | Hold mouse button or Space |
-| Team Player | Two-finger input | Hold two keys simultaneously |
-| Performance Review | Touch zones reverse | Left and right keys reverse |
-| Return to Office | Rapid two-thumb tapping | Rapid alternating keys |
-| Promotion Opportunity | Tap or ignore | Click, press Enter, or ignore |
+| Event | Status | Mobile | Desktop |
+| --- | --- | --- | --- |
+| Quick Call | Implemented interruption | Tap highlighted excuses | Tap them or use numbered keys |
+| Urgent Email | Implemented interruption | Press and hold | Hold pointer or Space |
+| Team Player | Design direction | Two-finger input | Hold two keys simultaneously |
+| Performance Review | Design direction | Touch zones reverse | Left and right keys reverse |
+| Return to Office crisis | Implemented dramatic phase | Authored final rhythm | Authored final rhythm |
+| Promotion Opportunity | Design direction | Tap or ignore | Click, press Enter, or ignore |
 
 ## Progression ideas
 
@@ -159,7 +283,7 @@ The game presents the bedroom as a revolutionary front and corporate demands as 
 - Levels: **Shifts** or **Days of resistance**
 - Losing: **Forced verticalisation**
 - Boss attacks: **Productivity offensives**
-- Final ten seconds: **The morning offensive**
+- Final crisis: **The morning offensive**
 - Opening campaign: **The Monday Uprising**
 - Perfect level: **Full Non-Compliance**
 - Player community: **The Horizontal Front**
@@ -244,9 +368,11 @@ Accessibility mode should change the required input pattern, not patronise the p
 
 ## Open questions
 
-The original questions about the duvet, rhythm, difficulty, rewards, recurring boss, promotion, narrative, protagonist and failure now have working answers. See [Expanded design direction](expanded-design-direction.md).
+The settled reasoning is recorded in [Design decisions](design-decisions.md).
 
-The content architecture and finite episode grammar are documented in [Data-driven episode architecture](data-driven-episode-architecture.md).
+The ownership and catalogue architecture is documented in [Content
+architecture](content-architecture.md); the accepted authoring vocabulary is
+defined by the [Episode grammar reference](episode-grammar-reference.md).
 
 Questions that remain genuinely open include:
 

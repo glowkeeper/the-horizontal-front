@@ -2,19 +2,19 @@
 
 ## Chosen direction
 
-The Horizontal Front will be built as a web-first 2D game using:
+The Horizontal Front is a web-first 2D game using:
 
 - **Phaser** for the game loop, rendering, scenes, input, animation and audio.
 - **TypeScript** for application and game code.
 - **Vite** for local development and production builds.
 - **HTML and CSS** for the page shell, accessibility controls and non-game interface where appropriate.
-- **JSON validated against TypeScript schemas** for episodes, confrontations and cartoon compositions.
+- **JSON validated with Zod schemas** for episodes, confrontations and cartoon compositions.
 - **A static, offline-capable web release first**, with a Progressive Web App manifest and service worker used to cache the files required for play.
 - **Capacitor later**, if and when the same game is prepared for iOS and Android stores.
 - **No application backend.** Device-local settings and progress can use browser storage.
 - **No tracking or monetisation.** The deployed game does not require analytics, advertising, payments or player accounts.
 
-The first release target is a responsive, landscape-oriented browser game with touch, keyboard and pointer support.
+The current release target is a responsive, landscape-oriented browser game with touch, keyboard and pointer support.
 
 ## Static public shell
 
@@ -66,7 +66,7 @@ During development and production builds, Vite converts the TypeScript into Java
 ```text
 TypeScript source
        ↓
-Vite type-checks and builds
+TypeScript checks types; Vite builds
        ↓
 Browser-compatible JavaScript
        ↓
@@ -147,11 +147,58 @@ function applyResistanceInput(
 
 The `Resistance` value keeps the fixed configuration and changing state of one confrontation together. Public transitions therefore cannot accidentally receive a different configuration on each call. This logic can be tested without starting Phaser or opening a browser. Mobile touch, desktop keyboard and pointer input can all produce the same `ResistanceInput` value.
 
+## Engine rules
+
+### Rhythm timing
+
 Rhythm is part of the domain model, not an effect owned by Phaser or the audio system. The functional engine judges normalised press and release input against the resolved score and explicit timing windows. The catalogue already proves straight alternation, waltz grouping, syncopation, explicit rests, sustained holds and call-and-response composition through the same reusable vocabulary.
 
 One elapsed-time clock drives rhythm judgement, dramatic phases and the cues that communicate them. At content-load time, the selected catalogued dramatic curve composes catalogued rhythm cycles into a finite timestamped score. Phaser and the audio adapter may render sound, animation, visual timing targets, and optional haptics, but they derive those cues from that resolved engine timing rather than maintaining competing clocks. This keeps input results deterministic and lets equivalent audio and visual presentations describe the same required rhythm.
 
-The compiler also produces a non-scoring guide timeline containing authored actions, rests and one opening count-in. Action guide events retain the engine's real timing tolerance and hold-release boundary. Later phase lead-ins create anticipation time but no guide event: the next action can be presented in advance while pressure continues against persistent resistance. They never repeat READY or invent a protected REST. Opening READY and authored REST are engine-level pauses: pressure integration and dramatic-curve progress exclude those intervals. The compiler ends each pause at the opening edge of the following cue's timing window, keeping instruction, judgement and pressure semantics on the same boundary. The Phaser adapter projects every action at one constant layout-authored scroll speed from a clipped centre emitter through compact left and right gates. Tempo changes note spacing, hold duration becomes physical note length, and timing tolerance becomes gate width. A gate's centre line marks the ideal beat and a missed note visibly escapes beyond it. Holds render as outlined streaming capsules whose head and tail carry press and release boundaries; the gate latches during an active hold, sustained material changes colour, and early release breaks the capsule. Lane clipping prevents long holds entering the opposite lane or requiring enormous off-screen geometry. The centre also carries compact targetless bands such as REST and the opening READY. Guide count, scroll speed, supported tolerance, geometry and opacity are validated layout data; content loading rejects an episode whose timing window the selected layout cannot display. Phrase previews, procedural audio and optional haptics can consume the same timeline without recreating rhythm interpretation or becoming required for comprehension.
+### Rhythm timeline and presentation
+
+The content compiler produces two related timelines. The scored timeline contains
+the taps and press-and-release holds judged by the engine. A non-scoring guide
+timeline retains those actions' real timing tolerances and hold-release
+boundaries while also representing authored rests and one opening count-in.
+Visual, audio and optional haptic adapters consume that common guide rather than
+reinterpreting rhythm content.
+
+`READY` is reserved for the confrontation's first lead-in. Later phase lead-ins
+provide anticipation time and allow the next action to approach, but do not
+invent another protected READY or REST: ordinary pressure continues against the
+resistance already earned. Opening READY and authored REST are genuine
+engine-level pauses. Pressure, safety movement, resistance changes and dramatic
+curve progress stop for their complete effective interval. Each pause ends at
+the opening edge of the following cue's valid timing window, so the engine never
+accepts an input while presentation still instructs the player to wait.
+
+The Phaser adapter projects every action from a clipped centre emitter toward
+its actual left or right control at one constant layout-authored scroll speed.
+Tempo changes the space between notes, hold duration changes physical note
+length and timing tolerance changes the width of the control gate. Position is
+the primary timing channel; opacity reinforces approach. Entering a gate permits
+input, its centre line marks the ideal beat, and leaving it is too late. The
+control displays `HIT NOW` for the complete valid window.
+
+A hold is one outlined streaming note. Its head communicates when to press, its
+body communicates continued control ownership and its emphasised tail
+communicates when to release. During an active hold the gate latches and the
+sustained section changes colour; an early release visibly breaks the note. Long
+holds stream through the available lane while clipping at the centre and canvas
+edge, so they neither enter the opposite lane nor require enormous off-screen
+geometry. A completed action is absorbed in a brief burst, while an expired
+action escapes beyond its gate as a crossed miss. Compact READY and REST bands
+remain at the centre because they have no control target.
+
+The selected layout owns guide count, scroll speed, supported tolerance,
+geometry, opacity, typography sizes, stroke widths, tween durations and easing.
+Content validation rejects timing windows or presentation values the layout
+cannot represent. Phrase previews, rehearsal, procedural audio and optional
+haptics may strengthen anticipation, but must reinforce this readable timing
+source rather than rescue an otherwise unreadable mechanic.
+
+### Pressure and state
 
 Engine advancement processes passive pressure and missed-cue deadlines chronologically. Advancing once across a long interval must therefore produce the same state and failure point as advancing through many small frames, including when pause intervals interrupt pressure.
 
@@ -163,17 +210,104 @@ Presentation intensity does not manufacture physical danger. Bed angle, duvet lo
 
 Rhythm complexity should be able to increase without requiring an ever-higher input rate. The rule system must remain suitable for reduced-input mappings and must not assume that keyboard, pointer, and touch inputs impose identical physical effort.
 
+## Content compilation pipeline
+
+The **content compiler** is the boundary between the finite authoring grammar and
+the functional game engine. It is project-owned TypeScript that translates
+validated, declarative content into immutable runtime configuration. It is not
+the TypeScript compiler, does not generate JavaScript or machine code, and does
+not execute instructions supplied by an episode.
+
+The pipeline has distinct responsibilities:
+
+```text
+Authored JSON
+    ↓
+Structural validation
+    ↓
+Ownership and reference resolution
+    ↓
+Semantic validation
+    ↓
+Content compilation
+    ↓
+Immutable runtime configuration
+    ↓
+Functional game engine
+```
+
+**Structural validation** uses Zod to reject unknown fields, unsupported
+discriminants, missing values and invalid individual field shapes. **Ownership
+and reference resolution** builds the selected episode's mechanic scope and
+resolves every explicit `shared` or `episode` reference without allowing shared
+content to depend on private content, cross-episode access or local shadowing.
+**Semantic validation** checks relationships which no isolated field can prove,
+such as rhythm-event overlap, curve continuity and whether an interruption fits
+a playable musical boundary. **Compilation** then performs deterministic
+lowering from author-facing musical and dramatic terms to engine-facing time and
+state configuration. Presentation resolution has its own equivalent structural
+and semantic validation boundary because it combines the compiled timing with
+the selected layout, skins and assets.
+
+For a confrontation, compilation performs these transformations:
+
+- Beat positions and durations become elapsed-time boundaries in milliseconds.
+- Repeated rhythm cycles become a finite, chronologically ordered scored cue
+  timeline of taps and press-and-release holds.
+- Authored rests and the opening lead-in become non-scoring guide and pause
+  intervals aligned with the real input windows.
+- Dramatic phases become contiguous runtime phases with explicit start and end
+  times and their authored pressure, recovery, resistance and intensity values.
+- Interruption phrase triggers become non-overlapping warning, active and return
+  windows, with their selected reusable mechanic resolved into finite runtime
+  interaction data.
+
+The principal outputs are `ResistanceConfig` and `ConfrontationConfig`. These
+contain no Phaser objects and require no catalogue lookups during play. The
+engine consumes the scored configuration; visual, audio and optional haptic
+adapters consume the same guide timing rather than interpreting episode JSON or
+maintaining independent clocks.
+
+`loadEpisode` owns the confrontation-compilation boundary: it parses an episode,
+creates its ownership scope and invokes the confrontation compiler. `loadGame`
+compiles every catalogued episode during content loading, so invalid mechanic
+content fails before play rather than producing a partial runtime state.
+`npm run validate:content` exercises this real loading and compilation path and
+then resolves every episode's presentation, including its timing compatibility,
+rather than using a separate, weaker validator.
+
+Compilation must remain generic. It may branch only on documented grammar
+discriminants, such as rhythm actions `tap`, `hold` and `rest` or interruption
+kinds `sequence` and `hold`; it must never branch on an episode ID. Adding a
+compiler capability therefore requires an
+author-facing finite vocabulary, structural and semantic validation, a plain
+runtime representation, reusable interpretation, documentation and tests of
+both accepted compilation and important rejection cases. A new capability must
+meet the engine-expansion rules in the [content architecture](content-architecture.md) rather
+than entering through an episode-specific compiler exception.
+
+The author-facing vocabulary compiled by this pipeline is defined in the
+[episode grammar reference](episode-grammar-reference.md).
+
 ## Architectural boundary
 
 ```text
 Episode JSON and artwork
            ↓
-Schema validation and content loader
+Structural validation
+           ↓
+Ownership and reference resolution
+           ↓
+Semantic validation
+           ↓
+Content compiler
+           ↓
+Immutable runtime configuration
            ↓
 Functional game engine
   - rhythm
   - pressure
-  - attacks
+  - interruptions
   - phase timing
   - outcomes
            ↓
@@ -190,23 +324,13 @@ This boundary prevents Phaser-specific objects from leaking throughout the engin
 
 Content resolution also has a uniform ownership boundary. The shared library is loaded first and cannot reference episode-owned material. Each episode loader then creates an isolated local scope from that episode's definitions. Explicit `{ source, id }` references resolve against either the shared library or that one local scope; duplicate local IDs, shared-ID shadowing, unresolved references and cross-episode access fail during loading. The resolved engine configuration contains no ownership lookup and no content IDs that alter behaviour.
 
-## Scenes
-
-The likely top-level Phaser scenes are:
-
-- **Boot:** load essential files and validate the content index.
-- **Title:** present the title and route to settings or play.
-- **Briefing:** perform the pre-confrontation cartoon.
-- **Resistance:** run the rhythmic confrontation.
-- **Result:** perform the victory, failure or trap-consequence cartoon.
-- **Interlude:** present occasional longer narrative sequences.
-- **Propaganda Department:** provide development-only episode composition and preview tools.
-
-These are application states and framework integration points, not objects that model the political world.
-
 ## Data-driven content
 
-Episodes contain no executable code. They are expressed through validated JSON, writing, artwork and audio using the finite grammar defined in [Data-driven episode architecture](data-driven-episode-architecture.md).
+Episodes contain no executable code. They are expressed through validated JSON,
+writing, artwork and audio using the complete authoring contract in the
+[episode grammar reference](episode-grammar-reference.md). The ownership,
+catalogue and engine-expansion rules surrounding that grammar are defined in the
+[content architecture](content-architecture.md).
 
 The engine must never branch on a particular episode identifier. A new capability is an explicit, reusable engine expansion and is not part of ordinary episode production.
 
@@ -222,13 +346,21 @@ Interruption presentation uses the same explicit ownership architecture as other
 
 The Phaser application states mirror the validated content hierarchy: `BootScene` preloads assets and opens `CampaignsScene`; campaign selection opens `CampaignBriefingScene`; accepted episode outcomes advance through `ResistanceScene`; completion opens `CampaignDebriefingScene`. Debriefing can replay through the briefing or return to Campaigns. No router or content-specific scene wiring is required.
 
-Copy follows the same content boundaries. Global interface and reusable mechanic copy comes from validated game data, campaign prose from campaign data, episode-specific confrontation/result prose from episode data, and visual-role captions from layout or skin data. Runtime code contributes only computed values through a finite named-placeholder formatter. A policy tripwire rejects direct player-visible string literals passed to Phaser text, button and announcement APIs; it is intentionally backed by schema validation, type checking and review rather than treated as a complete semantic proof. Interface chrome uses shared design-space constants and small code-owned responsive layout functions; authored world composition remains in validated presentation data.
+Copy follows the ownership partition defined in [Content hierarchy and
+ownership](content-architecture.md#content-hierarchy-and-ownership). Runtime
+code contributes only computed values through a finite named-placeholder
+formatter. A policy tripwire rejects direct player-visible string literals
+passed to Phaser text, button and announcement APIs; it is intentionally backed
+by schema validation, type checking and review rather than treated as a complete
+semantic proof. Interface chrome uses shared design-space constants and small
+code-owned responsive layout functions; authored world composition remains in
+validated presentation data.
 
 The play page's static identity is also data-owned. Vite injects title, description, exit label, initial live-region status and application label from `game.json` while transforming the HTML entry. The production static-build check verifies the emitted page contains those values and no unresolved placeholders, so tab titles and navigation remain meaningful before the Phaser bundle executes.
 
 The canvas navigation is adequate prototype input scaffolding, not the final accessibility surface. The live region and equivalent keyboard/pointer actions are real; semantic DOM campaign cards, buttons, focus management and mobile screen-reader behaviour remain required production work.
 
-Reusable scenes receive the validated episode as scene data; they do not import an episode file or choose an episode ID themselves. Episode presentation data selects a layout and skin. Validated layout JSON owns design-space anchors, pivots, interface slots and reusable motion parameters; validated skin JSON owns prototype primitive geometry or, later, semantic layered-asset references. Phaser code interprets this finite vocabulary and applies runtime state—it does not contain the authored composition coordinates.
+Reusable scenes receive the validated episode as scene data; they do not import an episode file or choose an episode ID themselves. Episode presentation data selects a layout and skin. Validated layout JSON owns design-space anchors, pivots, interface slots and reusable motion parameters; validated skin JSON owns prototype primitive geometry or semantic layered-asset references. Phaser code interprets this finite vocabulary and applies runtime state—it does not contain the authored composition coordinates.
 
 Artwork files are resolved through a validated asset catalog using stable semantic IDs. Skins may use either documented prototype shapes or image parts with explicit `{ source, id }` asset references; they never contain repository paths. Episodes likewise select layouts and skins through explicit ownership references. Both skins and physical assets are organised by ownership under `shared/` or `episodes/<episode-id>/`. A shared skin may use only shared assets; an episode-owned skin may use shared assets and assets owned by that episode. An episode may select only a shared skin or one in its own namespace. Build-time recursive discovery and policy validation reject unsafe paths, misleading ownership sources, unknown episode namespaces, missing files and unlisted files, and the generic boot scene preloads catalogued images before the selected presentation is instantiated.
 
@@ -238,7 +370,7 @@ Prototypes use these same production boundaries. Prototype tuning, writing and s
 
 ## Web and mobile path
 
-The game will be implemented and tested in the browser first. The same responsive codebase will support:
+The game is implemented and tested in the browser first. The same responsive codebase supports:
 
 - Touch controls on mobile browsers.
 - Keyboard controls on desktop.
@@ -254,7 +386,11 @@ The browser release must remain usable without a network connection after its re
 
 The repository and distributable project materials form part of the digital commons. Project software uses `AGPL-3.0-or-later`; original cultural and documentary material uses `CC-BY-SA-4.0`, subject to the boundaries and provenance exceptions in [the licensing guide](../LICENSE.md).
 
-No tracking or monetisation is part of the architecture. The game should not collect behavioural analytics, profile players, serve advertising, sell access or include purchases. Device-local settings and progress stay on the device and should not be transmitted elsewhere.
+The architectural consequence of the project's binding privacy and funding
+commitments is that settings and progress remain device-local: no analytics,
+advertising, payments, accounts or player-data transmission services are
+required. The policy itself is authoritative in the [project
+charter](../PROJECT_CHARTER.md).
 
 ## Initial exclusions
 
@@ -270,6 +406,11 @@ The first version does not require:
 - A general-purpose visual game editor.
 
 These exclusions keep the technical system aligned with the project's deliberate simplicity. They can be reconsidered only when a concrete requirement justifies them and the change does not weaken the static, offline-capable, non-tracking and non-commercial commitments above.
+
+A future constrained content-authoring tool is not a general-purpose editor.
+The planned Propaganda Department is deliberately limited to the documented
+game vocabulary and is not required for the first release; its role is defined
+in the [content architecture](content-architecture.md#future-authoring-tool).
 
 ## Technical principles
 

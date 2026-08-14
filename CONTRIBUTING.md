@@ -4,6 +4,21 @@ Thank you for helping build The Horizontal Front as a digital commons.
 
 Read the [project charter](PROJECT_CHARTER.md), [governance process](GOVERNANCE.md) and relevant design documents before proposing a change. Contributions must preserve the game's anti-capitalist satire and the charter's protected commitments.
 
+## Where to read next
+
+The [documentation index](docs/README.md) routes different kinds of work to
+their authoritative references:
+
+- Episode writing and composition: [episode grammar
+  reference](docs/episode-grammar-reference.md).
+- Content ownership, catalogues or new capabilities: [content
+  architecture](docs/content-architecture.md).
+- Engine, Phaser presentation, build or delivery: [technical
+  architecture](docs/technical-architecture.md).
+- Product or creative direction: [game concept](docs/game-concept.md) and
+  [design decisions](docs/design-decisions.md).
+- Research-led interaction decisions: [research index](docs/research/README.md).
+
 ## Before starting
 
 - Use the public issue tracker for bugs and proposals.
@@ -34,7 +49,9 @@ Run the smallest checks relevant to the change. For application integration, run
 npm run build
 ```
 
-The build includes the automated project-policy check. Run focused unit tests for engine rules and validate episode content when those areas change.
+The build includes the automated project-policy and documentation-integrity
+checks. Run focused unit tests for engine rules and validate episode content
+when those areas change.
 
 ## Licensing contributions
 

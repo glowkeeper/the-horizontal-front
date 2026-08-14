@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "assets": [
+    {
+      "id": "raised-fist-favicon",
+      "file": "favicon.svg",
+      "origin": "human-created",
+      "status": "prototype-placeholder",
+      "creator": "The Horizontal Front project, directed by the project maintainer and implemented by Codex",
+      "edits": [
+        "Placed the project's existing raised-fist Unicode motif on a rounded resistance-red field.",
+        "Used the established semantic colour palette and system emoji fonts for the prototype favicon."
+      ],
+      "licence": "CC-BY-SA-4.0",
+      "replacementStatus": "Replace or substantially human-refine when the project adopts production-approved identity artwork."
+    }
+  ]
+}

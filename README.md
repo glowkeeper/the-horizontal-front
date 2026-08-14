@@ -19,6 +19,7 @@ The project's public home is **[thehorizontalfront.org](https://thehorizontalfro
 ## Table of contents
 
 - [Background](#background)
+- [Documentation](#documentation)
 - [Project status](#project-status)
 - [Install](#install)
 - [Development](#development)
@@ -43,7 +44,18 @@ The project is governed by the following digital-commons commitments:
 
 Educational notes connecting the game to mutual aid, labour history, enclosure, collective action and horizontal governance are a future ambition rather than a current requirement.
 
-The binding commitments are in the [project charter](PROJECT_CHARTER.md). The working game brief and architecture are described in the [game concept](docs/game-concept.md) and [technical architecture](docs/technical-architecture.md). Episode authors should start with the [episode grammar reference](docs/episode-grammar-reference.md).
+The binding commitments are in the [project charter](PROJECT_CHARTER.md).
+
+## Documentation
+
+The [documentation index](docs/README.md) routes players, contributors, episode
+authors, developers and design reviewers to the right authoritative document.
+The working game brief is the [game concept](docs/game-concept.md); engine and
+delivery decisions are in the [technical
+architecture](docs/technical-architecture.md); ownership and catalogue rules are
+in the [content architecture](docs/content-architecture.md). Episode authors
+should start with the [episode grammar
+reference](docs/episode-grammar-reference.md).
 
 ## Project status
 
@@ -87,6 +99,7 @@ Useful project commands:
 | `npm run preview` | Preview the production build locally. |
 | `npm test` | Run the Vitest test suite. |
 | `npm run test:watch` | Run tests in watch mode. |
+| `npm run check:docs` | Check internal documentation links, anchors and referenced repository paths. |
 | `npm run check:policy` | Check the project’s architectural, privacy and charter constraints. |
 | `npm run validate:content` | Validate every campaign, episode, mechanic and presentation selection with author-readable errors. |
 | `npm run check:static` | Check the generated static and offline-capable build. |
@@ -96,7 +109,8 @@ Useful project commands:
 - `src/play/` contains the functional game engine, Phaser integration, game presentation and game-specific styles.
 - `src/site/` contains the public-site entry, static page templates and site styles.
 - `src/shared/` contains infrastructure genuinely shared by the site and game, including semantic theme tokens and service-worker registration.
-- `docs/` contains the game and technical design documents.
+- `docs/` contains the audience-routed game, authoring, content architecture,
+  technical architecture, design-decision and research documents.
 - `scripts/` contains repository-level generation, build finalisation and policy-checking tools.
 - `public/` contains static assets and the service worker.
 

@@ -130,10 +130,26 @@ support their mechanic kind and obey the same ownership rules.
 non-empty `headline` and `feedback`. No failure, trap-consequence or custom
 outcome discriminant exists.
 
+## What compilation means
+
+After an episode passes structural validation, the content compiler resolves its
+owned references, checks relationships between the selected definitions and
+translates its beat-based composition into the finite runtime configuration used
+by the game engine. In particular, it expands rhythm cycles into timestamped
+cues, constructs phase boundaries and places interruption warning, active and
+return windows. It does not execute episode-authored code; episodes have no such
+facility.
+
+This is distinct from the TypeScript compiler used to build the application.
+The complete pipeline, its runtime outputs and the rules for adding a reusable
+compiler capability are documented under [Content compilation
+pipeline](technical-architecture.md#content-compilation-pipeline).
+
 ## Why an episode is rejected
 
-Validation reports the field path for structural mistakes. Compilation then
-checks relationships which a field cannot establish alone:
+Validation reports the field path for structural mistakes. Reference resolution
+and semantic validation then check relationships which a field cannot establish
+alone:
 
 | Rejection | What to check |
 | --- | --- |

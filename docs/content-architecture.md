@@ -1,4 +1,4 @@
-# Data-driven episode architecture
+# Content architecture
 
 ## Foundational constraint
 
@@ -8,42 +8,11 @@ Not “usually no programming” and not “unless it does something interesting
 
 The engine provides reusable layouts and mechanics. Episodes provide structured data, writing, artwork and audio. This is both a technical decision and part of the game's identity: a small, comprehensible system supports creative expression without becoming an ever-expanding productivity apparatus.
 
-## Simple does not mean same
-
-A deck of cards has only 52 pieces and a handful of actions, yet produces enormous variety. A comic strip repeatedly uses the same characters and panels, but remains interesting because its situations and writing change.
-
-The goal is not unlimited mechanical variety. It is a **small vocabulary with rich combinations**.
-
-The initial mechanical vocabulary might contain:
-
-- Follow an authored rhythm.
-- Tap a sequence.
-- Press and hold.
-- Hold two controls.
-- Ignore a temptation.
-- Respond to reversed controls.
-- Endure increasing pressure.
-
-Episodes can combine these differently:
-
-```text
-Episode A
-Steady rhythm → Quick Call → frantic finale
-
-Episode B
-Slow heavy rhythm → tempting promotion → reversed controls
-
-Episode C
-Rapid rhythm → hold an email while continuing → two simultaneous demands
-```
-
-Nothing new is programmed, but the dramatic shape changes.
-
 ## Rhythm as a source of variety
 
 Rhythm is a core rule rather than decorative music laid over a tapping game. Episodes select dramatic curves; each curve composes reusable catalogue-owned rhythm patterns phase by phase. The implemented rhythm vocabulary contains timed left/right taps, explicit rests and sustained holds. Beat positions may be fractional, so the same finite notation expresses straight alternation, waltz groupings, syncopation, deliberate silence, press-and-release grips and call-and-response phrases.
 
-Rhythm files define a bounded cycle in beats. Each event is exactly one of `tap`, `hold` or `rest`. Tap and hold events name a side and beat position; holds also name their duration; rests explicitly reserve silence. A dramatic phase selects a shared or same-episode rhythm and supplies tempo, timing tolerance, lead-in, pressure, recovery, resistance gain and loss, and presentation intensity. The loader resolves those references into a finite timestamped score before play. The plain TypeScript engine never branches on a rhythm, curve or episode ID.
+Rhythm files define a bounded cycle in beats. Each event is exactly one of `tap`, `hold` or `rest`. Tap and hold events name a side and beat position; holds also name their duration; rests explicitly reserve silence. A dramatic phase selects a shared or same-episode rhythm and supplies tempo, timing tolerance, lead-in, pressure, recovery, resistance gain and loss, and presentation intensity. The content compiler resolves those references into a finite timestamped score before play. The plain TypeScript engine never branches on a rhythm, curve or episode ID.
 
 The engine judges player input against the required pattern and timing. Successful performance builds persistent resistance strength and helps recover the duvet. Authored phase pressure is multiplied by the remaining exposed fraction, `1 − resistance strength`, until a miss weakens that protection. READY and REST preserve the earned value. The same engine clock should drive judgement and the audio, visual, and optional haptic cues that communicate the rhythm.
 
@@ -51,86 +20,11 @@ Rhythm data remains finite and readable. It has no expressions, callbacks, varia
 
 Difficulty should come from pattern, timing, composition, interruptions, and pressure rather than primarily from ever-higher input rates. This is both a design principle and a physical-accessibility constraint.
 
-## Repetition is meaningful
+## Content hierarchy and ownership
 
-The game should not become a collection of unrelated minigames. Some sameness is part of the satire:
-
-- The boss always wants more.
-- Corporate initiatives have different names but make the same demands.
-- The player repeatedly fights for the same basic human freedom.
-- Victory is temporary.
-- Capitalism endlessly rebrands repetition as transformation.
-
-The Orange Fella might announce, “This is a completely unprecedented productivity framework,” before launching essentially the same attack under a new logo. The player recognises the repetition even though the boss does not.
-
-## Sources of variety
-
-### Narrative
-
-The strongest variety should come from writing and political subject matter:
-
-- Mandatory wellbeing.
-- Return-to-office mandates.
-- AI productivity surveillance.
-- Layoffs after record profits.
-- Executive bonuses.
-- Performance reviews.
-- Corporate family rhetoric.
-- Employee engagement surveys.
-- Outsourcing.
-- Zero-hours contracts.
-- “Unlimited” holiday.
-- Workplace mindfulness.
-- A merger nobody wanted.
-
-Each episode has its own premise, escalation and punchline.
-
-### Dramatic structure
-
-Episodes need not schedule pressure and attacks identically. One may be a steady siege; another may begin suspiciously easily; another may contain repeated temptations, false endings or a late betrayal.
-
-The first production curve, `alarm-escalation`, proves this composition with orientation, establishment, pressure and crisis phases followed by a separately timed resolution. Other curves may use any number of phases and may rise steadily, provide false relief, reverse their pressure or combine different catalogue rhythms. Phase IDs are author-facing descriptions only; they have no special engine behaviour.
-
-`The Alarm` exercises straight alternation, sustained grips and the shared `three-and-rest` phrase in live play. Its orientation teaches alternating taps, establishment introduces alternating press-and-release holds, pressure permits one protected beat after every three actions, and crisis returns to continuous alternation. The shared catalogue also contains deliberate rests, managerial waltz, syncopated counterpull and call-and-response patterns as validated production vocabulary ready for other episode compositions; their compiler and engine paths are covered by tests, but they are not all claimed as play-tested content. Explicit rests reserve authored silence and prevent other events occupying that interval. They intentionally compile to no input cue and suspend pressure, safety movement and resistance changes for their effective interval.
-
-The compiled presentation timeline preserves taps, holds, authored rests and the opening count-in separately from scored input cues. `READY` is reserved for the confrontation's first lead-in. Later phase lead-ins provide unscored anticipation time: the upcoming control is visible while ordinary pressure continues against the resistance already earned. They do not manufacture another READY or an unauthored protected REST. Opening READY and authored REST suspend passive pressure and authored dramatic movement for their complete intervals, so obeying a non-input instruction cannot worsen the player's state. Their visible and mechanical pause ends when the following cue's valid input window opens—not at its nominal centre beat—so the game never accepts an input while still instructing the player to wait. A shared guide selector exposes current and upcoming events to visual, audio or haptic adapters without putting judgement rules in those adapters. The Phaser presentation projects that timeline at one constant scroll speed: tap notes cross compact control gates, long hold notes have duration-derived length and distinct head and tail boundaries, completed actions disappear immediately, and expired actions escape as crossed misses. Each lane clips at the centre emitter and canvas edge, so arbitrarily long authored holds stream through the available space without crossing into the other lane. Gate width is derived from each action's authored timing tolerance, so visual and mechanical acceptance share a boundary; an active hold latches the gate and colours its sustained section. Compact REST and READY bands remain at the centre because they have no control target. Rests remain absent from the scored cue list. Layout data owns guide count, scroll speed, supported tolerance, geometry and opacity; other adapters may consume the same timeline for audio, haptics or phrase rehearsal.
-
-The crisis is a continuous alternating final phrase with no protected internal rest. Its visual intensity and authored pressure reach maximum, but its mechanical pressure remains answerable: resistance earned before and during the phrase persists between its beats, and accurate final play can recover a threatened position. Urgency comes from committing to the phrase rather than from an unsafe leap in input rate.
-
-### Mechanical composition
-
-A small number of mechanics may interact:
-
-- Alternate while holding.
-- Follow a sequence while pressure continues.
-- Ignore a promotion while it obscures the play area.
-- Handle reversed controls during the morning offensive.
-- Maintain rhythm while notifications compete for attention.
-
-Supported combinations must be explicit engine capabilities. The data format must not become a hidden programming language.
-
-### Presentation
-
-The bedroom remains recognisable while its presentation changes:
-
-- Dawn, rain, a heatwave or winter darkness.
-- A video call projected onto the wall.
-- Office furniture invading the room.
-- Corporate banners covering personal possessions.
-- Multiple Orange Fellas appearing on screens.
-- A shareholder meeting outside the window.
-- The bedroom becoming increasingly office-like.
-- Management presenting the same initiative under a new colour scheme.
-
-Cartoon sequences provide more visual freedom than the gameplay stage needs.
-
-### Emotion
-
-Episodes can be broadly ridiculous, quietly sinister, triumphantly rebellious, melancholic, surreal, hopeful or angry. The same short framework can feel different depending on its narrative context, dialogue, music and result.
-
-## Finite episode grammar
-
-The complete system should have an explicit, documented grammar that a non-programmer can understand.
+The complete authoring vocabulary is defined by the [episode grammar
+reference](episode-grammar-reference.md). The surrounding hierarchy and
+ownership rules below explain how that grammar composes into a complete game.
 
 ### Shared and episode-owned definitions
 
@@ -197,6 +91,19 @@ mechanics/
   interruptions/
     quick-call.json
     urgent-email.json
+presentation/
+  asset-catalog.json
+  layouts/
+    bed-head-right.json
+  skins/
+    shared/
+    episodes/the-alarm/
+  interruption-skins/
+    shared/
+    episodes/
+  assets/
+    shared/
+    episodes/the-alarm/
 ```
 
 The authoritative, author-facing description of the implemented format is the
@@ -232,7 +139,7 @@ if (episode.id === "mandatory-wellness") {
 It should understand only generic, reusable capabilities selected through the
 validated data described in the episode grammar reference.
 
-Every attack separates three concerns:
+Every interruption separates three concerns:
 
 ```text
 Mechanic       What the player physically does
@@ -277,11 +184,12 @@ For example:
 
 Quick Call and Wellbeing Check-In can therefore use the same mechanic with different presentation.
 
-An interruption composition anchors a reusable mechanic to a musical boundary using a phase ID, completed cycle count and an optional beat offset within that cycle. It supplies warning, active and return durations in beats—not unrelated wall-clock offsets—and declares bounded success and failure safety consequences. Compilation resolves beats through the selected phase tempo, rejects unknown phases, incompatible mechanic kinds, malformed choices, overlapping windows and starts inside an occupied tap, hold, rest or count-in interval. Cue and guide filtering use the same complete occupied intervals, including hold tails, before emitting pressure-pausing active and count-in intervals.
-
-The return boundary is the end of the authored count-in, expressed against the phase's musical clock. Resistance control becomes available there; an authored rest may deliberately follow before the next playable input window. Presentation validation separately guarantees that the first returning note can make its complete visible approach after the interruption panel clears.
-
-Sequence choices have stable local IDs, labels and keyboard bindings. Their ordered steps may reference only those choices. Hold mechanics define a press window and required duration in beats; episode presentation supplies the control label and confrontation copy. Browser or hardware cancellation is a neutral resolved outcome, distinct from a deliberate early release.
+The [episode grammar reference](episode-grammar-reference.md#interruptions) is
+authoritative for interruption composition and rejection rules. Runtime
+scheduling, pressure suspension, input ownership and cancellation semantics are
+documented under [Data-driven content](technical-architecture.md#data-driven-content);
+their evidence basis remains in [Interruption mechanics and accessible rhythm
+UI](research/interruption-mechanics-and-accessible-rhythm-ui.md).
 
 Interruption definitions follow the same two-level ownership rule as rhythms and dramatic curves. A shared interruption mechanic may be selected by any episode. An episode may instead define and select a private mechanic, but cannot shadow a shared ID or access another episode's definitions.
 
@@ -313,19 +221,15 @@ Cartoon scenes should use reusable layouts and semantic slots rather than making
 
 ```json
 {
-  "layout": "boss-intrudes-right",
-  "layers": [
-    {
-      "asset": "boss-smug",
-      "slot": "boss",
-      "offset": { "x": -20, "y": 5 },
-      "scale": 1.1
-    }
-  ]
+  "layout": { "source": "shared", "id": "bed-head-right" },
+  "skin": { "source": "episode", "id": "the-alarm-bedroom" },
+  "managementAction": "lift-head"
 }
 ```
 
-The layout determines responsive placement, scaling, text-safe areas and default layer order. The episode supplies poses, dialogue, props and small artistic offsets.
+The layout determines responsive placement, scaling, text-safe areas and
+default layer order. The selected skin supplies validated visual parts and
+semantic artwork references; episode copy remains in the episode itself.
 
 An episode selects a documented layout and skin through explicit ownership references; it does not contain asset file paths or the complete scene drawing. Layout JSON defines shared design-space anchors, pivots, slots and motion parameters. Skin JSON defines the visual parts occupying those slots through either the finite prototype-shape vocabulary or explicitly owned semantic image references resolved by a validated asset catalogue. Both skins and catalogue-owned files use `shared/` and `episodes/<episode-id>/` namespaces. Shared skins can use only shared assets. An episode-owned skin can use shared assets and assets owned by the same episode, and only that episode can select it. Shared Phaser adapters validate and interpret those files. This keeps ordinary composition and replacement artwork editable as data without turning episode JSON into a graphical programming language.
 
@@ -335,7 +239,7 @@ Each asset-catalogue entry is ordinary authored data. For example:
 {
   "id": "pillow-prototype",
   "file": "episodes/the-alarm/pillow-prototype.png",
-  "kind": "image",
+  "origin": "ai-generated",
   "status": "prototype-placeholder",
   "creator": "Creator or source",
   "generatedAt": "2026-08-13",
@@ -351,9 +255,12 @@ Each asset-catalogue entry is ordinary authored data. For example:
 
 Layout and skin validation must check relationships as well as field types. Coordinates and control bounds must fit the design canvas, dimensions must be positive, semantic part IDs must be unique and required parts present, layout/skin references must be compatible, and motion directions must agree with the layout's physical meaning.
 
-## The Propaganda Department editor
+## Future authoring tool
 
-A simple internal composition mode should become the normal episode-authoring interface. It may allow an author to:
+The Propaganda Department is a planned, deliberately constrained internal
+authoring tool, not a general-purpose game editor and not a requirement for the
+first release. It should eventually become the normal episode-authoring
+interface and may allow an author to:
 
 - Choose an episode structure and reusable layout.
 - Drag, scale, rotate and reorder artwork.
@@ -388,12 +295,13 @@ If the answers are not convincing, rewrite the episode rather than enlarging the
 
 ## Episode production workflow
 
-Once the engine exists, creating an episode should be a repeatable creative process:
+Creating an episode is a repeatable creative process:
 
 1. Write the political premise and punchline.
 2. Write the campaign briefing when the episode begins a new campaign.
 3. Select or commission the required poses and artwork.
-4. Arrange the cartoon in composition mode.
+4. Arrange the cartoon through validated layout and skin content; use the
+   constrained authoring tool when it becomes available.
 5. Define pressure, rhythm and interruptions through the episode grammar, anchoring interruptions to musical phrase boundaries.
 6. Preview touch and keyboard difficulty.
 7. Add audio and verify accessibility.
