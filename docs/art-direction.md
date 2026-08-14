@@ -25,6 +25,50 @@ not styles to imitate. Production prompts and briefs must not request imitation
 of a living artist, a named entertainment property or one historical artist's
 recognisable rendering style.
 
+## Reference traditions
+
+The first production draft draws inspiration from a deliberate combination of
+left-wing, radical and anti-authoritarian graphic traditions. These references
+identify political and visual qualities to study; they are not a request to
+copy a particular work or reproduce any artist's recognisable style.
+
+- **Emory Douglas — heroic political authority.** Study the monumental scale,
+  strong posture, limited colour and unequivocal dignity given to ordinary
+  people engaged in resistance. This principally informs whom the composition
+  honours: the player is an active political subject, not an object of pity.
+  See the [National Gallery of Art overview and selected
+  works](https://www.nga.gov/artists/35198-emory-douglas).
+- **David Low — readable theatrical satire.** Study the economical staging,
+  immediately legible central joke, symbolic props and ability to make
+  authoritarian power dangerous and ridiculous at once. This principally
+  informs how the confrontation reads as a scene. See the [British Cartoon
+  Archive biography and holdings](https://research.kent.ac.uk/british-cartoon-archive/record/david-low/).
+- **Clifford Harper — oppositional print character.** Study the handmade,
+  woodcut-like energy, strong black shapes and visual language of labour,
+  anarchist and collective action. This may inform texture, line, poster-like
+  outcome treatment and interface ornament without making the warm bedroom
+  uniformly severe. See the artist's [biography and account of his
+  work](https://cliffordharper.com/biography/).
+- **Käthe Kollwitz — bodily conviction and dignity.** Study the expressive
+  hands, physical weight and monumental treatment of workers and ordinary
+  people. This may inform the player's mass, determination and resistance poses
+  without importing the predominantly sombre emotional register of Kollwitz's
+  work. See MoMA's discussion of [Kollwitz's working-class
+  subjects](https://www.moma.org/magazine/articles/1051).
+- **Steve Bell — grotesque managerial excess.** Study the willingness to make
+  political power bodily, recurring, rude and absurd. This may give Management
+  permission to become genuinely grotesque, but the Orange Fella must not use
+  Bell's recognisable drawing manner or depend on caricaturing a real person's
+  face. See the artist's [cartoon archive](https://www.belltoons.co.uk/bellworks/).
+
+The intended synthesis is a heroic radical-print protagonist occupying a warm
+horizontal stronghold while an editorial-cartoon apparatus of managerial power
+invades from above and the right. Douglas principally informs whom the image
+honours; Low informs how the joke reads; Harper and Kollwitz may inform physical
+mark and bodily conviction; Bell gives Management permission to become
+grotesquely undignified. The resulting artwork must nevertheless establish its
+own shapes, characters, line, palette, compositions and recurring visual jokes.
+
 ## The player is the hero
 
 The player character is heroic, defiant and purposeful while remaining in bed.
