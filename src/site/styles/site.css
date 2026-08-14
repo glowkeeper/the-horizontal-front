@@ -196,10 +196,29 @@ h3 {
 .primary-action {
   display: inline-block;
   padding: 0.8rem 1.1rem;
+  border: 2px solid var(--colour-ink-charcoal);
   color: var(--colour-paper-white);
   background: var(--colour-resistance-red);
+  box-shadow: 0.25rem 0.25rem 0 var(--colour-ink-charcoal);
   font-weight: 800;
   text-decoration: none;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.primary-action:hover {
+  color: var(--colour-paper-white);
+  box-shadow: 0.35rem 0.35rem 0 var(--colour-ink-charcoal);
+  text-decoration: none;
+  transform: translate(-0.1rem, -0.1rem);
+}
+
+.primary-action:focus-visible {
+  outline-color: var(--colour-ink-charcoal);
+}
+
+.primary-action:active {
+  box-shadow: 0.08rem 0.08rem 0 var(--colour-ink-charcoal);
+  transform: translate(0.17rem, 0.17rem);
 }
 
 .commitment-grid,
@@ -346,5 +365,14 @@ h3 {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .primary-action {
+    transition: none;
+  }
+
+  .primary-action:hover,
+  .primary-action:active {
+    transform: none;
   }
 }

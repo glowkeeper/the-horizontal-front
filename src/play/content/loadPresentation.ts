@@ -2,6 +2,8 @@ import type { Episode } from "./loadEpisode";
 import {
   resistanceLayoutSchema,
   resistanceSkinSchema,
+  interruptionSkinSchema,
+  type InterruptionSkin,
   type ResistanceLayoutContent,
   type ResistanceSkin,
 } from "./schemas/presentationSchema";
@@ -16,10 +18,56 @@ const skinModules = import.meta.glob(
   "./presentation/skins/{shared,episodes/*}/*.json",
   { eager: true, import: "default" },
 );
+const interruptionSkinModules = import.meta.glob(
+  "./presentation/interruption-skins/{shared,episodes/*}/*.json",
+  { eager: true, import: "default" },
+);
+
+type InterruptionSkinRecord = {
+  readonly owner: "shared" | string;
+  readonly content: InterruptionSkin;
+};
+
+export function loadInterruptionSkinLibrary(
+  modules: Readonly<Record<string, unknown>> = interruptionSkinModules,
+): ReadonlyMap<string, InterruptionSkinRecord> {
+  const records = new Map<string, InterruptionSkinRecord>();
+  const sharedIds = new Set<string>();
+  const episodeIds = new Map<string, Set<string>>();
+  for (const [path, raw] of Object.entries(modules)) {
+    const match = /^\.\/presentation\/interruption-skins\/(shared|episodes\/([a-z0-9]+(?:-[a-z0-9]+)*))\/([a-z0-9]+(?:-[a-z0-9]+)*)\.json$/.exec(path);
+    if (!match) throw new Error(`Invalid interruption skin path: ${path}`);
+    const content = interruptionSkinSchema.parse(raw);
+    if (content.id !== match[3]) {
+      throw new Error(`Interruption skin ID must match its filename: ${path}`);
+    }
+    const owner = match[1] === "shared" ? "shared" : match[2];
+    records.set(path, { owner, content });
+    if (owner === "shared") sharedIds.add(content.id);
+    else {
+      const ownedIds = episodeIds.get(owner) ?? new Set<string>();
+      ownedIds.add(content.id);
+      episodeIds.set(owner, ownedIds);
+    }
+  }
+  for (const [episodeId, ownedIds] of episodeIds) {
+    for (const id of ownedIds) {
+      if (sharedIds.has(id)) {
+        throw new Error(
+          `${episodeId} episode interruption skin ${id} shadows a shared definition`,
+        );
+      }
+    }
+  }
+  return records;
+}
+
+const interruptionSkinLibrary = loadInterruptionSkinLibrary();
 
 export type LoadedPresentation = {
   readonly layout: ResistanceLayoutContent;
   readonly skin: ResistanceSkin;
+  readonly interruptionSkins: ReadonlyMap<string, InterruptionSkin>;
 };
 
 function loadLayout(id: string): ResistanceLayoutContent {
@@ -33,6 +81,55 @@ function loadLayout(id: string): ResistanceLayoutContent {
     throw new Error(`Layout ID mismatch: expected ${id}`);
   }
   return layout;
+}
+
+function loadInterruptionSkin(
+  episodeId: string,
+  reference: { readonly source: "shared" | "episode"; readonly id: string },
+): InterruptionSkin {
+  const path = reference.source === "shared"
+    ? `./presentation/interruption-skins/shared/${reference.id}.json`
+    : `./presentation/interruption-skins/episodes/${episodeId}/${reference.id}.json`;
+  const record = interruptionSkinLibrary.get(path);
+  if (record === undefined) {
+    throw new Error(`Missing ${reference.source} interruption skin: ${reference.id}`);
+  }
+  return record.content;
+}
+
+export function assertInterruptionSkinCompatibility(
+  skin: InterruptionSkin,
+  mechanic: "sequence" | "hold",
+): void {
+  if (!skin.supports.includes(mechanic)) {
+    throw new Error(`Interruption skin ${skin.id} does not support ${mechanic}`);
+  }
+}
+
+export function assertVisibleInterruptionReturns(
+  episode: Episode,
+  layout: ResistanceLayoutContent,
+): void {
+  const { feedback, leftControl, rightControl } = layout.anchors;
+  const speed = layout.controls.noteTravelPixelsPerMs;
+
+  for (const interruption of episode.confrontation.interruptions) {
+    const firstCue = episode.confrontation.resistance.cues.find(
+      (cue) => cue.atMs - cue.timingWindowMs >= interruption.returnsAtMs,
+    );
+    if (firstCue === undefined) {
+      throw new Error(
+        `Interruption ${interruption.id} must return before a playable resistance cue`,
+      );
+    }
+    const target = firstCue.side === "left" ? leftControl : rightControl;
+    const travelDurationMs = Math.abs(target.x - feedback.x) / speed;
+    if (firstCue.atMs - travelDurationMs < interruption.endsAtMs) {
+      throw new Error(
+        `Interruption ${interruption.id} return count-in cannot show the complete approach of its first resistance cue`,
+      );
+    }
+  }
 }
 
 function loadSkin(
@@ -110,6 +207,20 @@ export function loadPresentation(episode: Episode): LoadedPresentation {
   const assetIds = new Set(presentationAssets.map(({ id }) => id));
   assertSensiblePresentation(layout, skin, assetIds);
   assertAssetOwnership(episode.id, owner, skin);
+  assertVisibleInterruptionReturns(episode, layout);
 
-  return { layout, skin };
+  const interruptionSkins = new Map<string, InterruptionSkin>();
+  for (const interruption of episode.confrontation.interruptions) {
+    const interruptionSkin = loadInterruptionSkin(
+      episode.id,
+      interruption.presentation.skin,
+    );
+    assertInterruptionSkinCompatibility(
+      interruptionSkin,
+      interruption.interaction.kind,
+    );
+    interruptionSkins.set(interruption.id, interruptionSkin);
+  }
+
+  return { layout, skin, interruptionSkins };
 }

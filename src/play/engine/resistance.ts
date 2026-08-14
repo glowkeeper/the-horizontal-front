@@ -191,6 +191,26 @@ export function isResistancePaused(resistance: Resistance): boolean {
     && event.endsAtMs > resistance.state.elapsedMs);
 }
 
+export function isResistanceCountInActive(resistance: Resistance): boolean {
+  return resistance.config.guideEvents.some((event) =>
+    event.action === "count-in"
+    && event.atMs <= resistance.state.elapsedMs
+    && event.endsAtMs > resistance.state.elapsedMs);
+}
+
+export function adjustResistanceSafety(
+  resistance: Resistance,
+  amount: number,
+): Resistance {
+  if (!Number.isFinite(amount)) throw new Error("safety adjustment must be finite");
+  const duvetSafety = clamp01(resistance.state.duvetSafety + amount);
+  return withState(resistance, {
+    ...resistance.state,
+    duvetSafety,
+    outcome: duvetSafety === 0 ? "forced-verticalisation" : resistance.state.outcome,
+  });
+}
+
 export function getDramaticIntensity(config: ResistanceConfig, atMs: number): number {
   const phase = getPhase(config.phases, Math.min(atMs, config.durationMs));
   const activeDuration = getUnpausedDuration(
@@ -369,7 +389,8 @@ function getUnpausedDuration(
 function isPauseEvent(
   event: ResistanceConfig["guideEvents"][number],
 ): boolean {
-  return event.action === "rest" || event.action === "count-in";
+  return event.action === "rest" || event.action === "count-in"
+    || event.action === "interruption";
 }
 
 function getPhase(phases: readonly ResistancePhase[], atMs: number): ResistancePhase {

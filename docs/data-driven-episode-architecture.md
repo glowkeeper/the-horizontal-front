@@ -194,6 +194,9 @@ mechanics/
     call-and-response.json
   dramatic-curves/
     # shared curve JSON when a curve is genuinely reused
+  interruptions/
+    quick-call.json
+    urgent-email.json
 ```
 
 ```text
@@ -218,10 +221,13 @@ A phase may define:
 - Visual state
 - Audio state
 
-An attack is one of:
+The currently implemented interruption mechanics are:
 
 - Sequence
 - Hold
+
+The wider finite vocabulary may grow deliberately to include:
+
 - Dual hold
 - Reverse
 - Temptation
@@ -269,20 +275,32 @@ For example:
 
 ```json
 {
-  "mechanic": "sequence",
-  "skin": "wellbeing-survey",
-  "prompt": "How supported do you feel?",
+  "mechanic": { "source": "shared", "id": "quick-call" },
+  "presentation": {
+    "skin": { "source": "shared", "id": "management-notification" }
+  },
   "choices": [
-    "Completely",
-    "Extremely",
-    "Mandatory"
+    { "id": "completely", "label": "Completely", "key": "Digit1" },
+    { "id": "extremely", "label": "Extremely", "key": "Digit2" },
+    { "id": "mandatory", "label": "Mandatory", "key": "Digit3" }
   ],
-  "sequenceLength": 4,
-  "timeLimit": 3
+  "steps": ["mandatory", "completely", "extremely"]
 }
 ```
 
 Quick Call and Wellbeing Check-In can therefore use the same mechanic with different presentation.
+
+An interruption composition anchors a reusable mechanic to a musical boundary using a phase ID and completed cycle count. It supplies warning, active and return durations in beats—not unrelated wall-clock offsets—and declares bounded success and failure safety consequences. Compilation resolves beats through the selected phase tempo, rejects unknown phases, incompatible mechanic kinds, malformed choices and overlapping windows, removes resistance cues that would collide with the interruption, and emits pressure-pausing active and count-in intervals.
+
+The return boundary is the opening edge of the next resistance input window rather than the note's centre time. This means the engine and interface return control precisely when that note first becomes playable.
+
+Sequence choices have stable local IDs, labels and keyboard bindings. Their ordered steps may reference only those choices. Hold mechanics define a press window and required duration in beats; episode presentation supplies the control label and confrontation copy. Browser or hardware cancellation is a neutral resolved outcome, distinct from a deliberate early release.
+
+Interruption definitions follow the same two-level ownership rule as rhythms and dramatic curves. A shared interruption mechanic may be selected by any episode. An episode may instead define and select a private mechanic, but cannot shadow a shared ID or access another episode's definitions.
+
+Interruption presentation skins are a separate validated content family under `presentation/interruption-skins/shared/` and `presentation/interruption-skins/episodes/<episode-id>/`. Every interruption composition explicitly selects one with `{ source, id }`. A skin declares the mechanic kinds it supports and owns semantic appearance: theme roles, typography roles and sizes, layer depth, panel treatment, choice emphasis, hold progress styling, and warning/active/success/failure/cancelled/returning state treatments. Layout data continues to own anchors, dimensions and spatial offsets. The Phaser adapter interprets those two resolved inputs and contains no authored appearance values.
+
+Shared interruption skins are globally reusable. Episode-owned interruption skins are private, cannot shadow shared IDs and are resolved only for their owning episode. Content loading and repository policy checks reject invalid paths, filename/ID mismatches, unresolved ownership references and mechanic/skin incompatibility.
 
 ## JSON must not become programming
 
@@ -395,7 +413,7 @@ Once the engine exists, creating an episode should be a repeatable creative proc
 2. Choose a briefing layout.
 3. Select or commission the required poses and artwork.
 4. Arrange the cartoon in composition mode.
-5. Define pressure, rhythm and attacks through the episode grammar.
+5. Define pressure, rhythm and interruptions through the episode grammar, anchoring interruptions to musical phrase boundaries.
 6. Preview touch and keyboard difficulty.
 7. Add audio and verify accessibility.
 8. Validate and ship the episode.

@@ -42,6 +42,27 @@ async function findEmbeddedPlayerCopy(directory) {
   return findings;
 }
 
+async function findHardCodedPresentationValues(directory) {
+  const findings = [];
+  const files = (await listFiles(directory)).filter((file) => file.endsWith(".ts"));
+  const authoredValuePatterns = [
+    /fontSize\s*:\s*["'`]\d/g,
+    /\.setDepth\(\s*-?\d/g,
+    /\.setAlpha\(\s*0?\.\d/g,
+    /\.setStrokeStyle\(\s*\d/g,
+  ];
+  for (const file of files) {
+    const source = await readFile(file, "utf8");
+    for (const pattern of authoredValuePatterns) {
+      for (const match of source.matchAll(pattern)) {
+        const line = source.slice(0, match.index).split("\n").length;
+        findings.push(`${relative(projectRoot, file)}:${line}`);
+      }
+    }
+  }
+  return findings;
+}
+
 async function listFiles(directory) {
   let entries;
   try {
@@ -108,13 +129,23 @@ const discoveredRhythmFiles = (await listFiles(join(mechanicRoot, "rhythms")))
 const discoveredCurveFiles = (await listFiles(join(mechanicRoot, "dramatic-curves")))
   .map((file) => relative(join(mechanicRoot, "dramatic-curves"), file).split("\\").join("/"))
   .filter((file) => file.endsWith(".json"));
+const discoveredInterruptionFiles = (await listFiles(join(mechanicRoot, "interruptions")))
+  .map((file) => relative(join(mechanicRoot, "interruptions"), file).split("\\").join("/"))
+  .filter((file) => file.endsWith(".json"));
 const embeddedPlayerCopy = await findEmbeddedPlayerCopy(
   join(projectRoot, "src/play"),
+);
+const hardCodedPresentationValues = await findHardCodedPresentationValues(
+  join(projectRoot, "src/play/phaser/presentation"),
 );
 
 requirePolicy(
   embeddedPlayerCopy.length === 0,
   `Player-visible Phaser copy must come from validated content, not string literals: ${embeddedPlayerCopy.join(", ")}`,
+);
+requirePolicy(
+  hardCodedPresentationValues.length === 0,
+  `Phaser presentation modules must resolve authored visual values from validated layout, skin or theme data: ${hardCodedPresentationValues.join(", ")}`,
 );
 
 requirePolicy(
@@ -159,6 +190,13 @@ requirePolicy(
     && discoveredCurveFiles.every((file) =>
       mechanicCatalogueData.dramaticCurves.some((entry) => entry.file === file)),
   "Every dramatic-curve file must be listed exactly once with a matching durable ID in the mechanic catalogue.",
+);
+requirePolicy(
+  referencesMatchIds(mechanicCatalogueData.interruptions)
+    && discoveredInterruptionFiles.length === mechanicCatalogueData.interruptions.length
+    && discoveredInterruptionFiles.every((file) =>
+      mechanicCatalogueData.interruptions.some((entry) => entry.file === file)),
+  "Every interruption file must be listed exactly once with a matching durable ID in the mechanic catalogue.",
 );
 for (const id of [
   gameData.id,
@@ -250,6 +288,42 @@ const skinRecords = await Promise.all(skinFiles.map(async (file) => {
   return { path, content, owner };
 }));
 
+const interruptionSkinRoot = join(
+  projectRoot,
+  "src/play/content/presentation/interruption-skins",
+);
+const interruptionSkinFiles = await listFiles(interruptionSkinRoot);
+const interruptionSkinRecords = await Promise.all(
+  interruptionSkinFiles.map(async (file) => {
+    const path = relative(interruptionSkinRoot, file).split("\\").join("/");
+    const content = JSON.parse(await readFile(file, "utf8"));
+    const match = /^(shared|episodes\/([a-z0-9]+(?:-[a-z0-9]+)*))\/([a-z0-9]+(?:-[a-z0-9]+)*)\.json$/.exec(path);
+    requirePolicy(match !== null, `Interruption skin has an invalid ownership path: ${path}`);
+    if (match === null) return { path, content, owner: undefined };
+    const owner = match[1] === "shared" ? "shared" : match[2];
+    requirePolicy(
+      content.id === match[3],
+      `Interruption skin ID must match its filename: ${path}`,
+    );
+    requirePolicy(
+      owner === "shared" || episodeIds.has(owner),
+      `Episode-owned interruption skin names an unknown episode: ${path}`,
+    );
+    return { path, content, owner };
+  }),
+);
+const sharedInterruptionSkinIds = new Set(
+  interruptionSkinRecords
+    .filter(({ owner }) => owner === "shared")
+    .map(({ content }) => content.id),
+);
+for (const record of interruptionSkinRecords) {
+  requirePolicy(
+    record.owner === "shared" || !sharedInterruptionSkinIds.has(record.content.id),
+    `Episode-owned interruption skin ${record.content.id} must not shadow a shared skin.`,
+  );
+}
+
 for (const { id, file } of episodeReferences) {
   const episode = JSON.parse(
     await readFile(join(projectRoot, "src/play/content/episodes", file), "utf8"),
@@ -268,6 +342,23 @@ for (const { id, file } of episodeReferences) {
     matchingSkins.length === 1,
     `Episode ${id} must select exactly one shared or episode-owned skin named ${skinId}.`,
   );
+  for (const interruption of episode.confrontation.interruptions ?? []) {
+    const reference = interruption.presentation.skin;
+    const matchingInterruptionSkins = interruptionSkinRecords.filter(
+      ({ content, owner }) => content.id === reference.id && owner === (
+        reference.source === "shared" ? "shared" : id
+      ),
+    );
+    requirePolicy(
+      matchingInterruptionSkins.length === 1,
+      `Episode ${id} interruption ${interruption.id} must select exactly one owned interruption skin named ${reference.id}.`,
+    );
+    requirePolicy(
+      matchingInterruptionSkins.length !== 1
+        || matchingInterruptionSkins[0].content.supports.includes(interruption.kind),
+      `Episode ${id} interruption ${interruption.id} selects an incompatible interruption skin.`,
+    );
+  }
 }
 
 for (const [index, campaign] of campaignData.entries()) {

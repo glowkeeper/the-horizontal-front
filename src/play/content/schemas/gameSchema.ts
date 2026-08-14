@@ -108,6 +108,12 @@ export const gameSchema = z.object({
       missed: copyTemplate("side"),
       releasedEarly: copyTemplate("side"),
     }).strict(),
+    interruptions: z.object({
+      sequenceProgress: copyTemplate("instruction", "current", "total"),
+      holdReady: shortCopy,
+      holdHolding: shortCopy,
+      holdRelease: shortCopy,
+    }).strict(),
   }).strict(),
   campaigns: z.array(contentReferenceSchema).min(1),
 }).strict();

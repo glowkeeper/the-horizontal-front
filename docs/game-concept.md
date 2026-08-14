@@ -144,6 +144,12 @@ Possible levels or campaign beats:
 
 The difficulty can increase through stronger constant pressure, more frequent interruptions, combined attacks, deceptive offers, and more demanding finales—not merely by requiring ever-higher tapping speeds.
 
+### Interruption readability
+
+Management interruptions follow one shared perceptual lifecycle: warning, active interaction, immediate outcome and a musical return count-in. They begin only at validated rhythm-phrase boundaries. Replacement interruptions visibly take ownership of the controls, suspend baseline pressure and return control at the opening edge of the first playable resistance window. The first episode introduces Quick Call and Urgent Email individually rather than requiring simultaneous resistance.
+
+The evidence and design inferences behind this convention are recorded in [Interruption mechanics and accessible rhythm UI](research/interruption-mechanics-and-accessible-rhythm-ui.md).
+
 ## Tone and language
 
 The game presents the bedroom as a revolutionary front and corporate demands as military offensives. Useful vocabulary includes:

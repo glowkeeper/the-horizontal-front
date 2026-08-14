@@ -12,19 +12,28 @@ import {
   type CampaignRun,
 } from "../../engine/campaign";
 import {
-  advanceResistance,
-  applyResistanceInput,
-  createResistance,
   getNextRhythmCue,
   getRhythmGuide,
 } from "../../engine/resistance";
+import {
+  advanceConfrontation,
+  applyConfrontationInput,
+  createConfrontation,
+  getConfrontationControlOwner,
+  getInterruptionPresentationState,
+} from "../../engine/confrontation";
 import type {
+  Confrontation,
   Resistance,
   ResistanceSide,
   RhythmJudgement,
   RhythmGuideItem,
 } from "../../engine/types";
 import { getResistanceControlAction } from "../../input/resistanceInput";
+import {
+  getHoldActionForKey,
+  getSequenceChoiceForKey,
+} from "../../input/interruptionInput";
 import { createTextStyles, getThemeColour } from "../../theme/theme";
 import {
   createResistanceLayout,
@@ -36,6 +45,10 @@ import {
   getRhythmNotePosition,
   getVisibleLaneSegment,
 } from "../presentation/rhythmGuidePresentation";
+import {
+  createInterruptionPresentation,
+  type InterruptionPresentation,
+} from "../presentation/interruptionPresentation";
 
 const MAXIMUM_FRAME_DELTA_MS = 100;
 
@@ -54,6 +67,7 @@ type RhythmGuideVisual = {
 
 export class ResistanceScene extends Phaser.Scene {
   private resistance!: Resistance;
+  private confrontation!: Confrontation;
   private campaign!: Campaign;
   private episode!: Episode;
   private run!: CampaignRun;
@@ -78,6 +92,8 @@ export class ResistanceScene extends Phaser.Scene {
   private result!: Phaser.GameObjects.Text;
   private transitioning = false;
   private outcomeActionsAvailable = false;
+  private interruptionPresentation!: InterruptionPresentation;
+  private announcedInterruptionState: string | null = null;
 
   public constructor() {
     super({ key: "ResistanceScene" });
@@ -96,18 +112,34 @@ export class ResistanceScene extends Phaser.Scene {
   }
 
   public create(): void {
-    this.resistance = createResistance(
-      this.episode.confrontation.resistance,
-    );
+    this.confrontation = createConfrontation({
+      resistance: this.episode.confrontation.resistance,
+      interruptions: this.episode.confrontation.interruptions,
+    });
+    this.resistance = this.confrontation.resistance;
     this.confrontationTimeMs = 0;
     this.finished = false;
     this.transitioning = false;
     this.outcomeActionsAvailable = false;
     this.lastReportedExpiredStep = -1;
     this.lastAnnouncedNowStep = -1;
+    this.announcedInterruptionState = null;
 
     this.createBedroom();
     this.createRhythmInterface();
+    this.interruptionPresentation = createInterruptionPresentation(
+      this,
+      this.layout,
+      {
+        select: (choiceId) => this.applyInterruptionInput({
+          kind: "sequence", choiceId,
+        }),
+        hold: () => this.applyInterruptionInput({ kind: "hold", action: "press" }),
+        announce: (id, copy) => this.announceInterruptionState(id, copy),
+        countInCopy: game.mechanics.resistance.cueCountIn,
+        copy: game.mechanics.interruptions,
+      },
+    );
     this.bindInput();
     announce(this.episode.confrontation.copy.instructionsStatus);
   }
@@ -121,10 +153,11 @@ export class ResistanceScene extends Phaser.Scene {
       deltaMs,
       MAXIMUM_FRAME_DELTA_MS,
     );
-    this.resistance = advanceResistance(
-      this.resistance,
+    this.confrontation = advanceConfrontation(
+      this.confrontation,
       this.confrontationTimeMs,
     );
+    this.resistance = this.confrontation.resistance;
 
     this.renderResistance();
 
@@ -275,14 +308,93 @@ export class ResistanceScene extends Phaser.Scene {
     }).setOrigin(0.5);
   }
 
+  private handleInterruptionKey(
+    event: KeyboardEvent,
+    action: "press" | "release",
+  ): boolean {
+    if (getConfrontationControlOwner(this.confrontation) !== "interruption") return false;
+    const active = this.confrontation.activeInterruption;
+    if (!active) return true;
+    const interruption = this.confrontation.config.interruptions[active.index];
+    if (interruption.interaction.kind === "sequence" && action === "press") {
+      const choiceId = getSequenceChoiceForKey(event, interruption.interaction.choices);
+      if (choiceId) this.applyInterruptionInput({ kind: "sequence", choiceId });
+      return true;
+    }
+    if (interruption.interaction.kind === "hold") {
+      const holdAction = getHoldActionForKey(event, action);
+      if (holdAction) this.applyInterruptionInput({ kind: "hold", action: holdAction });
+      return true;
+    }
+    return true;
+  }
+
+  private releaseInterruptionHold(): void {
+    if (getConfrontationControlOwner(this.confrontation) !== "interruption") return;
+    const active = this.confrontation.activeInterruption;
+    if (!active || active.holdStartedAtMs === null) return;
+    this.applyInterruptionInput({ kind: "hold", action: "release" });
+  }
+
+  private cancelInterruptionHold(): void {
+    if (getConfrontationControlOwner(this.confrontation) !== "interruption") return;
+    const active = this.confrontation.activeInterruption;
+    if (!active || active.holdStartedAtMs === null) return;
+    this.applyInterruptionInput({ kind: "hold", action: "cancel" });
+  }
+
+  private applyInterruptionInput(
+    input: { kind: "sequence"; choiceId: string }
+      | { kind: "hold"; action: "press" | "release" | "cancel" },
+  ): void {
+    this.confrontation = applyConfrontationInput(this.confrontation, {
+      ...input,
+      atMs: this.confrontationTimeMs,
+    });
+    this.resistance = this.confrontation.resistance;
+  }
+
+  private renderInterruption(): void {
+    const state = getInterruptionPresentationState(this.confrontation);
+    const resistanceVisible = state.stage === "resistance"
+      || state.stage === "warning"
+      || state.stage === "returning";
+    for (const control of [
+      this.leftCue, this.rightCue, this.leftBeatLine, this.rightBeatLine,
+      this.leftCueLabel, this.rightCueLabel,
+    ]) control.setVisible(resistanceVisible);
+    if (!resistanceVisible) {
+      this.rhythmEmitter.setVisible(false);
+      this.pauseBand.setVisible(false);
+      this.cueLabel.setVisible(false);
+      this.guideVisuals.forEach(({ note, tail, holdBar, heldBar }) => {
+        note.setVisible(false); tail.setVisible(false);
+        holdBar.setVisible(false); heldBar.setVisible(false);
+      });
+    }
+    if (state.stage === "resistance") this.announcedInterruptionState = null;
+    this.interruptionPresentation.render(state, this.confrontationTimeMs);
+  }
+
+  private announceInterruptionState(id: string, copy: string): void {
+    if (this.announcedInterruptionState === id) return;
+    this.announcedInterruptionState = id;
+    announce(copy);
+  }
+
   private bindInput(): void {
     const keyboard = this.input.keyboard;
 
     keyboard?.addCapture([
       Phaser.Input.Keyboard.KeyCodes.LEFT,
       Phaser.Input.Keyboard.KeyCodes.RIGHT,
+      Phaser.Input.Keyboard.KeyCodes.SPACE,
+      Phaser.Input.Keyboard.KeyCodes.ONE,
+      Phaser.Input.Keyboard.KeyCodes.TWO,
+      Phaser.Input.Keyboard.KeyCodes.THREE,
     ]);
     keyboard?.on("keydown", (event: KeyboardEvent) => {
+      if (this.handleInterruptionKey(event, "press")) return;
       const action = getResistanceControlAction(event, "press");
       if (action?.kind === "resist") {
         this.handleResistanceInput(action.side, action.action);
@@ -293,6 +405,7 @@ export class ResistanceScene extends Phaser.Scene {
       }
     });
     keyboard?.on("keyup", (event: KeyboardEvent) => {
+      if (this.handleInterruptionKey(event, "release")) return;
       const action = getResistanceControlAction(event, "release");
       if (action?.kind === "resist") this.handleResistanceInput(action.side, action.action);
     });
@@ -302,10 +415,27 @@ export class ResistanceScene extends Phaser.Scene {
         return;
       }
 
-      this.handleResistanceInput(pointerSide(pointer, this.cameras.main.centerX), "press");
+      if (getConfrontationControlOwner(this.confrontation) === "resistance") {
+        this.handleResistanceInput(pointerSide(pointer, this.cameras.main.centerX), "press");
+      }
     });
     this.input.on("pointerup", (pointer: Phaser.Input.Pointer) => {
-      if (!this.finished) this.handleResistanceInput(pointerSide(pointer, this.cameras.main.centerX), "release");
+      if (!this.finished && getConfrontationControlOwner(this.confrontation) === "resistance") {
+        this.handleResistanceInput(pointerSide(pointer, this.cameras.main.centerX), "release");
+      }
+    });
+    this.input.on("pointerup", () => this.releaseInterruptionHold());
+    this.input.on("pointerupoutside", () => this.releaseInterruptionHold());
+    const cancel = () => this.cancelInterruptionHold();
+    const cancelPointer = () => this.cancelInterruptionHold();
+    const canvas = this.game.canvas;
+    window.addEventListener("blur", cancel);
+    document.addEventListener("visibilitychange", cancel);
+    canvas.addEventListener("pointercancel", cancelPointer);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      window.removeEventListener("blur", cancel);
+      document.removeEventListener("visibilitychange", cancel);
+      canvas.removeEventListener("pointercancel", cancelPointer);
     });
   }
 
@@ -314,11 +444,10 @@ export class ResistanceScene extends Phaser.Scene {
       return;
     }
 
-    this.resistance = applyResistanceInput(this.resistance, {
-      side,
-      action,
-      atMs: this.confrontationTimeMs,
+    this.confrontation = applyConfrontationInput(this.confrontation, {
+      kind: "resistance", side, action, atMs: this.confrontationTimeMs,
     });
+    this.resistance = this.confrontation.resistance;
     this.renderJudgement(
       this.resistance.state.lastRhythmJudgement,
     );
@@ -444,6 +573,7 @@ export class ResistanceScene extends Phaser.Scene {
         }
       }
     }
+    this.renderInterruption();
   }
 
   private renderRhythmGuide(guide: readonly RhythmGuideItem[]): void {
@@ -881,6 +1011,8 @@ function formatCueItem(item: RhythmGuideItem): string {
     case "rest":
       return game.mechanics.resistance.cueRest;
     case "count-in":
+      return game.mechanics.resistance.cueCountIn;
+    case "interruption":
       return game.mechanics.resistance.cueCountIn;
     case "hold":
       return formatCopy(game.mechanics.resistance.cueHold, {

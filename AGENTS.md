@@ -18,6 +18,14 @@ These instructions apply to every AI coding assistant working in this repository
 - Preserve the maintainer's existing naming, layout and stylistic preferences.
 - Ask before making a material product or architectural decision that has not already been settled in the documentation.
 
+## Research-informed decisions
+
+- Base consequential decisions about game mechanics, interaction design, accessibility and player experience on relevant evidence where practical, rather than convention or intuition alone.
+- Prefer primary research, standards and authoritative platform guidance. Distinguish what a source demonstrates from a design inference made for this game; do not present an analogy or convention as settled evidence.
+- Record research that materially constrains the product under `docs/research/`, including sources, findings, limitations and the resulting project decisions, so contributors can inspect and challenge the reasoning.
+- Apply research proportionately. A small reversible tuning change does not require a literature review, while a new reusable mechanic, input model or accessibility convention deserves deliberate investigation before its grammar is fixed.
+- Treat published evidence as an input to playtesting, not a substitute for it. Verify research-informed mechanics with representative players and revise them when observed play conflicts with the design assumptions.
+
 ## Product intent
 
 The Horizontal Front is a satirical, rhythm-based 2D web and mobile game about working extremely hard to remain in bed while an authoritarian Orange Fella tries to force the player into work.

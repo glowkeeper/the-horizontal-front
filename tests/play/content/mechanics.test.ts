@@ -7,6 +7,7 @@ import {
   compileResistanceConfig,
   createEpisodeMechanicScope,
   loadMechanicLibrary,
+  resolveInterruptionMechanic,
 } from "../../../src/play/content/loadMechanics";
 import {
   advanceResistance,
@@ -15,6 +16,7 @@ import {
 } from "../../../src/play/engine/resistance";
 import {
   dramaticCurveSchema,
+  interruptionMechanicSchema,
   rhythmPatternSchema,
   sharedDramaticCurveSchema,
 } from "../../../src/play/content/schemas/mechanicsSchema";
@@ -40,17 +42,18 @@ describe("catalogued resistance composition", () => {
 
   it("compiles The Alarm into four contiguous phases and a finite cue score", () => {
     const config = game.entryEpisode.confrontation.resistance;
-    expect(config.durationMs + config.resolutionDurationMs).toBe(26_000);
+    expect(config.durationMs + config.resolutionDurationMs).toBe(30_000);
     expect(config.phases.map(({ id, startsAtMs, endsAtMs }) => ({ id, startsAtMs, endsAtMs })))
       .toEqual([
         { id: "orientation", startsAtMs: 0, endsAtMs: 4_000 },
-        { id: "establishment", startsAtMs: 4_000, endsAtMs: 10_000 },
-        { id: "pressure", startsAtMs: 10_000, endsAtMs: 18_000 },
-        { id: "crisis", startsAtMs: 18_000, endsAtMs: 23_000 },
+        { id: "establishment", startsAtMs: 4_000, endsAtMs: 14_000 },
+        { id: "pressure", startsAtMs: 14_000, endsAtMs: 22_000 },
+        { id: "crisis", startsAtMs: 22_000, endsAtMs: 27_000 },
       ]);
     expect(config.guideEvents.some(({ action }) => action === "rest")).toBe(true);
-    const opening = config.guideEvents.filter(({ action }) => action === "count-in");
-    expect(opening).toEqual([expect.objectContaining({ atMs: 0, phaseIndex: 0 })]);
+    const countIns = config.guideEvents.filter(({ action }) => action === "count-in");
+    expect(countIns).toContainEqual(expect.objectContaining({ atMs: 0, phaseIndex: 0 }));
+    const opening = countIns.filter(({ atMs }) => atMs === 0);
     expect(opening[0].endsAtMs).toBe(
       config.cues[0].atMs - config.cues[0].timingWindowMs,
     );
@@ -285,6 +288,33 @@ describe("catalogued resistance composition", () => {
     });
     expect(() => createEpisodeMechanicScope("shadow-episode", {
       rhythms: [shadow], dramaticCurves: [],
+    }, mechanics)).toThrow(/shadows a shared definition/);
+  });
+
+  it("applies the same shared and episode ownership boundary to interruptions", () => {
+    expect([...mechanics.interruptions.keys()]).toEqual([
+      "quick-call", "urgent-email",
+    ]);
+    const privateMechanic = interruptionMechanicSchema.parse({
+      schemaVersion: 1,
+      id: "private-check-in",
+      kind: "sequence",
+      choiceCount: 2,
+      stepCount: 2,
+    });
+    const owner = createEpisodeMechanicScope("owner", {
+      rhythms: [], dramaticCurves: [], interruptions: [privateMechanic],
+    }, mechanics);
+    expect(resolveInterruptionMechanic(
+      { source: "episode", id: "private-check-in" }, owner,
+    )).toEqual(privateMechanic);
+    const outsider = createEpisodeMechanicScope("outsider", undefined, mechanics);
+    expect(() => resolveInterruptionMechanic(
+      { source: "episode", id: "private-check-in" }, outsider,
+    )).toThrow(/outsider references unknown episode interruption/);
+    expect(() => createEpisodeMechanicScope("shadow", {
+      rhythms: [], dramaticCurves: [],
+      interruptions: [{ ...privateMechanic, id: "quick-call" }],
     }, mechanics)).toThrow(/shadows a shared definition/);
   });
 

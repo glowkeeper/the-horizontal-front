@@ -9,5 +9,9 @@
     { "id": "sustained-grip", "file": "sustained-grip.json" },
     { "id": "call-and-response", "file": "call-and-response.json" }
   ],
-  "dramaticCurves": []
+  "dramaticCurves": [],
+  "interruptions": [
+    { "id": "quick-call", "file": "quick-call.json" },
+    { "id": "urgent-email", "file": "urgent-email.json" }
+  ]
 }

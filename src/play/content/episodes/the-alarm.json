@@ -17,7 +17,7 @@
             "rhythm": { "source": "shared", "id": "straight-alternation" },
             "beatIntervalMs": 900,
             "timingWindowMs": 350,
-            "leadInBeats": 1,
+            "leadInBeats": 3,
             "pressurePerSecond": 0.018,
             "recoveryPerAction": 0.045,
             "safetyPenaltyPerMiss": 0.012,
@@ -28,7 +28,7 @@
           },
           {
             "id": "establishment",
-            "durationMs": 6000,
+            "durationMs": 10000,
             "rhythm": { "source": "shared", "id": "sustained-grip" },
             "beatIntervalMs": 820,
             "timingWindowMs": 320,
@@ -79,6 +79,62 @@
     "resistance": {
       "dramaticCurve": { "source": "episode", "id": "alarm-escalation" }
     },
+    "interruptions": [
+      {
+        "id": "quick-call-from-management",
+        "kind": "sequence",
+        "mechanic": { "source": "shared", "id": "quick-call" },
+        "trigger": { "phase": "establishment", "afterCycles": 0 },
+        "warningBeats": 1,
+        "activeBeats": 3,
+        "returnCountInBeats": 3,
+        "consequences": { "successSafety": 0.03, "failureSafety": -0.04 },
+        "presentation": {
+          "skin": { "source": "shared", "id": "management-notification" }
+        },
+        "choices": [
+          { "id": "dentist", "label": "1  DENTIST", "key": "Digit1" },
+          { "id": "broken-wifi", "label": "2  BROKEN WI-FI", "key": "Digit2" },
+          { "id": "family-emergency", "label": "3  FAMILY EMERGENCY", "key": "Digit3" }
+        ],
+        "steps": ["broken-wifi", "dentist", "family-emergency"],
+        "copy": {
+          "warning": "INCOMING: QUICK CALL",
+          "headline": "JUST A QUICK CALL",
+          "instruction": "COMPLETE 3 EXCUSES IN ORDER",
+          "status": "Just a Quick Call. Complete three highlighted excuses in order.",
+          "success": "CALL DEFLECTED",
+          "failure": "WRONG EXCUSE — CALL CONNECTED",
+          "expired": "TOO LATE — CALL CONNECTED",
+          "cancelled": "CALL INTERRUPTED — NO PENALTY",
+          "returning": "BACK TO THE LINE"
+        }
+      },
+      {
+        "id": "urgent-email-from-management",
+        "kind": "hold",
+        "mechanic": { "source": "shared", "id": "urgent-email" },
+        "trigger": { "phase": "pressure", "afterCycles": 0 },
+        "warningBeats": 1,
+        "activeBeats": 4,
+        "returnCountInBeats": 3,
+        "consequences": { "successSafety": 0.03, "failureSafety": -0.04 },
+        "presentation": {
+          "skin": { "source": "shared", "id": "management-notification" }
+        },
+        "copy": {
+          "warning": "INCOMING: URGENT EMAIL",
+          "headline": "URGENT EMAIL",
+          "instruction": "MARK IT UNREAD BEFORE IT OPENS",
+          "status": "Urgent Email. Press and hold the control, or hold Space, then release when instructed.",
+          "success": "SUCCESSFULLY UNREAD",
+          "failure": "RELEASED EARLY — EMAIL OPENED",
+          "expired": "EMAIL OPENED BY MANAGEMENT",
+          "cancelled": "INPUT INTERRUPTED — NO PENALTY",
+          "returning": "BACK TO THE LINE"
+        }
+      }
+    ],
     "presentation": {
       "layout": { "source": "shared", "id": "bed-head-right" },
       "skin": { "source": "episode", "id": "the-alarm-bedroom" },

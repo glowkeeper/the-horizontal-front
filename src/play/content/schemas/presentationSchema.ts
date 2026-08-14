@@ -10,10 +10,69 @@ const colourRoleSchema = z.enum([
   "managementGold",
   "paperWhite",
 ]);
-
 const pointSchema = z.object({ x: z.number(), y: z.number() }).strict();
 const positiveSizeSchema = z.number().positive();
 const unitIntervalSchema = z.number().min(0).max(1);
+
+const interruptionStateStyleSchema = z.object({
+  headlineColour: colourRoleSchema,
+  panelVisible: z.boolean(),
+  contentVisible: z.boolean(),
+}).strict();
+const textStyleRoleSchema = z.enum(["notice", "title", "body", "status"]);
+
+export const interruptionSkinSchema = z.object({
+  schemaVersion: z.literal(1),
+  id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+  supports: z.array(z.enum(["sequence", "hold"])).min(1),
+  layerDepth: z.number().int(),
+  panel: z.object({
+    fill: colourRoleSchema,
+    fillAlpha: unitIntervalSchema,
+    stroke: colourRoleSchema,
+    strokeWidth: positiveSizeSchema,
+  }).strict(),
+  typography: z.object({
+    headlineRole: textStyleRoleSchema,
+    instructionRole: textStyleRoleSchema,
+    actionRole: textStyleRoleSchema,
+    headlineSizePx: positiveSizeSchema,
+    instructionSizePx: positiveSizeSchema,
+    actionSizePx: positiveSizeSchema,
+    instructionColour: colourRoleSchema,
+    actionColour: colourRoleSchema,
+  }).strict(),
+  choice: z.object({
+    fill: colourRoleSchema,
+    activeFill: colourRoleSchema,
+    stroke: colourRoleSchema,
+    strokeWidth: positiveSizeSchema,
+    activeLabelAlpha: unitIntervalSchema,
+    inactiveLabelAlpha: unitIntervalSchema,
+  }).strict(),
+  hold: z.object({
+    fill: colourRoleSchema,
+    stroke: colourRoleSchema,
+    strokeWidth: positiveSizeSchema,
+    progressFill: colourRoleSchema,
+    progressAlpha: unitIntervalSchema,
+  }).strict(),
+  states: z.object({
+    warning: interruptionStateStyleSchema,
+    active: interruptionStateStyleSchema,
+    success: interruptionStateStyleSchema,
+    failure: interruptionStateStyleSchema,
+    cancelled: interruptionStateStyleSchema,
+    returning: interruptionStateStyleSchema,
+  }).strict(),
+}).strict().superRefine((skin, context) => {
+  if (new Set(skin.supports).size !== skin.supports.length) {
+    context.addIssue({ code: "custom", message: "supported interruption mechanics must be unique" });
+  }
+  if (skin.choice.activeLabelAlpha < skin.choice.inactiveLabelAlpha) {
+    context.addIssue({ code: "custom", message: "active choice labels must not be less visible" });
+  }
+});
 
 const styledPartSchema = z.object({
   id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
@@ -156,6 +215,7 @@ export const resistanceLayoutSchema = z.object({
     leftControl: pointSchema,
     rightControl: pointSchema,
     feedback: pointSchema,
+    interruption: pointSchema,
   }).strict(),
   controls: z.object({
     gateHeight: positiveSizeSchema,
@@ -173,6 +233,16 @@ export const resistanceLayoutSchema = z.object({
     visibleGuideEvents: z.number().int().min(1).max(5),
     pauseBandWidth: positiveSizeSchema,
     pauseBandHeight: positiveSizeSchema,
+    interruptionPanelWidth: positiveSizeSchema,
+    interruptionPanelHeight: positiveSizeSchema,
+    interruptionChoiceWidth: positiveSizeSchema,
+    interruptionChoiceHeight: positiveSizeSchema,
+    interruptionChoiceGap: z.number().nonnegative(),
+    interruptionHoldWidth: positiveSizeSchema,
+    interruptionHoldHeight: positiveSizeSchema,
+    interruptionHeadlineOffsetY: z.number(),
+    interruptionInstructionOffsetY: z.number(),
+    interruptionActionOffsetY: z.number(),
   }).strict(),
   motion: z.object({
     danger: z.object({
@@ -218,3 +288,4 @@ export type ResistanceLayoutContent = z.infer<typeof resistanceLayoutSchema>;
 export type ResistanceSkin = z.infer<typeof resistanceSkinSchema>;
 export type ShapePart = z.infer<typeof shapePartSchema>;
 export type AssetCatalog = z.infer<typeof assetCatalogSchema>;
+export type InterruptionSkin = z.infer<typeof interruptionSkinSchema>;

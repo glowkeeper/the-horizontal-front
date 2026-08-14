@@ -20,11 +20,16 @@ const curveModules = import.meta.glob("./mechanics/dramatic-curves/*.json", {
   eager: true,
   import: "default",
 });
+const interruptionModules = import.meta.glob("./mechanics/interruptions/*.json", {
+  eager: true,
+  import: "default",
+});
 
 export const mechanics = loadMechanicLibrary(
   mechanicCatalogueContent,
   rhythmModules,
   curveModules,
+  interruptionModules,
 );
 
 export const game = loadGame(gameContent, campaignModules, episodeModules, mechanics);

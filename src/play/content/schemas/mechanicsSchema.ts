@@ -9,6 +9,24 @@ import {
 const sideSchema = z.enum(["left", "right"]);
 const positiveBeat = z.number().positive().max(32);
 
+const interruptionMechanicBaseSchema = z.object({
+  schemaVersion: z.literal(1),
+  id: contentIdSchema,
+});
+
+export const interruptionMechanicSchema = z.discriminatedUnion("kind", [
+  interruptionMechanicBaseSchema.extend({
+    kind: z.literal("sequence"),
+    choiceCount: z.number().int().min(2).max(3),
+    stepCount: z.number().int().min(1).max(8),
+  }).strict(),
+  interruptionMechanicBaseSchema.extend({
+    kind: z.literal("hold"),
+    pressWindowBeats: positiveBeat,
+    holdBeats: positiveBeat,
+  }).strict(),
+]);
+
 const tapEventSchema = z.object({
   action: z.literal("tap"),
   side: sideSchema,
@@ -151,14 +169,20 @@ export const sharedDramaticCurveSchema = createDramaticCurveSchema(sharedPhaseSc
 export const episodeMechanicDefinitionsSchema = z.object({
   rhythms: z.array(rhythmPatternSchema).default([]),
   dramaticCurves: z.array(dramaticCurveSchema).default([]),
+  interruptions: z.array(interruptionMechanicSchema).default([]),
 }).strict();
 
 export const mechanicCatalogueSchema = z.object({
   schemaVersion: z.literal(1),
   rhythms: z.array(z.object({ id: contentIdSchema, file: z.string() }).strict()).min(1),
   dramaticCurves: z.array(z.object({ id: contentIdSchema, file: z.string() }).strict()),
+  interruptions: z.array(z.object({ id: contentIdSchema, file: z.string() }).strict()).default([]),
 }).strict();
 
 export type RhythmPatternContent = z.infer<typeof rhythmPatternSchema>;
 export type DramaticCurveContent = z.infer<typeof dramaticCurveSchema>;
-export type EpisodeMechanicDefinitions = z.infer<typeof episodeMechanicDefinitionsSchema>;
+type ParsedEpisodeMechanicDefinitions = z.infer<typeof episodeMechanicDefinitionsSchema>;
+export type EpisodeMechanicDefinitions = Omit<ParsedEpisodeMechanicDefinitions, "interruptions"> & {
+  readonly interruptions?: ParsedEpisodeMechanicDefinitions["interruptions"];
+};
+export type InterruptionMechanicContent = z.infer<typeof interruptionMechanicSchema>;

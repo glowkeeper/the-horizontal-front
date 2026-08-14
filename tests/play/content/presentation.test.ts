@@ -9,11 +9,15 @@ import { loadEpisode } from "../../../src/play/content/loadEpisode";
 import { loadPresentationAssetCatalog } from "../../../src/play/content/loadPresentationAssetCatalog";
 import {
   assertAssetOwnership,
+  assertInterruptionSkinCompatibility,
+  assertVisibleInterruptionReturns,
+  loadInterruptionSkinLibrary,
   loadPresentation,
 } from "../../../src/play/content/loadPresentation";
 import { presentationAssets } from "../../../src/play/content/presentationAssets";
 import {
   assetCatalogSchema,
+  interruptionSkinSchema,
   resistanceLayoutSchema,
   resistanceSkinSchema,
 } from "../../../src/play/content/schemas/presentationSchema";
@@ -34,6 +38,12 @@ describe("presentation content", () => {
     const presentation = loadPresentation(game.entryEpisode);
 
     expect(presentation.skin.id).toBe("the-alarm-bedroom");
+    expect([...presentation.interruptionSkins.entries()].map(([id, value]) => [
+      id, value.id,
+    ])).toEqual([
+      ["quick-call-from-management", "management-notification"],
+      ["urgent-email-from-management", "management-notification"],
+    ]);
     expect(presentationAssets[0]).toMatchObject({
       id: "pillow-prototype",
       file: "episodes/the-alarm/pillow-prototype.png",
@@ -68,6 +78,78 @@ describe("presentation content", () => {
       .toThrow(/Missing shared presentation skin/);
   });
 
+  it("does not fall back between shared and episode interruption-skin ownership", () => {
+    const wrongSource = loadEpisode({
+      ...episodeContent,
+      confrontation: {
+        ...episodeContent.confrontation,
+        interruptions: episodeContent.confrontation.interruptions.map(
+          (interruption, index) => index === 0 ? {
+            ...interruption,
+            presentation: {
+              skin: { source: "episode" as const, id: "management-notification" },
+            },
+          } : interruption,
+        ),
+      },
+    }, mechanics);
+    expect(() => loadPresentation(wrongSource))
+      .toThrow(/Missing episode interruption skin/);
+  });
+
+  it("validates interruption skin compatibility and semantic appearance", () => {
+    const sequenceOnly = interruptionSkinSchema.parse({
+      schemaVersion: 1,
+      id: "sequence-only",
+      supports: ["sequence"],
+      layerDepth: 1,
+      panel: {
+        fill: "paperWhite", fillAlpha: 1,
+        stroke: "inkCharcoal", strokeWidth: 1,
+      },
+      typography: {
+        headlineRole: "notice", instructionRole: "status", actionRole: "notice",
+        headlineSizePx: 20, instructionSizePx: 16, actionSizePx: 14,
+        instructionColour: "inkCharcoal", actionColour: "inkCharcoal",
+      },
+      choice: {
+        fill: "paperWhite", activeFill: "managementGold",
+        stroke: "inkCharcoal", strokeWidth: 1,
+        activeLabelAlpha: 1, inactiveLabelAlpha: 0.5,
+      },
+      hold: {
+        fill: "paperWhite", stroke: "inkCharcoal", strokeWidth: 1,
+        progressFill: "workLightBlue", progressAlpha: 0.7,
+      },
+      states: Object.fromEntries([
+        "warning", "active", "success", "failure", "cancelled", "returning",
+      ].map((state) => [state, {
+        headlineColour: "inkCharcoal",
+        panelVisible: state !== "warning",
+        contentVisible: state !== "returning",
+      }])),
+    });
+    expect(() => assertInterruptionSkinCompatibility(sequenceOnly, "sequence"))
+      .not.toThrow();
+    expect(() => assertInterruptionSkinCompatibility(sequenceOnly, "hold"))
+      .toThrow(/does not support hold/);
+  });
+
+  it("rejects interruption-skin filename mismatches and local shadowing", () => {
+    const sharedPath = "./presentation/interruption-skins/shared/notice.json";
+    const shared = {
+      ...loadPresentation(game.entryEpisode).interruptionSkins.values().next().value,
+      id: "notice",
+    };
+    expect(() => loadInterruptionSkinLibrary({
+      [sharedPath]: { ...shared, id: "wrong" },
+    })).toThrow(/ID must match/);
+    expect(() => loadInterruptionSkinLibrary({
+      [sharedPath]: shared,
+      "./presentation/interruption-skins/episodes/the-alarm/notice.json": shared,
+    })).toThrow(/shadows a shared definition/);
+  });
+
   it("rejects an episode timing window wider than its layout can display", () => {
     const tooWide = loadEpisode({
       ...episodeContent,
@@ -84,6 +166,20 @@ describe("presentation content", () => {
       },
     }, mechanics);
     expect(() => loadPresentation(tooWide)).toThrow(/cannot display.*timing tolerance/);
+  });
+
+  it("requires the first post-interruption note to make its complete visible approach", () => {
+    const insufficientReturn = loadEpisode({
+      ...episodeContent,
+      confrontation: {
+        ...episodeContent.confrontation,
+        interruptions: episodeContent.confrontation.interruptions.map(
+          (interruption) => ({ ...interruption, returnCountInBeats: 1 }),
+        ),
+      },
+    }, mechanics);
+    expect(() => assertVisibleInterruptionReturns(insufficientReturn, layout))
+      .toThrow(/complete approach/);
   });
 
   it("rejects non-positive primitive dimensions", () => {
@@ -192,6 +288,28 @@ describe("presentation content", () => {
       skin,
       assetIds,
     )).toThrow(/emitter must remain subordinate/);
+  });
+
+  it("rejects interruption panels and controls which are not operable", () => {
+    expect(() => assertSensiblePresentation(
+      {
+        ...layout,
+        anchors: {
+          ...layout.anchors,
+          interruption: { x: 10, y: layout.anchors.interruption.y },
+        },
+      },
+      skin,
+      assetIds,
+    )).toThrow(/interruption panel must fit/);
+    expect(() => assertSensiblePresentation(
+      {
+        ...layout,
+        controls: { ...layout.controls, interruptionChoiceHeight: 20 },
+      },
+      skin,
+      assetIds,
+    )).toThrow(/enhanced pointer targets/);
   });
 
   it("rejects reversed lift and downhill motion", () => {

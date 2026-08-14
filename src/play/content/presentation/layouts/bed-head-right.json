@@ -19,7 +19,8 @@
     "nextCue": { "x": 640, "y": 145 },
     "leftControl": { "x": 410, "y": 610 },
     "rightControl": { "x": 870, "y": 610 },
-    "feedback": { "x": 640, "y": 690 }
+    "feedback": { "x": 640, "y": 690 },
+    "interruption": { "x": 640, "y": 570 }
   },
   "controls": {
     "gateHeight": 76,
@@ -36,7 +37,17 @@
     "noteMinimumAlpha": 0.18,
     "visibleGuideEvents": 3,
     "pauseBandWidth": 154,
-    "pauseBandHeight": 44
+    "pauseBandHeight": 44,
+    "interruptionPanelWidth": 760,
+    "interruptionPanelHeight": 190,
+    "interruptionChoiceWidth": 220,
+    "interruptionChoiceHeight": 68,
+    "interruptionChoiceGap": 24,
+    "interruptionHoldWidth": 520,
+    "interruptionHoldHeight": 76,
+    "interruptionHeadlineOffsetY": -66,
+    "interruptionInstructionOffsetY": -30,
+    "interruptionActionOffsetY": 38
   },
   "motion": {
     "danger": { "bedAngleDegrees": -18, "duvetX": -300, "sleeperX": -130, "workLightAlpha": 0.62 },

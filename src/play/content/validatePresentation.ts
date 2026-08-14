@@ -67,6 +67,30 @@ export function assertSensiblePresentation(
   ) {
     throw new Error("centre emitter must remain subordinate to rhythm controls");
   }
+  const interruption = layout.anchors.interruption;
+  const panelHalfWidth = layout.controls.interruptionPanelWidth / 2;
+  const panelHalfHeight = layout.controls.interruptionPanelHeight / 2;
+  if (
+    interruption.x - panelHalfWidth < 0
+    || interruption.x + panelHalfWidth > width
+    || interruption.y - panelHalfHeight < 0
+    || interruption.y + panelHalfHeight > height
+  ) {
+    throw new Error("interruption panel must fit within the design canvas");
+  }
+  const maximumChoiceRowWidth = layout.controls.interruptionChoiceWidth * 3
+    + layout.controls.interruptionChoiceGap * 2;
+  if (maximumChoiceRowWidth > layout.controls.interruptionPanelWidth) {
+    throw new Error("interruption choices must fit within the panel");
+  }
+  if (
+    layout.controls.interruptionChoiceWidth < 44
+    || layout.controls.interruptionChoiceHeight < 44
+    || layout.controls.interruptionHoldWidth < 44
+    || layout.controls.interruptionHoldHeight < 44
+  ) {
+    throw new Error("interruption controls must provide enhanced pointer targets");
+  }
 
   if (bedFromFoot.x <= 0) {
     throw new Error("bedFromFoot must place the head to the right of the foot");

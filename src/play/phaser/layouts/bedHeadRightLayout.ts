@@ -21,7 +21,7 @@ export function createBedHeadRightLayout(
     );
   }
 
-  const { layout, skin } = loadPresentation(episode);
+  const { layout, skin, interruptionSkins } = loadPresentation(episode);
   const colours = getColours();
   const { backdrop, anchors, motion } = layout;
 
@@ -78,6 +78,7 @@ export function createBedHeadRightLayout(
 
   return {
     content: layout,
+    interruptionSkins,
 
     render(duvetSafety, dramaticIntensity): void {
       const state = getResistancePresentation(duvetSafety, dramaticIntensity, motion);

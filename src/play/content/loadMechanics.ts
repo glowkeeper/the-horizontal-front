@@ -1,15 +1,20 @@
 import type {
+  ConfrontationConfig,
+  InterruptionConfig,
   ResistanceConfig,
   RhythmGuideEvent,
   ScoredRhythmCue,
 } from "../engine/types";
+import type { InterruptionCompositionContent } from "./schemas/episodeSchema";
 import {
   dramaticCurveSchema,
   mechanicCatalogueSchema,
+  interruptionMechanicSchema,
   rhythmPatternSchema,
   sharedDramaticCurveSchema,
   type DramaticCurveContent,
   type EpisodeMechanicDefinitions,
+  type InterruptionMechanicContent,
   type RhythmPatternContent,
 } from "./schemas/mechanicsSchema";
 import type { OwnedContentReference } from "./schemas/ownershipSchema";
@@ -18,6 +23,7 @@ import type { ContentModules } from "./loadGame";
 export type MechanicLibrary = {
   readonly rhythms: ReadonlyMap<string, RhythmPatternContent>;
   readonly dramaticCurves: ReadonlyMap<string, DramaticCurveContent>;
+  readonly interruptions: ReadonlyMap<string, InterruptionMechanicContent>;
 };
 
 export type EpisodeMechanicScope = {
@@ -25,12 +31,14 @@ export type EpisodeMechanicScope = {
   readonly shared: MechanicLibrary;
   readonly rhythms: ReadonlyMap<string, RhythmPatternContent>;
   readonly dramaticCurves: ReadonlyMap<string, DramaticCurveContent>;
+  readonly interruptions: ReadonlyMap<string, InterruptionMechanicContent>;
 };
 
 export function loadMechanicLibrary(
   catalogueContent: unknown,
   rhythmModules: ContentModules,
   curveModules: ContentModules,
+  interruptionModules: ContentModules = {},
 ): MechanicLibrary {
   const catalogue = mechanicCatalogueSchema.parse(catalogueContent);
   const rhythms = loadEntries(catalogue.rhythms, "rhythms", rhythmModules, rhythmPatternSchema.parse);
@@ -40,6 +48,12 @@ export function loadMechanicLibrary(
     curveModules,
     sharedDramaticCurveSchema.parse,
   );
+  const interruptions = loadEntries(
+    catalogue.interruptions,
+    "interruptions",
+    interruptionModules,
+    interruptionMechanicSchema.parse,
+  );
   for (const curve of dramaticCurves.values()) {
     for (const phase of curve.phases) {
       if (!rhythms.has(phase.rhythm.id)) {
@@ -47,7 +61,7 @@ export function loadMechanicLibrary(
       }
     }
   }
-  return { rhythms, dramaticCurves };
+  return { rhythms, dramaticCurves, interruptions };
 }
 
 export function createEpisodeMechanicScope(
@@ -67,13 +81,32 @@ export function createEpisodeMechanicScope(
     definitions?.dramaticCurves ?? [],
     shared.dramaticCurves,
   );
-  const scope = { episodeId, shared, rhythms, dramaticCurves };
+  const interruptions = mapEpisodeDefinitions(
+    episodeId,
+    "interruption",
+    definitions?.interruptions ?? [],
+    shared.interruptions,
+  );
+  const scope = { episodeId, shared, rhythms, dramaticCurves, interruptions };
   for (const curve of dramaticCurves.values()) {
     for (const phase of curve.phases) {
       resolveOwnedDefinition("rhythm", phase.rhythm, scope, shared.rhythms, rhythms);
     }
   }
   return scope;
+}
+
+export function resolveInterruptionMechanic(
+  reference: OwnedContentReference,
+  scope: EpisodeMechanicScope,
+): InterruptionMechanicContent {
+  return resolveOwnedDefinition(
+    "interruption",
+    reference,
+    scope,
+    scope.shared.interruptions,
+    scope.interruptions,
+  );
 }
 
 export function compileResistanceConfig(
@@ -132,6 +165,108 @@ export function compileResistanceConfig(
     cues,
     guideEvents: alignedGuideEvents,
   };
+}
+
+export function compileConfrontationConfig(
+  dramaticCurveReference: OwnedContentReference,
+  compositions: readonly InterruptionCompositionContent[],
+  scope: EpisodeMechanicScope,
+): ConfrontationConfig {
+  const resistance = compileResistanceConfig(dramaticCurveReference, scope);
+  const curve = resolveOwnedDefinition(
+    "dramatic curve",
+    dramaticCurveReference,
+    scope,
+    scope.shared.dramaticCurves,
+    scope.dramaticCurves,
+  );
+  const interruptions: InterruptionConfig[] = compositions.map((composition) => {
+    const phaseIndex = curve.phases.findIndex(({ id }) => id === composition.trigger.phase);
+    if (phaseIndex < 0) {
+      throw new Error(`${scope.episodeId} interruption ${composition.id} references unknown phase ${composition.trigger.phase}`);
+    }
+    const phase = curve.phases[phaseIndex];
+    const compiledPhase = resistance.phases[phaseIndex];
+    const rhythm = resolveOwnedDefinition(
+      "rhythm", phase.rhythm, scope, scope.shared.rhythms, scope.rhythms,
+    );
+    const beatMs = phase.beatIntervalMs;
+    const cycleMs = rhythm.cycleBeats * beatMs;
+    const startsAtMs = compiledPhase.startsAtMs
+      + phase.leadInBeats * beatMs
+      + composition.trigger.afterCycles * cycleMs;
+    const warningStartsAtMs = startsAtMs - composition.warningBeats * beatMs;
+    const endsAtMs = startsAtMs + composition.activeBeats * beatMs;
+    const returnsAtMs = endsAtMs
+      + composition.returnCountInBeats * beatMs
+      - phase.timingWindowMs;
+    if (warningStartsAtMs < compiledPhase.startsAtMs || returnsAtMs > compiledPhase.endsAtMs) {
+      throw new Error(`${scope.episodeId} interruption ${composition.id} must fit inside phase ${phase.id}`);
+    }
+    const mechanic = resolveInterruptionMechanic(composition.mechanic, scope);
+    if (mechanic.kind !== composition.kind) {
+      throw new Error(`${scope.episodeId} interruption ${composition.id} composition kind must match ${mechanic.id}`);
+    }
+    let interaction: InterruptionConfig["interaction"];
+    if (composition.kind === "sequence" && mechanic.kind === "sequence") {
+      if (composition.choices.length !== mechanic.choiceCount
+        || composition.steps.length !== mechanic.stepCount) {
+        throw new Error(`${scope.episodeId} interruption ${composition.id} must supply ${mechanic.choiceCount} choices and ${mechanic.stepCount} steps`);
+      }
+      const choiceIds = new Set(composition.choices.map(({ id }) => id));
+      if (choiceIds.size !== composition.choices.length
+        || composition.steps.some((step) => !choiceIds.has(step))) {
+        throw new Error(`${scope.episodeId} interruption ${composition.id} steps must reference unique local choices`);
+      }
+      if (new Set(composition.choices.map(({ key }) => key)).size !== composition.choices.length) {
+        throw new Error(`${scope.episodeId} interruption ${composition.id} choice keys must be unique`);
+      }
+      interaction = { kind: "sequence", choices: composition.choices, steps: composition.steps };
+    } else if (composition.kind === "hold" && mechanic.kind === "hold") {
+      if (mechanic.pressWindowBeats + mechanic.holdBeats > composition.activeBeats) {
+        throw new Error(`${scope.episodeId} interruption ${composition.id} activeBeats cannot contain its press and hold windows`);
+      }
+      interaction = {
+        kind: "hold",
+        pressDeadlineMs: startsAtMs + mechanic.pressWindowBeats * beatMs,
+        requiredHoldMs: mechanic.holdBeats * beatMs,
+      };
+    } else {
+      throw new Error(`${scope.episodeId} interruption ${composition.id} has an incompatible mechanic`);
+    }
+    return {
+      id: composition.id, warningStartsAtMs, startsAtMs, endsAtMs, returnsAtMs,
+      consequences: composition.consequences,
+      presentation: composition.presentation,
+      copy: composition.copy, interaction,
+    };
+  }).sort((left, right) => left.startsAtMs - right.startsAtMs);
+  for (let index = 1; index < interruptions.length; index += 1) {
+    if (interruptions[index].warningStartsAtMs < interruptions[index - 1].returnsAtMs) {
+      throw new Error(`${scope.episodeId} interruption windows must not overlap`);
+    }
+  }
+  const blocked = (atMs: number, timingWindowMs = 0) => interruptions.some((attack) =>
+    atMs + timingWindowMs > attack.startsAtMs
+    && atMs - timingWindowMs < attack.returnsAtMs);
+  const cues = resistance.cues.filter((cue) => !blocked(cue.atMs, cue.timingWindowMs));
+  const guideEvents = resistance.guideEvents.filter((event) =>
+    !interruptions.some((attack) => event.endsAtMs > attack.startsAtMs
+      && event.atMs < attack.returnsAtMs));
+  for (const attack of interruptions) {
+    const phaseIndex = resistance.phases.findIndex((phase) =>
+      attack.startsAtMs >= phase.startsAtMs && attack.startsAtMs < phase.endsAtMs);
+    guideEvents.push({
+      action: "interruption", atMs: attack.startsAtMs,
+      endsAtMs: attack.endsAtMs, phaseIndex,
+    });
+    guideEvents.push({
+      action: "count-in", atMs: attack.endsAtMs,
+      endsAtMs: attack.returnsAtMs, phaseIndex,
+    });
+  }
+  guideEvents.sort((left, right) => left.atMs - right.atMs);
+  return { resistance: { ...resistance, cues, guideEvents }, interruptions };
 }
 
 function alignPausesWithInputWindows(

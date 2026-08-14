@@ -42,6 +42,12 @@
       "tooEarly": "✕ TOO EARLY — {side} ON NOW",
       "missed": "✕ MISSED — {side}",
       "releasedEarly": "✕ RELEASED TOO EARLY — {side}"
+    },
+    "interruptions": {
+      "sequenceProgress": "{instruction} — {current} OF {total}",
+      "holdReady": "PRESS AND HOLD\nSPACE OR BUTTON",
+      "holdHolding": "HOLDING — KEEP HOLDING",
+      "holdRelease": "RELEASE NOW"
     }
   },
   "campaigns": [
