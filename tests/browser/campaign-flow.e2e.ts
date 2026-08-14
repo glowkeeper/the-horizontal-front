@@ -89,3 +89,11 @@ test("accepts an outcome into the campaign debrief", async ({ page }) => {
   await page.keyboard.press("Escape");
   await expect(gameStatus(page)).toHaveText(campaignStatus);
 });
+
+test("CONTROLLED FAILURE: uploads browser diagnostics", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("body")).toHaveAttribute(
+    "data-controlled-browser-failure",
+    "present",
+  );
+});
