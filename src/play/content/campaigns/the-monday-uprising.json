@@ -4,7 +4,11 @@
   "title": "The Monday Uprising",
   "briefing": {
     "headline": "MONDAY. DAWN.",
-    "body": "Management has declared the working week open. The bed remains under horizontal control. Hold the line."
+    "body": "Management has declared the working week open. The bed remains under horizontal control. Hold the line.",
+    "illustration": {
+      "source": "campaign",
+      "id": "monday-uprising-briefing"
+    }
   },
   "episodes": [
     {
@@ -15,6 +19,10 @@
   "debriefing": {
     "headline": "THE MONDAY UPRISING",
     "body": "The line held wherever resistance was possible. Rest now. Management is already scheduling the lessons-learned meeting.",
-    "scoreLabel": "EPISODES HELD"
+    "scoreLabel": "EPISODES HELD",
+    "illustration": {
+      "source": "campaign",
+      "id": "monday-uprising-debriefing"
+    }
   }
 }

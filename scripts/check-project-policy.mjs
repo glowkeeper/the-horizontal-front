@@ -127,6 +127,7 @@ const campaignData = await Promise.all(gameData.campaigns.map(async ({ file }) =
   ))));
 const episodeReferences = campaignData.flatMap(({ episodes }) => episodes);
 const assetCatalogData = JSON.parse(await readFile(assetCatalogPath, "utf8"));
+const campaignIds = new Set(gameData.campaigns.map(({ id }) => id));
 const episodeIds = new Set(
   episodeReferences.map(({ id }) => id),
 );
@@ -239,7 +240,14 @@ const discoveredAssetFiles = (await listFiles(assetRoot))
 
 requirePolicy(
   assetCatalogData.assets.every(({ file }) => assetFilePattern.test(file)),
-  "Every presentation asset catalogue path must be a PNG or WebP safely namespaced under shared/ or episodes/<episode-id>/.",
+  "Every presentation asset catalogue path must be a PNG or WebP safely namespaced under shared/, campaigns/<campaign-id>/ or episodes/<episode-id>/.",
+);
+requirePolicy(
+  assetCatalogData.assets.every(({ file }) => {
+    const match = /^campaigns\/([^/]+)\//.exec(file);
+    return match === null || campaignIds.has(match[1]);
+  }),
+  "Every campaign-owned presentation asset must name a game campaign.",
 );
 requirePolicy(
   assetCatalogData.assets.every(({ file }) => {

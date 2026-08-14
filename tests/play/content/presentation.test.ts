@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import layoutContent from "../../../src/play/content/presentation/layouts/bed-head-right.json";
+import illustratedLayoutContent from "../../../src/play/content/presentation/layouts/illustration-left.json";
 import skinContent from "../../../src/play/content/presentation/skins/episodes/the-alarm/the-alarm-bedroom.json";
 import sharedSkinContent from "../../../src/play/content/presentation/skins/shared/shape-bedroom.json";
 import catalogContent from "../../../src/play/content/presentation/asset-catalog.json";
@@ -14,22 +15,59 @@ import {
   loadInterruptionSkinLibrary,
   loadPresentation,
 } from "../../../src/play/content/loadPresentation";
-import { presentationAssets } from "../../../src/play/content/presentationAssets";
+import {
+  presentationAssets,
+  resolveIllustrationAsset,
+} from "../../../src/play/content/presentationAssets";
 import {
   assetCatalogSchema,
   interruptionSkinSchema,
+  illustratedPanelLayoutSchema,
   resistanceLayoutSchema,
   resistanceSkinSchema,
 } from "../../../src/play/content/schemas/presentationSchema";
 import { assertSensiblePresentation } from "../../../src/play/content/validatePresentation";
+import { assertSensibleIllustratedPanel } from "../../../src/play/content/validateIllustratedPanel";
 import { game, mechanics } from "../../../src/play/content/game";
 
 const layout = resistanceLayoutSchema.parse(layoutContent);
 const skin = resistanceSkinSchema.parse(skinContent);
 const sharedSkin = resistanceSkinSchema.parse(sharedSkinContent);
 const assetIds = new Set(presentationAssets.map(({ id }) => id));
+const illustratedLayout = illustratedPanelLayoutSchema.parse(illustratedLayoutContent);
 
 describe("presentation content", () => {
+  it("keeps the generic illustrated panel separate, bounded and approximately 2:1", () => {
+    expect(() => assertSensibleIllustratedPanel(illustratedLayout)).not.toThrow();
+    expect(illustratedLayout.illustration.width / illustratedLayout.semanticContent.width)
+      .toBeCloseTo(2, 1);
+    expect(() => assertSensibleIllustratedPanel({
+      ...illustratedLayout,
+      semanticContent: { ...illustratedLayout.semanticContent, x: 800 },
+    })).toThrow(/remain separate/);
+    expect(() => assertSensibleIllustratedPanel({
+      ...illustratedLayout,
+      anchors: {
+        ...illustratedLayout.anchors,
+        headline: { x: 100, y: illustratedLayout.anchors.headline.y },
+      },
+    })).toThrow(/headline anchor must remain inside semantic content/);
+  });
+
+  it("enforces campaign and episode illustration ownership without fallback", () => {
+    expect(resolveIllustrationAsset(
+      { source: "campaign", id: "monday-uprising-briefing" },
+      "the-monday-uprising",
+    ).file).toMatch(/^campaigns\/the-monday-uprising\//);
+    expect(resolveIllustrationAsset(
+      { source: "episode", id: "the-alarm-victory" },
+      "the-alarm",
+    ).file).toMatch(/^episodes\/the-alarm\//);
+    expect(() => resolveIllustrationAsset(
+      { source: "shared", id: "the-alarm-victory" },
+      "the-alarm",
+    )).toThrow(/must resolve under shared/);
+  });
   it("validates every real episode presentation", () => {
     for (const episode of game.episodes) {
       expect(() => loadPresentation(episode)).not.toThrow();
@@ -504,7 +542,11 @@ describe("presentation content", () => {
   });
 
   it("resolves catalogued image files to build URLs", () => {
-    const assets = loadPresentationAssetCatalog(catalogContent, {
+    const singleAssetCatalog = {
+      ...catalogContent,
+      assets: [catalogContent.assets[0]],
+    };
+    const assets = loadPresentationAssetCatalog(singleAssetCatalog, {
       "./presentation/assets/episodes/the-alarm/pillow-prototype.png":
         "/assets/pillow-prototype-hash.png",
     });

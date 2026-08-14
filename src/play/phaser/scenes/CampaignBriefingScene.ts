@@ -3,11 +3,13 @@ import Phaser from "phaser";
 import type { Campaign } from "../../content/loadGame";
 import { formatCopy } from "../../content/formatCopy";
 import { game } from "../../content/game";
+import { resolveIllustrationAsset } from "../../content/presentationAssets";
 import { createCampaignRun } from "../../engine/campaign";
 import { createTextStyles, getThemeColour } from "../../theme/theme";
 import { getMenuAction } from "../../input/menuInput";
 import { GAME_CENTRE_X } from "../design";
 import { announce } from "../sceneChrome";
+import { createIllustratedSemanticPanel } from "../presentation/illustratedSemanticPanel";
 
 type CampaignBriefingData = { readonly campaign: Campaign };
 
@@ -26,20 +28,26 @@ export class CampaignBriefingScene extends Phaser.Scene {
   public create(): void {
     this.transitioning = false;
     const { briefing, episodes, title } = this.campaign;
-    this.cameras.main.setBackgroundColor(getThemeColour("duvetCream"));
-    this.add.text(GAME_CENTRE_X, 95, title.toUpperCase(), createTextStyles().notice)
-      .setOrigin(0.5);
-    this.add.text(GAME_CENTRE_X, 225, briefing.headline, createTextStyles().title)
-      .setOrigin(0.5);
-    this.add.text(GAME_CENTRE_X, 390, briefing.body, {
-      ...createTextStyles().body,
-      wordWrap: { width: 900 },
-      lineSpacing: 9,
-    }).setOrigin(0.5);
-    this.add.text(GAME_CENTRE_X, 615, game.interface.briefingInstructions, {
-      ...createTextStyles().notice,
-      color: getThemeColour("resistanceRed"),
-    }).setOrigin(0.5);
+    if (briefing.illustration) {
+      const asset = resolveIllustrationAsset(briefing.illustration, this.campaign.id);
+      createIllustratedSemanticPanel(this, {
+        assetId: asset.id,
+        kicker: title.toUpperCase(),
+        headline: briefing.headline,
+        body: briefing.body,
+        instruction: game.interface.briefingInstructions,
+      });
+    } else {
+      this.cameras.main.setBackgroundColor(getThemeColour("duvetCream"));
+      this.add.text(GAME_CENTRE_X, 95, title.toUpperCase(), createTextStyles().notice).setOrigin(0.5);
+      this.add.text(GAME_CENTRE_X, 225, briefing.headline, createTextStyles().title).setOrigin(0.5);
+      this.add.text(GAME_CENTRE_X, 390, briefing.body, {
+        ...createTextStyles().body, wordWrap: { width: 900 }, lineSpacing: 9,
+      }).setOrigin(0.5);
+      this.add.text(GAME_CENTRE_X, 615, game.interface.briefingInstructions, {
+        ...createTextStyles().notice, color: getThemeColour("resistanceRed"),
+      }).setOrigin(0.5);
+    }
 
     const begin = () => {
       if (this.transitioning) return;

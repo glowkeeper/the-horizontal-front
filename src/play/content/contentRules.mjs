@@ -1,6 +1,6 @@
 export const contentIdPattern = /^(?!\d+$)(?!.*(?:^|-)\d+(?:-|$))[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-export const assetFilePattern = /^(?:shared|episodes\/[a-z0-9]+(?:-[a-z0-9]+)*)\/[a-z0-9]+(?:[a-z0-9-]*[a-z0-9])?(?:\/[a-z0-9]+(?:[a-z0-9-]*[a-z0-9])?)*\.(?:png|webp)$/;
+export const assetFilePattern = /^(?:shared|campaigns\/[a-z0-9]+(?:-[a-z0-9]+)*|episodes\/[a-z0-9]+(?:-[a-z0-9]+)*)\/[a-z0-9]+(?:[a-z0-9-]*[a-z0-9])?(?:\/[a-z0-9]+(?:[a-z0-9-]*[a-z0-9])?)*\.(?:png|webp)$/;
 
 export const copyPlaceholderPattern = /\{([a-zA-Z][a-zA-Z0-9]*)\}/g;
 export const maximumCampaignsWithoutPaging = 5;

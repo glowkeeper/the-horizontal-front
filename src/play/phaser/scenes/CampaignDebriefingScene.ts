@@ -3,12 +3,14 @@ import Phaser from "phaser";
 import type { Campaign } from "../../content/loadGame";
 import { formatCopy } from "../../content/formatCopy";
 import { game } from "../../content/game";
+import { resolveIllustrationAsset } from "../../content/presentationAssets";
 import type { CampaignRun } from "../../engine/campaign";
 import { isCampaignComplete } from "../../engine/campaign";
 import { getMenuAction } from "../../input/menuInput";
 import { createTextStyles, getThemeColour } from "../../theme/theme";
 import { GAME_CENTRE_X } from "../design";
 import { announce, createButton } from "../sceneChrome";
+import { createIllustratedSemanticPanel } from "../presentation/illustratedSemanticPanel";
 
 type CampaignDebriefingData = {
   readonly campaign: Campaign;
@@ -39,27 +41,37 @@ export class CampaignDebriefingScene extends Phaser.Scene {
     this.transitioning = false;
     const { debriefing } = this.campaign;
     const score = `${this.run.episodesHeld} / ${this.run.episodesTotal}`;
-    this.cameras.main.setBackgroundColor(getThemeColour("duvetCream"));
-    this.add.text(GAME_CENTRE_X, 90, debriefing.headline, createTextStyles().title)
-      .setOrigin(0.5);
-    this.add.text(GAME_CENTRE_X, 235, debriefing.body, {
-      ...createTextStyles().body,
-      wordWrap: { width: 900 },
-      lineSpacing: 9,
-    }).setOrigin(0.5);
-    this.add.text(GAME_CENTRE_X, 410, debriefing.scoreLabel, createTextStyles().notice)
-      .setOrigin(0.5);
-    this.add.text(GAME_CENTRE_X, 485, score, {
-      ...createTextStyles().title,
-      color: getThemeColour("resistanceRed"),
-    }).setOrigin(0.5);
+    const panelLayout = debriefing.illustration
+      ? createIllustratedSemanticPanel(this, {
+        assetId: resolveIllustrationAsset(debriefing.illustration, this.campaign.id).id,
+        headline: debriefing.headline,
+        body: debriefing.body,
+        detail: `${debriefing.scoreLabel}\n${score}`,
+      })
+      : null;
+    if (!panelLayout) {
+      this.cameras.main.setBackgroundColor(getThemeColour("duvetCream"));
+      this.add.text(GAME_CENTRE_X, 90, debriefing.headline, createTextStyles().title).setOrigin(0.5);
+      this.add.text(GAME_CENTRE_X, 235, debriefing.body, {
+        ...createTextStyles().body, wordWrap: { width: 900 }, lineSpacing: 9,
+      }).setOrigin(0.5);
+      this.add.text(GAME_CENTRE_X, 410, debriefing.scoreLabel, createTextStyles().notice).setOrigin(0.5);
+      this.add.text(GAME_CENTRE_X, 485, score, {
+        ...createTextStyles().title, color: getThemeColour("resistanceRed"),
+      }).setOrigin(0.5);
+    }
 
     const replay = () => this.transitionTo("CampaignBriefingScene", {
       campaign: this.campaign,
     });
     const campaigns = () => this.transitionTo("CampaignsScene");
-    createButton(this, 390, 610, 410, game.interface.replayCampaign, replay);
-    createButton(this, 890, 610, 410, game.interface.returnToCampaigns, campaigns);
+    if (panelLayout) {
+      createButton(this, panelLayout.anchors.primaryAction.x, panelLayout.anchors.primaryAction.y, panelLayout.actions.width, game.interface.replayCampaign, replay);
+      createButton(this, panelLayout.anchors.secondaryAction.x, panelLayout.anchors.secondaryAction.y, panelLayout.actions.width, game.interface.returnToCampaigns, campaigns);
+    } else {
+      createButton(this, 390, 610, 410, game.interface.replayCampaign, replay);
+      createButton(this, 890, 610, 410, game.interface.returnToCampaigns, campaigns);
+    }
 
     this.input.keyboard?.on("keydown", (event: KeyboardEvent) => {
       const action = getMenuAction(event);

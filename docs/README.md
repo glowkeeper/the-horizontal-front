@@ -44,7 +44,9 @@ authoritative [verification evidence](verification-evidence.md) vocabulary.
 Read [release process](release-process.md) for production invariants, supported
 environment claims, the no-placeholders rule, versioning and the Cloudflare
 publication and rollback sequence. Read [art direction](art-direction.md)
-before producing, integrating or approving visual assets.
+before producing, integrating or approving visual assets. Exploratory sheets
+are preserved separately under [art development](art/README.md); their presence
+there does not make them production assets.
 
 ## I want to make or review a design decision
 
@@ -71,6 +73,7 @@ substitute for that context.
 | Browser-review tooling and safety | [Browser verification](browser-verification.md) |
 | Production release readiness and publication | [Release process](release-process.md) |
 | Provisional production visual direction | [Art direction](art-direction.md) |
+| Exploratory visual-development artefacts | [Art development](art/README.md) |
 | Evidence and design inferences | [Research index](research/README.md) |
 
 Some defining constraints are intentionally repeated for the audience that

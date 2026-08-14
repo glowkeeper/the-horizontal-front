@@ -147,11 +147,19 @@
   "results": {
     "victory": {
       "headline": "THE LINE HOLDS",
-      "feedback": "REST, BRIEFLY"
+      "feedback": "REST, BRIEFLY",
+      "illustration": {
+        "source": "episode",
+        "id": "the-alarm-victory"
+      }
     },
     "forcedVerticalisation": {
       "headline": "FORCED VERTICALISATION",
-      "feedback": "MANAGEMENT PREVAILS"
+      "feedback": "MANAGEMENT PREVAILS",
+      "illustration": {
+        "source": "episode",
+        "id": "the-alarm-forced-verticalisation"
+      }
     }
   }
 }

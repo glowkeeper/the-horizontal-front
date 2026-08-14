@@ -136,7 +136,7 @@ const assetBaseSchema = z.object({
   id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
   file: z.string().regex(
     assetFilePattern,
-    "must be a PNG or WebP under shared/ or episodes/<episode-id>/",
+    "must be a PNG or WebP under shared/, campaigns/<campaign-id>/ or episodes/<episode-id>/",
   ),
   status: z.enum(["prototype-placeholder", "production-approved"]),
   creator: z.string().trim().min(1),
@@ -184,6 +184,42 @@ const rectangleSchema = z.object({
   width: positiveSizeSchema, height: positiveSizeSchema,
   originX: unitIntervalSchema.optional(),
   originY: unitIntervalSchema.optional(),
+}).strict();
+
+export const illustratedPanelLayoutSchema = z.object({
+  schemaVersion: z.literal(1),
+  id: z.literal("illustration-left"),
+  designSize: z.object({
+    width: z.number().int().positive(),
+    height: z.number().int().positive(),
+  }).strict(),
+  illustration: rectangleSchema,
+  semanticContent: rectangleSchema,
+  appearance: z.object({
+    illustrationStrokeWidth: positiveSizeSchema,
+    semanticStrokeWidth: positiveSizeSchema,
+    semanticFillAlpha: unitIntervalSchema,
+  }).strict(),
+  actions: z.object({
+    width: positiveSizeSchema,
+  }).strict(),
+  typography: z.object({
+    kickerSizePx: positiveSizeSchema,
+    headlineSizePx: positiveSizeSchema,
+    bodySizePx: positiveSizeSchema,
+    instructionSizePx: positiveSizeSchema,
+    horizontalInset: positiveSizeSchema,
+    bodyLineSpacingPx: z.number().nonnegative(),
+  }).strict(),
+  anchors: z.object({
+    kicker: pointSchema,
+    headline: pointSchema,
+    body: pointSchema,
+    detail: pointSchema,
+    instruction: pointSchema,
+    primaryAction: pointSchema,
+    secondaryAction: pointSchema,
+  }).strict(),
 }).strict();
 
 const easeSchema = z.enum([
@@ -337,3 +373,4 @@ export type ResistanceSkin = z.infer<typeof resistanceSkinSchema>;
 export type ShapePart = z.infer<typeof shapePartSchema>;
 export type AssetCatalog = z.infer<typeof assetCatalogSchema>;
 export type InterruptionSkin = z.infer<typeof interruptionSkinSchema>;
+export type IllustratedPanelLayoutContent = z.infer<typeof illustratedPanelLayoutSchema>;

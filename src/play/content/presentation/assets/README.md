@@ -1,14 +1,22 @@
 # Presentation asset ownership
 
-- Put artwork intentionally reusable across episodes under `shared/`.
+- Put artwork intentionally reusable across campaigns or episodes under `shared/`.
+- Put campaign-specific artwork under `campaigns/<campaign-id>/`.
 - Put episode-specific artwork under `episodes/<episode-id>/`.
 - Register every image and its provenance in `../asset-catalog.json`.
-- Reference the catalogue's semantic asset ID from skins through explicit
-  `{ "source": "shared|episode", "id": "..." }` data; never put file paths in
-  episodes or skins.
+- Reference the catalogue's semantic asset ID through explicit source-and-ID
+  data; never put file paths in campaigns, episodes or skins.
 
 Shared skins may use only shared assets. An episode-owned skin may use shared
 assets and assets owned by the same episode.
+
+Campaign briefing and debriefing illustrations may use `shared|campaign`.
+Episode result illustrations may use `shared|episode`. Each local reference is
+private to its owning campaign or episode.
+
+Every campaign debriefing requires an illustration. Its composition must remain
+truthful for every possible campaign tally—none, some or all episodes held—and
+must not encode a score or unambiguous victory or defeat in the pixels.
 
 The declared source must agree with the catalogue path; resolution never falls
 back from one ownership level to the other.

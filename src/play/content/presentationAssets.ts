@@ -18,3 +18,27 @@ export const presentationAssets = loadPresentationAssetCatalog(
 export const presentationAssetIds = new Set(
   presentationAssets.map(({ id }) => id),
 );
+
+type IllustrationReference = {
+  readonly source: "shared" | "campaign" | "episode";
+  readonly id: string;
+};
+
+export function resolveIllustrationAsset(
+  reference: IllustrationReference,
+  ownerId: string,
+) {
+  const asset = presentationAssets.find(({ id }) => id === reference.id);
+  if (asset === undefined) {
+    throw new Error(`Unknown presentation asset: ${reference.id}`);
+  }
+  const expectedPrefix = reference.source === "shared"
+    ? "shared/"
+    : `${reference.source}s/${ownerId}/`;
+  if (!asset.file.startsWith(expectedPrefix)) {
+    throw new Error(
+      `${reference.source} illustration ${reference.id} must resolve under ${expectedPrefix}`,
+    );
+  }
+  return asset;
+}

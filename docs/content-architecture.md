@@ -54,7 +54,7 @@ Each campaign has a finite narrative flow:
 briefing → ordered playable episodes → debriefing
 ```
 
-The campaign JSON authors non-empty briefing and debriefing headlines and body copy, plus the debriefing label for the tally. It does not author a score or executable entry, continuation or exit criteria. After an episode result, the player may retry without recording anything or accept either victory or forced verticalisation and advance. Plain TypeScript campaign rules count accepted victories as episodes held, accepted outcomes as episodes attempted, and present `held / total` after the final episode.
+The campaign JSON authors non-empty briefing and debriefing headlines and body copy, plus the debriefing label for the tally. A briefing may select a catalogued illustration through an explicit `shared` or `campaign` ownership reference; every debriefing must select one. A campaign-debrief illustration is an aftermath image, never an authored outcome: it must remain semantically valid for every possible `held / total` tally, including none, some or all episodes held, and must not visually assert victory, defeat or a particular score. The campaign does not author a score or executable entry, continuation or exit criteria. After an episode result, the player may retry without recording anything or accept either victory or forced verticalisation and advance. Plain TypeScript campaign rules count accepted victories as episodes held, accepted outcomes as episodes attempted, and present `held / total` after the final episode.
 
 The player-facing application follows the same hierarchy. Boot presents a Campaigns screen generated from every validated campaign. Selecting one opens its briefing. After its debriefing, replay returns through that campaign's briefing with a fresh tally, while Campaigns returns to the catalogue. These are generic application states, not campaign-specific routes.
 
@@ -231,7 +231,9 @@ The layout determines responsive placement, scaling, text-safe areas and
 default layer order. The selected skin supplies validated visual parts and
 semantic artwork references; episode copy remains in the episode itself.
 
-An episode selects a documented layout and skin through explicit ownership references; it does not contain asset file paths or the complete scene drawing. Layout JSON defines shared design-space anchors, pivots, slots and motion parameters. Skin JSON defines the visual parts occupying those slots through either the finite prototype-shape vocabulary or explicitly owned semantic image references resolved by a validated asset catalogue. Both skins and catalogue-owned files use `shared/` and `episodes/<episode-id>/` namespaces. Shared skins can use only shared assets. An episode-owned skin can use shared assets and assets owned by the same episode, and only that episode can select it. Shared Phaser adapters validate and interpret those files. This keeps ordinary composition and replacement artwork editable as data without turning episode JSON into a graphical programming language.
+An episode selects a documented layout and skin through explicit ownership references; it does not contain asset file paths or the complete scene drawing. Layout JSON defines shared design-space anchors, pivots, slots and motion parameters. Skin JSON defines the visual parts occupying those slots through either the finite prototype-shape vocabulary or explicitly owned semantic image references resolved by a validated asset catalogue. Catalogue-owned files use `shared/`, `campaigns/<campaign-id>/` and `episodes/<episode-id>/` namespaces. A campaign narrative may select shared art or art owned by that campaign; an episode result may select shared art or art owned by that episode. Shared skins can use only shared assets. An episode-owned skin can use shared assets and assets owned by the same episode, and only that episode can select it. Resolution never falls back across ownership levels. Shared Phaser adapters validate and interpret those files. This keeps ordinary composition and replacement artwork editable as data without turning episode JSON into a graphical programming language.
+
+Campaign briefings, episode results and campaign debriefings share the validated `illustration-left` narrative layout. Its illustration and semantic-content regions are separate, bounded and approximately two-to-one in width. Artwork contains no story copy: headings, prose, tallies, instructions and actions remain in the semantic panel and retain their existing content ownership. The same renderer consumes all three narrative roles; selecting an illustration never introduces campaign- or episode-ID branching.
 
 Each asset-catalogue entry is ordinary authored data. For example:
 
@@ -251,7 +253,7 @@ Each asset-catalogue entry is ordinary authored data. For example:
 }
 ```
 
-`id` is the stable name used by skins. `file` is the only repository path and must be a PNG or WebP inside an allowed ownership namespace. The remaining fields preserve provenance and distinguish provisional material from production-approved artwork.
+`id` is the stable semantic name used by skins and narrative illustration references. `file` is the only repository path and must be a PNG or WebP inside an allowed ownership namespace. The remaining fields preserve provenance and distinguish provisional material from production-approved artwork.
 
 Layout and skin validation must check relationships as well as field types. Coordinates and control bounds must fit the design canvas, dimensions must be positive, semantic part IDs must be unique and required parts present, layout/skin references must be compatible, and motion directions must agree with the layout's physical meaning.
 

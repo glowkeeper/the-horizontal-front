@@ -18,6 +18,70 @@
       ],
       "licence": "CC-BY-SA-4.0",
       "replacementStatus": "Replace or substantially human-refine before production approval."
+    },
+    {
+      "id": "monday-uprising-briefing",
+      "file": "campaigns/the-monday-uprising/briefing.png",
+      "origin": "ai-generated",
+      "status": "prototype-placeholder",
+      "creator": "OpenAI image generation tool, directed by the project maintainer and Codex",
+      "generatedAt": "2026-08-14",
+      "generationTool": "OpenAI built-in image generation (gpt-image-2)",
+      "prompt": "Create a dedicated campaign briefing illustration from the approved fifth concept sheet: the gender-ambiguous dark-haired hero remains firmly and heroically horizontal beneath a cream duvet while an original fictional grotesque corporate-management archetype points and fumes amid absurd administrative machinery. Original editorial political-cartoon treatment with bold charcoal linework, cut-paper shapes, dry printed texture and a warm cream, brown, charcoal and muted-red palette. Single coherent landscape composition for an illustration-left game panel. Angry but ridiculous management; defiant hero. No text, logos, signatures, watermarks, photorealism, named-artist imitation, real-person likeness or UI.",
+      "edits": [
+        "Generated as a dedicated illustration using the fifth production concept sheet as an art-direction reference.",
+        "Copied without cropping into the campaign-owned presentation assets directory; the generic renderer applies a non-destructive cover crop."
+      ],
+      "licence": "CC-BY-SA-4.0",
+      "replacementStatus": "First-draft campaign artwork awaiting integrated human perceptual review and substantial human refinement before production approval."
+    },
+    {
+      "id": "monday-uprising-debriefing",
+      "file": "campaigns/the-monday-uprising/debriefing.png",
+      "origin": "ai-generated",
+      "status": "prototype-placeholder",
+      "creator": "OpenAI image generation tool, directed by the project maintainer and Codex",
+      "generatedAt": "2026-08-14",
+      "generationTool": "OpenAI built-in image generation (gpt-image-2)",
+      "prompt": "Create a dedicated campaign debrief illustration from the approved fifth concept sheet: the gender-ambiguous hero remains in the horizontal bed after the campaign, tired but resolute, amid ambiguous evidence of struggle and stalled administrative machinery; distant warm windows and subtle raised-fist silhouettes suggest continuing collective resistance. Original editorial political-cartoon linework, cut-paper shapes and dry printed texture. The image must remain valid for every possible held/total tally and must assert neither victory nor defeat. No text, digits, score marks, logos, signatures, watermarks, photorealism, named-artist imitation or real-person likeness.",
+      "edits": [
+        "Generated as a dedicated tally-neutral campaign aftermath using the fifth production concept sheet as an art-direction reference.",
+        "Copied without cropping into the campaign-owned presentation assets directory; the generic renderer applies a non-destructive cover crop."
+      ],
+      "licence": "CC-BY-SA-4.0",
+      "replacementStatus": "First-draft campaign artwork awaiting integrated human perceptual review, tally-neutrality review and substantial human refinement before production approval."
+    },
+    {
+      "id": "the-alarm-victory",
+      "file": "episodes/the-alarm/victory.png",
+      "origin": "ai-generated",
+      "status": "prototype-placeholder",
+      "creator": "OpenAI image generation tool, directed by the project maintainer and Codex",
+      "generatedAt": "2026-08-14",
+      "generationTool": "OpenAI built-in image generation (gpt-image-2)",
+      "prompt": "Create a dedicated episode victory debrief illustration from the approved fifth concept sheet: the same gender-ambiguous hero remains in the horizontal bed, raises a clenched fist and retains the cream duvet while the fictional corporate-management archetype and administrative machinery recoil in furious comic defeat. Original editorial political-cartoon linework, cut-paper shapes and dry printed texture; warm restrained palette; readable at game-panel size. No text, logos, signatures, watermarks, photorealism, named-artist imitation, real-person likeness or UI.",
+      "edits": [
+        "Generated as a dedicated outcome illustration using the fifth production concept sheet as an art-direction reference.",
+        "Copied without cropping into the episode-owned presentation assets directory; the generic renderer applies a non-destructive cover crop."
+      ],
+      "licence": "CC-BY-SA-4.0",
+      "replacementStatus": "First-draft episode artwork awaiting integrated human perceptual review and substantial human refinement before production approval."
+    },
+    {
+      "id": "the-alarm-forced-verticalisation",
+      "file": "episodes/the-alarm/forced-verticalisation.png",
+      "origin": "ai-generated",
+      "status": "prototype-placeholder",
+      "creator": "OpenAI image generation tool, directed by the project maintainer and Codex",
+      "generatedAt": "2026-08-14",
+      "generationTool": "OpenAI built-in image generation (gpt-image-2)",
+      "prompt": "Create a dedicated forced-verticalisation episode debrief illustration from the approved fifth concept sheet: absurd machinery has raised the wooden bed toward vertical; the same gender-ambiguous hero clings fiercely to the cream duvet and keeps glaring in defiance, while the fictional grotesque corporate-management archetype strains angrily at levers, prevailing briefly but remaining laughable. Original editorial political-cartoon linework, cut-paper shapes and dry printed texture. Funny, dramatic and sad; defeat without humiliation. No text, logos, signatures, watermarks, photorealism, named-artist imitation, real-person likeness or UI.",
+      "edits": [
+        "Generated as a dedicated outcome illustration using the fifth production concept sheet as an art-direction reference.",
+        "Copied without cropping into the episode-owned presentation assets directory; the generic renderer applies a non-destructive cover crop."
+      ],
+      "licence": "CC-BY-SA-4.0",
+      "replacementStatus": "First-draft episode artwork awaiting integrated human perceptual review and substantial human refinement before production approval."
     }
   ]
 }

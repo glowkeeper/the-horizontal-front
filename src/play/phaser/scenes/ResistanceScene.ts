@@ -3,6 +3,7 @@ import Phaser from "phaser";
 import type { Campaign } from "../../content/loadGame";
 import { formatCopy } from "../../content/formatCopy";
 import { game } from "../../content/game";
+import { resolveIllustrationAsset } from "../../content/presentationAssets";
 import type { Episode } from "../../content/loadEpisode";
 import {
   acceptCampaignOutcome,
@@ -49,6 +50,8 @@ import {
   createInterruptionPresentation,
   type InterruptionPresentation,
 } from "../presentation/interruptionPresentation";
+import { createIllustratedSemanticPanel } from "../presentation/illustratedSemanticPanel";
+import type { IllustratedPanelLayoutContent } from "../../content/schemas/presentationSchema";
 
 const MAXIMUM_FRAME_DELTA_MS = 100;
 
@@ -92,6 +95,7 @@ export class ResistanceScene extends Phaser.Scene {
   private result!: Phaser.GameObjects.Text;
   private transitioning = false;
   private outcomeActionsAvailable = false;
+  private illustratedOutcomeLayout: IllustratedPanelLayoutContent | null = null;
   private interruptionPresentation!: InterruptionPresentation;
   private announcedInterruptionState: string | null = null;
 
@@ -121,6 +125,7 @@ export class ResistanceScene extends Phaser.Scene {
     this.finished = false;
     this.transitioning = false;
     this.outcomeActionsAvailable = false;
+    this.illustratedOutcomeLayout = null;
     this.lastReportedExpiredStep = -1;
     this.lastAnnouncedNowStep = -1;
     this.announcedInterruptionState = null;
@@ -934,20 +939,24 @@ export class ResistanceScene extends Phaser.Scene {
       ? this.episode.results.victory
       : this.episode.results.forcedVerticalisation;
 
-    this.result
-      .setText(resultContent.headline)
-      .setColor(
-        victory
-          ? getThemeColour("resistanceRed")
-          : getThemeColour("workLightBlue"),
-      )
-      .setVisible(true);
-    this.feedback.setText(resultContent.feedback);
-    this.feedback.setVisible(true);
-    if (victory) {
-      this.layout.animateVictory();
+    if (resultContent.illustration) {
+      this.children.removeAll(true);
+      const asset = resolveIllustrationAsset(resultContent.illustration, this.episode.id);
+      this.illustratedOutcomeLayout = createIllustratedSemanticPanel(this, {
+        assetId: asset.id,
+        kicker: this.episode.title.toUpperCase(),
+        headline: resultContent.headline,
+        body: resultContent.feedback,
+      });
     } else {
-      this.layout.animateForcedVerticalisation();
+
+      this.result
+        .setText(resultContent.headline)
+        .setColor(victory ? getThemeColour("resistanceRed") : getThemeColour("workLightBlue"))
+        .setVisible(true);
+      this.feedback.setText(resultContent.feedback).setVisible(true);
+      if (victory) this.layout.animateVictory();
+      else this.layout.animateForcedVerticalisation();
     }
 
     announce(formatCopy(game.interface.resolutionStatus, {
@@ -963,10 +972,17 @@ export class ResistanceScene extends Phaser.Scene {
     if (this.transitioning) return;
     const { restart } = this.layout.content.anchors;
     const actions = this.layout.content.rhythmPresentation.outcomeActions;
-    createButton(this, restart.x - actions.horizontalOffset, restart.y, actions.width, game.interface.retryEpisode, () => {
+    const retryPosition = this.illustratedOutcomeLayout?.anchors.primaryAction ?? {
+      x: restart.x - actions.horizontalOffset, y: restart.y,
+    };
+    const acceptPosition = this.illustratedOutcomeLayout?.anchors.secondaryAction ?? {
+      x: restart.x + actions.horizontalOffset, y: restart.y,
+    };
+    const width = this.illustratedOutcomeLayout?.actions.width ?? actions.width;
+    createButton(this, retryPosition.x, retryPosition.y, width, game.interface.retryEpisode, () => {
       this.restartConfrontation();
     });
-    createButton(this, restart.x + actions.horizontalOffset, restart.y, actions.width, game.interface.acceptOutcome, () => {
+    createButton(this, acceptPosition.x, acceptPosition.y, width, game.interface.acceptOutcome, () => {
       this.acceptOutcomeAndContinue();
     });
     this.outcomeActionsAvailable = true;

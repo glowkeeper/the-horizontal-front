@@ -127,8 +127,10 @@ support their mechanic kind and obey the same ownership rules.
 
 `confrontation.copy` supplies `headline` and accessible `instructionsStatus`.
 `results` contains exactly `victory` and `forcedVerticalisation`; each supplies
-non-empty `headline` and `feedback`. No failure, trap-consequence or custom
-outcome discriminant exists.
+non-empty `headline` and `feedback` and may select a catalogued illustration
+through a `shared` or same-episode reference. The illustration contains no
+story copy and is rendered by the shared illustrated narrative layout. No
+failure, trap-consequence or custom outcome discriminant exists.
 
 ## What compilation means
 

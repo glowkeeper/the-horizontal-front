@@ -7,6 +7,7 @@ import {
   type CampaignContent,
   type GameContent,
 } from "./schemas/gameSchema";
+import { resolveIllustrationAsset } from "./presentationAssets";
 
 export type ContentModules = Readonly<Record<string, unknown>>;
 
@@ -103,8 +104,21 @@ export function loadGame(
       if (episode.id !== entry.id) {
         throw new Error(`Episode ID mismatch for ${episodePath}: expected ${entry.id}`);
       }
+      for (const result of [
+        episode.results.victory,
+        episode.results.forcedVerticalisation,
+      ]) {
+        if (result.illustration) {
+          resolveIllustrationAsset(result.illustration, episode.id);
+        }
+      }
       return episode;
     });
+    for (const section of [campaign.briefing, campaign.debriefing]) {
+      if (section.illustration) {
+        resolveIllustrationAsset(section.illustration, campaign.id);
+      }
+    }
     return { ...campaign, episodes };
   });
 

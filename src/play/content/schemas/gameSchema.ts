@@ -27,9 +27,15 @@ const contentReferenceSchema = z.object({
   }
 });
 
+const campaignIllustrationReferenceSchema = z.object({
+  source: z.enum(["shared", "campaign"]),
+  id: contentIdSchema,
+}).strict();
+
 const campaignTextSchema = z.object({
   headline: shortCopy,
   body: bodyCopy,
+  illustration: campaignIllustrationReferenceSchema.optional(),
 }).strict();
 
 function copyTemplate(...required: string[]) {
@@ -77,6 +83,7 @@ export const campaignSchema = z.object({
   briefing: campaignTextSchema,
   episodes: z.array(contentReferenceSchema).min(1),
   debriefing: campaignTextSchema.extend({
+    illustration: campaignIllustrationReferenceSchema,
     scoreLabel: z.string().trim().min(1),
   }).strict(),
 }).strict();

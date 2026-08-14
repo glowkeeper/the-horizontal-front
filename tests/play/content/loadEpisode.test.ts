@@ -42,6 +42,13 @@ describe("game content loading", () => {
         debriefing: { ...campaignContent.debriefing, scoreLabel: "" },
       },
     }, episodeModules)).toThrow();
+    const { illustration: _illustration, ...debriefingWithoutIllustration } = campaignContent.debriefing;
+    expect(() => loadTestGame(gameContent, {
+      "./campaigns/the-monday-uprising.json": {
+        ...campaignContent,
+        debriefing: debriefingWithoutIllustration,
+      },
+    }, episodeModules)).toThrow(/illustration/);
   });
 
   it("requires validated global interface copy and its placeholders", () => {
@@ -169,6 +176,10 @@ describe("game content loading", () => {
       ...campaignContent,
       id: "management-retaliates",
       title: "Management Retaliates",
+      briefing: {
+        headline: campaignContent.briefing.headline,
+        body: campaignContent.briefing.body,
+      },
     };
     expect(() => loadTestGame(
       {

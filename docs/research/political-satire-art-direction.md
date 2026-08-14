@@ -209,6 +209,8 @@ these propositions:
    the system, rather than the resisting character, the object of ridicule.
 
 These are hypotheses for asset production and integration, not accepted facts.
+The first visual test and its unresolved questions are recorded in [First
+production concept sheet](first-production-concept-sheet.md).
 
 ## Limitations and risks
 
@@ -237,6 +239,9 @@ Before any first-draft asset is marked production-approved:
 - inspect it for copied composition, distinctive motifs, signatures, logos,
   watermarks and suspiciously specific similarities;
 - test it at supported desktop and landscape-mobile sizes in the real layout;
+- test every campaign-debrief illustration against no, partial and complete
+  held tallies; the pixels must remain truthful in all three cases and must not
+  predetermine the campaign's computed outcome;
 - review silhouettes and important states without colour;
 - inspect each animation layer, transparent bound and pivot in motion;
 - record prompt, source generation, tool, date, selection, edits and human art

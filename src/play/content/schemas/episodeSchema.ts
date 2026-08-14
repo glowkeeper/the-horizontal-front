@@ -83,6 +83,7 @@ const resultSchema = z
   .object({
     headline: shortCopy,
     feedback: shortCopy,
+    illustration: ownedContentReferenceSchema.optional(),
   })
   .strict();
 
