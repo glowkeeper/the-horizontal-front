@@ -208,25 +208,31 @@ export function compileConfrontationConfig(
       throw new Error(`${scope.episodeId} interruption ${composition.id} must fit inside phase ${phase.id}`);
     }
     const mechanic = resolveInterruptionMechanic(composition.mechanic, scope);
-    if (mechanic.kind !== composition.kind) {
-      throw new Error(`${scope.episodeId} interruption ${composition.id} composition kind must match ${mechanic.id}`);
-    }
     let interaction: InterruptionConfig["interaction"];
-    if (composition.kind === "sequence" && mechanic.kind === "sequence") {
+    if (composition.kind === "sequence") {
+      if (mechanic.kind !== "sequence") {
+        throw new Error(`${scope.episodeId} interruption ${composition.id} kind sequence does not match selected ${mechanic.kind} mechanic ${mechanic.id}`);
+      }
       if (composition.choices.length !== mechanic.choiceCount
         || composition.steps.length !== mechanic.stepCount) {
-        throw new Error(`${scope.episodeId} interruption ${composition.id} must supply ${mechanic.choiceCount} choices and ${mechanic.stepCount} steps`);
+        throw new Error(`${scope.episodeId} interruption ${composition.id} supplies ${composition.choices.length} choices and ${composition.steps.length} steps; mechanic ${mechanic.id} requires ${mechanic.choiceCount} choices and ${mechanic.stepCount} steps`);
       }
       const choiceIds = new Set(composition.choices.map(({ id }) => id));
-      if (choiceIds.size !== composition.choices.length
-        || composition.steps.some((step) => !choiceIds.has(step))) {
-        throw new Error(`${scope.episodeId} interruption ${composition.id} steps must reference unique local choices`);
+      if (choiceIds.size !== composition.choices.length) {
+        throw new Error(`${scope.episodeId} interruption ${composition.id} choice IDs must be unique`);
+      }
+      const unknownStep = composition.steps.find((step) => !choiceIds.has(step));
+      if (unknownStep) {
+        throw new Error(`${scope.episodeId} interruption ${composition.id} step ${unknownStep} does not name one of this interruption's choices`);
       }
       if (new Set(composition.choices.map(({ key }) => key)).size !== composition.choices.length) {
         throw new Error(`${scope.episodeId} interruption ${composition.id} choice keys must be unique`);
       }
       interaction = { kind: "sequence", choices: composition.choices, steps: composition.steps };
-    } else if (composition.kind === "hold" && mechanic.kind === "hold") {
+    } else {
+      if (mechanic.kind !== "hold") {
+        throw new Error(`${scope.episodeId} interruption ${composition.id} kind hold does not match selected ${mechanic.kind} mechanic ${mechanic.id}`);
+      }
       if (mechanic.pressWindowBeats + mechanic.holdBeats > composition.activeBeats) {
         throw new Error(`${scope.episodeId} interruption ${composition.id} activeBeats cannot contain its press and hold windows`);
       }
@@ -235,8 +241,6 @@ export function compileConfrontationConfig(
         pressDeadlineMs: startsAtMs + mechanic.pressWindowBeats * beatMs,
         requiredHoldMs: mechanic.holdBeats * beatMs,
       };
-    } else {
-      throw new Error(`${scope.episodeId} interruption ${composition.id} has an incompatible mechanic`);
     }
     return {
       id: composition.id, warningStartsAtMs, startsAtMs, endsAtMs, returnsAtMs,

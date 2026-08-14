@@ -71,7 +71,8 @@ describe("game content loading", () => {
     expect(() => loadTestGame({
       ...gameContent,
       mechanics: {
-        resistance: { ...gameContent.mechanics.resistance, now: "NOW" },
+        ...gameContent.mechanics,
+        resistance: { ...gameContent.mechanics.resistance, cueTap: "NOW" },
       },
     }, campaignModules, episodeModules)).toThrow(/must contain exactly/);
   });

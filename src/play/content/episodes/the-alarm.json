@@ -3,7 +3,6 @@
   "id": "the-alarm",
   "title": "The Alarm",
   "definitions": {
-    "rhythms": [],
     "dramaticCurves": [
       {
         "schemaVersion": 1,

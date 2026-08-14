@@ -9,11 +9,12 @@
   "scripts": {
     "check:policy": "node scripts/check-project-policy.mjs",
     "check:static": "node scripts/check-static-build.mjs",
+    "validate:content": "node scripts/validate-content.mjs",
     "generate:site": "node scripts/generate-site-pages.mjs",
     "test": "vitest run",
     "dev": "npm run generate:site && vite",
     "preview": "vite preview",
-    "build": "npm run generate:site && npm run check:policy && tsc --noEmit && vite build && node scripts/finalize-static-build.mjs && npm run check:static",
+    "build": "npm run generate:site && npm run check:policy && npm run validate:content && tsc --noEmit && vite build && node scripts/finalize-static-build.mjs && npm run check:static",
     "test:watch": "vitest"
   },
   "repository": {

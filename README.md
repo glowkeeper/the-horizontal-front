@@ -43,7 +43,7 @@ The project is governed by the following digital-commons commitments:
 
 Educational notes connecting the game to mutual aid, labour history, enclosure, collective action and horizontal governance are a future ambition rather than a current requirement.
 
-The binding commitments are in the [project charter](PROJECT_CHARTER.md). The working game brief and architecture are described in the [game concept](docs/game-concept.md) and [technical architecture](docs/technical-architecture.md).
+The binding commitments are in the [project charter](PROJECT_CHARTER.md). The working game brief and architecture are described in the [game concept](docs/game-concept.md) and [technical architecture](docs/technical-architecture.md). Episode authors should start with the [episode grammar reference](docs/episode-grammar-reference.md).
 
 ## Project status
 
@@ -88,6 +88,7 @@ Useful project commands:
 | `npm test` | Run the Vitest test suite. |
 | `npm run test:watch` | Run tests in watch mode. |
 | `npm run check:policy` | Check the project’s architectural, privacy and charter constraints. |
+| `npm run validate:content` | Validate every campaign, episode, mechanic and presentation selection with author-readable errors. |
 | `npm run check:static` | Check the generated static and offline-capable build. |
 
 ## Project structure

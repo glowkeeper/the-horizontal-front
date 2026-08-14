@@ -5,6 +5,7 @@ import {
   type MechanicLibrary,
 } from "./loadMechanics";
 import { episodeSchema, type EpisodeContent } from "./schemas/episodeSchema";
+import { parseContent } from "./parseContent";
 
 export interface Episode extends Omit<EpisodeContent, "confrontation"> {
   readonly confrontation: Omit<EpisodeContent["confrontation"], "resistance" | "interruptions"> & {
@@ -15,7 +16,7 @@ export interface Episode extends Omit<EpisodeContent, "confrontation"> {
 }
 
 export function loadEpisode(content: unknown, mechanics: MechanicLibrary): Episode {
-  const episode = episodeSchema.parse(content);
+  const episode = parseContent("Episode content", episodeSchema, content);
   const dramaticCurve = episode.confrontation.resistance.dramaticCurve;
   const scope = createEpisodeMechanicScope(
     episode.id,

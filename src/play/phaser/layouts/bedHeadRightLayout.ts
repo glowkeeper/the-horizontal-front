@@ -14,13 +14,6 @@ export function createBedHeadRightLayout(
   scene: Phaser.Scene,
   episode: Episode,
 ): ResistanceLayout {
-  const selection = episode.confrontation.presentation;
-  if (selection.managementAction !== "lift-head") {
-    throw new Error(
-      `The bed-head-right layout does not support ${selection.managementAction}`,
-    );
-  }
-
   const { layout, skin, interruptionSkins } = loadPresentation(episode);
   const colours = getColours();
   const { backdrop, anchors, motion } = layout;

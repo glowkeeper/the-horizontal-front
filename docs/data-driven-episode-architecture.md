@@ -199,46 +199,23 @@ mechanics/
     urgent-email.json
 ```
 
-```text
-An episode consists of:
+The authoritative, author-facing description of the implemented format is the
+[episode grammar reference](episode-grammar-reference.md). In summary, an
+episode owns its identity, optional private mechanic definitions, one playable
+confrontation and exactly two authored outcomes: victory and forced
+verticalisation. Campaign briefings and debriefings belong to campaign JSON,
+not episode JSON.
 
-1 briefing
-1 confrontation
-1 result
+A confrontation selects a shared dramatic curve or one defined by its episode.
+A curve contains one or more ordered phases plus a resolution duration. A phase
+selects a rhythm and authors its duration, beat timing, pressure, recovery,
+resistance-strength response and continuous presentation intensity.
 
-A confrontation explicitly selects either a shared dramatic curve or one defined by its episode. A curve consists of one or more ordered phases and a resolution duration. `The Alarm` owns `alarm-escalation` inside its episode JSON because that composition is part of the episode's authorship; its phases reuse shared rhythm vocabulary.
-
-A phase may define:
-
-- Duration
-- Boss pressure
-- Catalogued rhythm ID
-- Beat interval, timing window and lead-in
-- Recovery and resistance-strength parameters
-- Continuous presentation intensity
-- Available attacks
-- Dialogue interruption
-- Visual state
-- Audio state
-
-The currently implemented interruption mechanics are:
-
-- Sequence
-- Hold
-
-The wider finite vocabulary may grow deliberately to include:
-
-- Dual hold
-- Reverse
-- Temptation
-- Offensive
-
-A result is:
-
-- Victory
-- Failure
-- Trap consequence
-```
+Interruptions are composed at confrontation level and anchored to a named phase
+and musical position. The currently implemented interruption mechanics are
+`sequence` and `hold`. Possible future capabilities such as dual hold, reverse,
+temptation or offensive are design ideas only and are not accepted episode
+vocabulary.
 
 Everything is selected from a documented set of valid pieces. The grammar is deliberately finite rather than pretending JSON can describe anything.
 
@@ -252,16 +229,8 @@ if (episode.id === "mandatory-wellness") {
 }
 ```
 
-It should understand generic, reusable capabilities:
-
-```ts
-runAttack({
-  type: "sequence",
-  prompt: "COMPLETE YOUR WELLBEING CHECK-IN",
-  choices: ["Thriving", "Energised", "Fully aligned"],
-  order: [2, 0, 1]
-});
-```
+It should understand only generic, reusable capabilities selected through the
+validated data described in the episode grammar reference.
 
 Every attack separates three concerns:
 
@@ -275,7 +244,14 @@ For example:
 
 ```json
 {
+  "id": "wellbeing-check-in",
+  "kind": "sequence",
   "mechanic": { "source": "shared", "id": "quick-call" },
+  "trigger": { "phase": "pressure", "afterCycles": 0, "afterBeats": 3 },
+  "warningBeats": 1,
+  "activeBeats": 3,
+  "returnCountInBeats": 3,
+  "consequences": { "successSafety": 0.03, "failureSafety": -0.04 },
   "presentation": {
     "skin": { "source": "shared", "id": "management-notification" }
   },
@@ -284,7 +260,18 @@ For example:
     { "id": "extremely", "label": "Extremely", "key": "Digit2" },
     { "id": "mandatory", "label": "Mandatory", "key": "Digit3" }
   ],
-  "steps": ["mandatory", "completely", "extremely"]
+  "steps": ["mandatory", "completely", "extremely"],
+  "copy": {
+    "warning": "INCOMING: WELLBEING CHECK-IN",
+    "headline": "MANDATORY WELLBEING",
+    "instruction": "COMPLETE THE ANSWERS IN ORDER",
+    "status": "Complete the highlighted answers in order.",
+    "success": "WELLBEING CONFIRMED",
+    "failure": "INCORRECT WELLBEING",
+    "expired": "WELLBEING AUTO-COMPLETED",
+    "cancelled": "CHECK-IN CANCELLED",
+    "returning": "BACK TO THE LINE"
+  }
 }
 ```
 
@@ -314,15 +301,9 @@ The commitment to data-driven episodes must not produce a sprawling scripting la
 - Embedded JavaScript.
 - Episode-specific state machines.
 
-Prefer a limited collection of readable, validated options:
-
-```json
-{
-  "onSuccess": "resume",
-  "onFailure": "increase-pressure",
-  "onIgnored": "award-non-compliance"
-}
-```
+Prefer the limited, readable options in the episode grammar reference. A future
+engine expansion must update that reference when it introduces a new validated
+choice; undocumented outcome commands are not accepted episode vocabulary.
 
 If the schema becomes difficult to explain on one reasonably sized reference page, it is becoming too clever.
 
@@ -410,7 +391,7 @@ If the answers are not convincing, rewrite the episode rather than enlarging the
 Once the engine exists, creating an episode should be a repeatable creative process:
 
 1. Write the political premise and punchline.
-2. Choose a briefing layout.
+2. Write the campaign briefing when the episode begins a new campaign.
 3. Select or commission the required poses and artwork.
 4. Arrange the cartoon in composition mode.
 5. Define pressure, rhythm and interruptions through the episode grammar, anchoring interruptions to musical phrase boundaries.
