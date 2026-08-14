@@ -39,6 +39,13 @@ the isolated, credential-free Playwright MCP reviewer, repository-owned browser
 tests, CI execution and diagnostic artefacts. Report the result using the
 authoritative [verification evidence](verification-evidence.md) vocabulary.
 
+## I want to prepare a production release
+
+Read [release process](release-process.md) for production invariants, supported
+environment claims, the no-placeholders rule, versioning and the Cloudflare
+publication and rollback sequence. Read [art direction](art-direction.md)
+before producing, integrating or approving visual assets.
+
 ## I want to make or review a design decision
 
 Read the [game concept](game-concept.md), [design
@@ -62,6 +69,8 @@ substitute for that context.
 | Runtime and delivery architecture | [Technical architecture](technical-architecture.md) |
 | Verification claims and evidence levels | [Verification evidence](verification-evidence.md) |
 | Browser-review tooling and safety | [Browser verification](browser-verification.md) |
+| Production release readiness and publication | [Release process](release-process.md) |
+| Provisional production visual direction | [Art direction](art-direction.md) |
 | Evidence and design inferences | [Research index](research/README.md) |
 
 Some defining constraints are intentionally repeated for the audience that

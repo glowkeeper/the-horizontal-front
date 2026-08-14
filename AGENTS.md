@@ -43,6 +43,9 @@ Read the relevant documents before changing product behaviour:
 - `docs/content-architecture.md`
 - `docs/episode-grammar-reference.md`
 - `docs/technical-architecture.md`
+- `docs/art-direction.md` when a change touches artwork or visual composition
+- `docs/release-process.md` when a change touches production readiness,
+  versioning, support claims, deployment or release publication
 - `docs/research/` when a change touches a researched interaction or accessibility decision
 
 Do not dilute the satire into a generic sleep, wellness or productivity game.

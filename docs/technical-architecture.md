@@ -14,7 +14,14 @@ The Horizontal Front is a web-first 2D game using:
 - **No application backend.** Device-local settings and progress can use browser storage.
 - **No tracking or monetisation.** The deployed game does not require analytics, advertising, payments or player accounts.
 
-The current release target is a responsive, landscape-oriented browser game with touch, keyboard and pointer support.
+The current release target is a responsive, landscape-oriented browser game.
+The initial production support matrix requires desktop Google Chrome with
+keyboard and pointer input and Google Chrome on a real Android device in
+landscape with touch input. Audio-enabled and muted play are both required.
+Exact browser and device versions remain release evidence rather than permanent
+architectural claims; other environments are not claimed until they are
+deliberately verified. The durable readiness and publication rules are recorded in
+[Release process](release-process.md).
 
 ## Static public shell
 
