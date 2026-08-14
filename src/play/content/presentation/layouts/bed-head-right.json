@@ -49,6 +49,25 @@
     "interruptionInstructionOffsetY": -30,
     "interruptionActionOffsetY": 38
   },
+  "rhythmPresentation": {
+    "typography": { "titleSizePx": 25, "controlSizePx": 15, "feedbackSizePx": 19, "cueSizePx": 18 },
+    "layers": { "result": 20, "successfulNote": 10, "missedNote": 12 },
+    "strokes": { "guide": 2, "successfulNote": 4, "missedNote": 2 },
+    "opacity": { "inactiveGate": 0.28, "inactiveLabel": 0.55, "holdBarMultiplier": 0.7 },
+    "guide": { "tailRadiusMultiplier": 0.78, "releaseTailScale": 1.3 },
+    "feedback": { "initialScale": 1.12, "durationMs": 140, "ease": "Back.Out" },
+    "successfulNote": { "finalScale": 2, "durationMs": 180, "ease": "Quad.Out" },
+    "expiredNote": {
+      "crossWidthMultiplier": 1.3, "crossThickness": 4, "crossAngleDegrees": 45,
+      "escapeDistanceMultiplier": 4, "durationMs": 360, "ease": "Quad.Out"
+    },
+    "brokenHold": {
+      "minimumWidthMultiplier": 1.4, "gateWidthMultiplier": 0.42,
+      "fragmentOffsetMultiplier": 0.58, "fragmentYOffset": 4, "fragmentAngleDegrees": 8,
+      "escapeXMultiplier": 3, "escapeYMultiplier": 2, "durationMs": 320, "ease": "Quad.In"
+    },
+    "outcomeActions": { "horizontalOffset": 220, "width": 360 }
+  },
   "motion": {
     "danger": { "bedAngleDegrees": -18, "duvetX": -300, "sleeperX": -130, "workLightAlpha": 0.62 },
     "rest": { "workLightAlpha": 0.08 },

@@ -186,7 +186,9 @@ const rectangleSchema = z.object({
   originY: unitIntervalSchema.optional(),
 }).strict();
 
-const easeSchema = z.enum(["Sine.Out", "Back.In", "Quad.In"]);
+const easeSchema = z.enum([
+  "Sine.Out", "Back.In", "Back.Out", "Quad.In", "Quad.Out",
+]);
 
 export const resistanceLayoutSchema = z.object({
   schemaVersion: z.literal(1),
@@ -243,6 +245,52 @@ export const resistanceLayoutSchema = z.object({
     interruptionHeadlineOffsetY: z.number(),
     interruptionInstructionOffsetY: z.number(),
     interruptionActionOffsetY: z.number(),
+  }).strict(),
+  rhythmPresentation: z.object({
+    typography: z.object({
+      titleSizePx: positiveSizeSchema,
+      controlSizePx: positiveSizeSchema,
+      feedbackSizePx: positiveSizeSchema,
+      cueSizePx: positiveSizeSchema,
+    }).strict(),
+    layers: z.object({
+      result: z.number(), successfulNote: z.number(), missedNote: z.number(),
+    }).strict(),
+    strokes: z.object({
+      guide: positiveSizeSchema, successfulNote: positiveSizeSchema,
+      missedNote: positiveSizeSchema,
+    }).strict(),
+    opacity: z.object({
+      inactiveGate: unitIntervalSchema,
+      inactiveLabel: unitIntervalSchema,
+      holdBarMultiplier: unitIntervalSchema,
+    }).strict(),
+    guide: z.object({
+      tailRadiusMultiplier: z.number().positive().max(1),
+      releaseTailScale: z.number().min(1),
+    }).strict(),
+    feedback: z.object({
+      initialScale: z.number().min(1), durationMs: z.number().int().positive(), ease: easeSchema,
+    }).strict(),
+    successfulNote: z.object({
+      finalScale: z.number().min(1), durationMs: z.number().int().positive(), ease: easeSchema,
+    }).strict(),
+    expiredNote: z.object({
+      crossWidthMultiplier: z.number().positive(), crossThickness: positiveSizeSchema,
+      crossAngleDegrees: z.number().min(0).max(180),
+      escapeDistanceMultiplier: z.number().positive(),
+      durationMs: z.number().int().positive(), ease: easeSchema,
+    }).strict(),
+    brokenHold: z.object({
+      minimumWidthMultiplier: z.number().positive(), gateWidthMultiplier: z.number().positive(),
+      fragmentOffsetMultiplier: z.number().positive(), fragmentYOffset: positiveSizeSchema,
+      fragmentAngleDegrees: z.number().min(0).max(180),
+      escapeXMultiplier: z.number().positive(), escapeYMultiplier: z.number().positive(),
+      durationMs: z.number().int().positive(), ease: easeSchema,
+    }).strict(),
+    outcomeActions: z.object({
+      horizontalOffset: positiveSizeSchema, width: positiveSizeSchema,
+    }).strict(),
   }).strict(),
   motion: z.object({
     danger: z.object({

@@ -30,6 +30,18 @@ describe("confrontation coordinator", () => {
     ))).toBe("resistance");
   });
 
+  it("removes a judged note from the guide immediately", () => {
+    const cue = config.resistance.cues[0];
+    let confrontation = advanceConfrontation(createConfrontation(config), cue.atMs);
+    confrontation = applyConfrontationInput(confrontation, {
+      kind: "resistance", side: cue.side, action: "press", atMs: cue.atMs,
+    });
+    expect(getRhythmGuide(confrontation.resistance).some(
+      (item) => (item.action === "tap" || item.action === "hold")
+        && item.atMs === cue.atMs,
+    )).toBe(false);
+  });
+
   it("compiles interruptions onto non-overlapping musical windows", () => {
     expect(config.interruptions.map(({ id }) => id)).toEqual([
       "quick-call-from-management",
@@ -66,6 +78,9 @@ describe("confrontation coordinator", () => {
     confrontation = advanceConfrontation(confrontation, attack.startsAtMs);
     expect(getInterruptionPresentationState(confrontation).stage).toBe("active");
     expect(getConfrontationControlOwner(confrontation)).toBe("interruption");
+    confrontation = advanceConfrontation(confrontation, attack.endsAtMs);
+    expect(getInterruptionPresentationState(confrontation).stage).toBe("returning");
+    expect(getConfrontationControlOwner(confrontation)).toBe("none");
   });
 
   it("resolves the ordered Quick Call by recognition and suspends input until return", () => {
@@ -150,6 +165,15 @@ describe("confrontation coordinator", () => {
     expect(cancelled.resistance.state.duvetSafety).toBe(safetyBeforeCancellation);
   });
 
+  it("ignores cancellation unless a hold is actually in progress", () => {
+    const ready = reachSecondInterruption();
+    const unchanged = applyConfrontationInput(ready, {
+      kind: "hold", action: "cancel",
+      atMs: ready.resistance.state.elapsedMs,
+    });
+    expect(unchanged.activeInterruption).toEqual(ready.activeInterruption);
+  });
+
   it("reports a late Urgent Email press instead of silently ignoring it", () => {
     const ready = reachSecondInterruption();
     const attack = config.interruptions[1];
@@ -180,6 +204,18 @@ describe("confrontation coordinator", () => {
     expect(confrontation.resistance.state.duvetSafety)
       .toBeCloseTo(safetyAfterConsequence);
     expect(getConfrontationControlOwner(confrontation)).toBe("none");
+  });
+
+  it("discards resistance input while an interruption owns the controls", () => {
+    const attack = config.interruptions[0];
+    const ready = advanceConfrontation(createConfrontation(config), attack.startsAtMs);
+    const nextCueStep = ready.resistance.state.nextRhythmStep;
+    const ignored = applyConfrontationInput(ready, {
+      kind: "resistance", side: "left", action: "press", atMs: attack.startsAtMs,
+    });
+    expect(ignored.resistance.state.nextRhythmStep).toBe(nextCueStep);
+    expect(ignored.resistance.state.lastRhythmJudgement)
+      .toEqual(ready.resistance.state.lastRhythmJudgement);
   });
 });
 

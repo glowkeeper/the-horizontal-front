@@ -44,7 +44,9 @@ async function findEmbeddedPlayerCopy(directory) {
 
 async function findHardCodedPresentationValues(directory) {
   const findings = [];
-  const files = (await listFiles(directory)).filter((file) => file.endsWith(".ts"));
+  const files = directory.endsWith(".ts")
+    ? [directory]
+    : (await listFiles(directory)).filter((file) => file.endsWith(".ts"));
   const authoredValuePatterns = [
     /fontSize\s*:\s*["'`]\d/g,
     /\.setDepth\(\s*-?\d/g,
@@ -135,9 +137,14 @@ const discoveredInterruptionFiles = (await listFiles(join(mechanicRoot, "interru
 const embeddedPlayerCopy = await findEmbeddedPlayerCopy(
   join(projectRoot, "src/play"),
 );
-const hardCodedPresentationValues = await findHardCodedPresentationValues(
-  join(projectRoot, "src/play/phaser/presentation"),
-);
+const hardCodedPresentationValues = [
+  ...await findHardCodedPresentationValues(
+    join(projectRoot, "src/play/phaser/presentation"),
+  ),
+  ...await findHardCodedPresentationValues(
+    join(projectRoot, "src/play/phaser/scenes/ResistanceScene.ts"),
+  ),
+];
 
 requirePolicy(
   embeddedPlayerCopy.length === 0,
@@ -145,7 +152,7 @@ requirePolicy(
 );
 requirePolicy(
   hardCodedPresentationValues.length === 0,
-  `Phaser presentation modules must resolve authored visual values from validated layout, skin or theme data: ${hardCodedPresentationValues.join(", ")}`,
+  `Resistance Phaser presentation must resolve authored visual values from validated layout, skin or theme data: ${hardCodedPresentationValues.join(", ")}`,
 );
 
 requirePolicy(

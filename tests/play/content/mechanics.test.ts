@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import episodeContent from "../../../src/play/content/episodes/the-alarm.json";
 import straightAlternationContent from "../../../src/play/content/mechanics/rhythms/straight-alternation.json";
 import { game, mechanics } from "../../../src/play/content/game";
+import { loadEpisode } from "../../../src/play/content/loadEpisode";
 import {
   compileResistanceConfig,
   createEpisodeMechanicScope,
@@ -58,7 +59,7 @@ describe("catalogued resistance composition", () => {
       config.cues[0].atMs - config.cues[0].timingWindowMs,
     );
     expect(config.guideEvents.some((event) =>
-      event.action === "rest" && event.phaseIndex === 2)).toBe(true);
+      event.action === "rest" && event.phaseIndex === 1)).toBe(true);
     expect(config.guideEvents.some((event) =>
       event.action === "rest" && event.phaseIndex === 3)).toBe(false);
     const establishmentIndex = config.phases.findIndex(
@@ -75,6 +76,24 @@ describe("catalogued resistance composition", () => {
     }));
     expect(config.cues.every((cue, index) => index === 0 || cue.atMs >= config.cues[index - 1].atMs))
       .toBe(true);
+    expect(config.guideEvents
+      .filter(({ action }) => action === "tap" || action === "hold")
+      .map(({ atMs }) => atMs))
+      .toEqual(config.cues.map(({ atMs }) => atMs));
+  });
+
+  it("rejects an interruption which begins during an occupied hold", () => {
+    expect(() => loadEpisode({
+      ...episodeContent,
+      confrontation: {
+        ...episodeContent.confrontation,
+        interruptions: episodeContent.confrontation.interruptions.map(
+          (interruption, index) => index === 0
+            ? { ...interruption, trigger: { ...interruption.trigger, afterBeats: 2 } }
+            : interruption,
+        ),
+      },
+    }, mechanics)).toThrow(/starts during a hold event/);
   });
 
   it("keeps The Alarm's curve episode-owned while composing shared rhythms", () => {

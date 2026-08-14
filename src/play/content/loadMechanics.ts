@@ -192,9 +192,13 @@ export function compileConfrontationConfig(
     );
     const beatMs = phase.beatIntervalMs;
     const cycleMs = rhythm.cycleBeats * beatMs;
+    if (composition.trigger.afterBeats >= rhythm.cycleBeats) {
+      throw new Error(`${scope.episodeId} interruption ${composition.id} trigger afterBeats must fall inside its rhythm cycle`);
+    }
     const startsAtMs = compiledPhase.startsAtMs
       + phase.leadInBeats * beatMs
-      + composition.trigger.afterCycles * cycleMs;
+      + composition.trigger.afterCycles * cycleMs
+      + composition.trigger.afterBeats * beatMs;
     const warningStartsAtMs = startsAtMs - composition.warningBeats * beatMs;
     const endsAtMs = startsAtMs + composition.activeBeats * beatMs;
     const returnsAtMs = endsAtMs
@@ -246,13 +250,31 @@ export function compileConfrontationConfig(
       throw new Error(`${scope.episodeId} interruption windows must not overlap`);
     }
   }
-  const blocked = (atMs: number, timingWindowMs = 0) => interruptions.some((attack) =>
-    atMs + timingWindowMs > attack.startsAtMs
-    && atMs - timingWindowMs < attack.returnsAtMs);
-  const cues = resistance.cues.filter((cue) => !blocked(cue.atMs, cue.timingWindowMs));
-  const guideEvents = resistance.guideEvents.filter((event) =>
-    !interruptions.some((attack) => event.endsAtMs > attack.startsAtMs
-      && event.atMs < attack.returnsAtMs));
+  for (const attack of interruptions) {
+    const collision = resistance.guideEvents.find((event) => {
+      const interval = guideEventInterval(event);
+      return interval.startsAtMs < attack.startsAtMs
+        && interval.endsAtMs > attack.startsAtMs;
+    });
+    if (collision) {
+      throw new Error(
+        `${scope.episodeId} interruption ${attack.id} starts during a ${collision.action} event`,
+      );
+    }
+  }
+  const overlapsAttack = (startsAtMs: number, endsAtMs: number) =>
+    interruptions.some((attack) =>
+      endsAtMs > attack.startsAtMs && startsAtMs < attack.returnsAtMs);
+  const cues = resistance.cues.filter((cue) => {
+    const interval = cueInterval(cue);
+    return !overlapsAttack(interval.startsAtMs, interval.endsAtMs);
+  });
+  const guideEvents = resistance.guideEvents.flatMap((event) => {
+    const interval = guideEventInterval(event);
+    if (!overlapsAttack(interval.startsAtMs, interval.endsAtMs)) return [event];
+    if (event.action === "tap" || event.action === "hold") return [];
+    return subtractInterruptionWindows(event, interruptions);
+  });
   for (const attack of interruptions) {
     const phaseIndex = resistance.phases.findIndex((phase) =>
       attack.startsAtMs >= phase.startsAtMs && attack.startsAtMs < phase.endsAtMs);
@@ -267,6 +289,55 @@ export function compileConfrontationConfig(
   }
   guideEvents.sort((left, right) => left.atMs - right.atMs);
   return { resistance: { ...resistance, cues, guideEvents }, interruptions };
+}
+
+function cueInterval(cue: ScoredRhythmCue): {
+  readonly startsAtMs: number;
+  readonly endsAtMs: number;
+} {
+  return {
+    startsAtMs: cue.atMs - cue.timingWindowMs,
+    endsAtMs: (cue.releaseAtMs ?? cue.atMs) + cue.timingWindowMs,
+  };
+}
+
+function guideEventInterval(event: RhythmGuideEvent): {
+  readonly startsAtMs: number;
+  readonly endsAtMs: number;
+} {
+  return {
+    startsAtMs: event.action === "tap" || event.action === "hold"
+      ? event.atMs - event.timingWindowMs
+      : event.atMs,
+    endsAtMs: event.endsAtMs,
+  };
+}
+
+function subtractInterruptionWindows(
+  event: Extract<RhythmGuideEvent, { readonly action: "rest" | "count-in" | "interruption" }>,
+  interruptions: readonly InterruptionConfig[],
+): RhythmGuideEvent[] {
+  let segments = [{ startsAtMs: event.atMs, endsAtMs: event.endsAtMs }];
+  for (const attack of interruptions) {
+    segments = segments.flatMap((segment) => {
+      if (segment.endsAtMs <= attack.startsAtMs
+        || segment.startsAtMs >= attack.returnsAtMs) return [segment];
+      return [
+        segment.startsAtMs < attack.startsAtMs
+          ? { startsAtMs: segment.startsAtMs, endsAtMs: attack.startsAtMs }
+          : null,
+        segment.endsAtMs > attack.returnsAtMs
+          ? { startsAtMs: attack.returnsAtMs, endsAtMs: segment.endsAtMs }
+          : null,
+      ].filter((candidate): candidate is { startsAtMs: number; endsAtMs: number } =>
+        candidate !== null && candidate.endsAtMs > candidate.startsAtMs);
+    });
+  }
+  return segments.map((segment) => ({
+    ...event,
+    atMs: segment.startsAtMs,
+    endsAtMs: segment.endsAtMs,
+  }));
 }
 
 function alignPausesWithInputWindows(

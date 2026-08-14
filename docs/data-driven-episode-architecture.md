@@ -290,9 +290,9 @@ For example:
 
 Quick Call and Wellbeing Check-In can therefore use the same mechanic with different presentation.
 
-An interruption composition anchors a reusable mechanic to a musical boundary using a phase ID and completed cycle count. It supplies warning, active and return durations in beats—not unrelated wall-clock offsets—and declares bounded success and failure safety consequences. Compilation resolves beats through the selected phase tempo, rejects unknown phases, incompatible mechanic kinds, malformed choices and overlapping windows, removes resistance cues that would collide with the interruption, and emits pressure-pausing active and count-in intervals.
+An interruption composition anchors a reusable mechanic to a musical boundary using a phase ID, completed cycle count and an optional beat offset within that cycle. It supplies warning, active and return durations in beats—not unrelated wall-clock offsets—and declares bounded success and failure safety consequences. Compilation resolves beats through the selected phase tempo, rejects unknown phases, incompatible mechanic kinds, malformed choices, overlapping windows and starts inside an occupied tap, hold, rest or count-in interval. Cue and guide filtering use the same complete occupied intervals, including hold tails, before emitting pressure-pausing active and count-in intervals.
 
-The return boundary is the opening edge of the next resistance input window rather than the note's centre time. This means the engine and interface return control precisely when that note first becomes playable.
+The return boundary is the end of the authored count-in, expressed against the phase's musical clock. Resistance control becomes available there; an authored rest may deliberately follow before the next playable input window. Presentation validation separately guarantees that the first returning note can make its complete visible approach after the interruption panel clears.
 
 Sequence choices have stable local IDs, labels and keyboard bindings. Their ordered steps may reference only those choices. Hold mechanics define a press window and required duration in beats; episode presentation supplies the control label and confrontation copy. Browser or hardware cancellation is a neutral resolved outcome, distinct from a deliberate early release.
 

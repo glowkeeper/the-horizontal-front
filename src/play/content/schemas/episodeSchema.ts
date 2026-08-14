@@ -29,6 +29,7 @@ const interruptionBaseSchema = z.object({
   trigger: z.object({
     phase: contentIdSchema,
     afterCycles: z.number().int().nonnegative(),
+    afterBeats: z.number().nonnegative().default(0),
   }).strict(),
   warningBeats: z.number().int().positive().max(8),
   activeBeats: z.number().int().positive().max(16),
@@ -49,7 +50,7 @@ const interruptionCompositionSchema = z.discriminatedUnion("kind", [
     choices: z.array(z.object({
       id: contentIdSchema,
       label: shortCopy,
-      key: z.enum(["Digit1", "Digit2", "Digit3", "Digit4", "Digit5", "Digit6"]),
+      key: z.enum(["Digit1", "Digit2", "Digit3"]),
     }).strict()).min(2).max(3),
     steps: z.array(contentIdSchema).min(1).max(8),
   }).strict(),

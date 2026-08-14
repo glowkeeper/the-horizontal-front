@@ -108,6 +108,7 @@ export function applyConfrontationInput(
   }
   if (input.kind === "hold" && attack.interaction.kind === "hold") {
     if (input.action === "cancel") {
+      if (next.activeInterruption.holdStartedAtMs === null) return next;
       return resolveInterruption(next, "cancelled", "cancelled");
     }
     if (input.action === "press") {
@@ -145,7 +146,7 @@ export function getConfrontationControlOwner(
   const attack = confrontation.config.interruptions[active.index];
   const elapsedMs = confrontation.resistance.state.elapsedMs;
   if (active.outcome === null && elapsedMs >= attack.startsAtMs
-    && elapsedMs <= attack.endsAtMs) return "interruption";
+    && elapsedMs < attack.endsAtMs) return "interruption";
   return "none";
 }
 

@@ -167,7 +167,7 @@ export function getRhythmGuide(
   let actionIndex = 0;
   const visible = resistance.config.guideEvents
     .filter((event) => {
-      if (event.action === "rest" || event.action === "count-in") {
+      if (event.action !== "tap" && event.action !== "hold") {
         return event.endsAtMs > elapsedMs;
       }
       const completed = actionIndex < resistance.state.nextRhythmStep;

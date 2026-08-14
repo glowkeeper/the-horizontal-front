@@ -172,11 +172,12 @@ export class ResistanceScene extends Phaser.Scene {
       this.episode,
     );
     const { anchors } = this.layout.content;
+    const presentation = this.layout.content.rhythmPresentation;
 
     this.add
       .text(anchors.title.x, anchors.title.y, this.episode.confrontation.copy.headline, {
         ...createTextStyles().notice,
-        fontSize: "25px",
+        fontSize: presentation.typography.titleSizePx,
       })
       .setOrigin(0.5);
 
@@ -193,7 +194,7 @@ export class ResistanceScene extends Phaser.Scene {
     this.result = this.add
       .text(anchors.result.x, anchors.result.y, "", createTextStyles().title)
       .setOrigin(0.5)
-      .setDepth(20)
+      .setDepth(presentation.layers.result)
       .setVisible(false);
 
   }
@@ -201,6 +202,7 @@ export class ResistanceScene extends Phaser.Scene {
   private createRhythmInterface(): void {
     const colours = this.colours();
     const { anchors, controls } = this.layout.content;
+    const presentation = this.layout.content.rhythmPresentation;
     const maximumGateWidth = this.gateWidth(controls.maximumTimingWindowMs);
     const maximumLaneWidth = Math.max(
       anchors.feedback.x,
@@ -240,13 +242,13 @@ export class ResistanceScene extends Phaser.Scene {
     this.leftCueLabel = this.add
       .text(anchors.leftControl.x, anchors.leftControl.y + controls.controlLabelOffsetY, game.mechanics.resistance.leftControl, {
         ...createTextStyles().notice,
-        fontSize: "15px",
+        fontSize: presentation.typography.controlSizePx,
       })
       .setOrigin(0.5);
     this.rightCueLabel = this.add
       .text(anchors.rightControl.x, anchors.rightControl.y + controls.controlLabelOffsetY, game.mechanics.resistance.rightControl, {
         ...createTextStyles().notice,
-        fontSize: "15px",
+        fontSize: presentation.typography.controlSizePx,
       })
       .setOrigin(0.5);
 
@@ -257,19 +259,23 @@ export class ResistanceScene extends Phaser.Scene {
           0, 0, maximumLaneWidth, controls.noteRadius, colours.managementGold,
         )
           .setOrigin(0.5)
-          .setStrokeStyle(2, colours.inkCharcoal)
+          .setStrokeStyle(presentation.strokes.guide, colours.inkCharcoal)
           .setVisible(false),
         heldBar: this.add.rectangle(
           0, 0, maximumLaneWidth, controls.noteRadius, colours.workLightBlue,
         )
           .setOrigin(0.5)
-          .setStrokeStyle(2, colours.inkCharcoal)
+          .setStrokeStyle(presentation.strokes.guide, colours.inkCharcoal)
           .setVisible(false),
         note: this.add.circle(0, 0, controls.noteRadius, colours.managementGold)
-          .setStrokeStyle(2, colours.inkCharcoal)
+          .setStrokeStyle(presentation.strokes.guide, colours.inkCharcoal)
           .setVisible(false),
-        tail: this.add.circle(0, 0, controls.noteRadius * 0.78, colours.managementGold)
-          .setStrokeStyle(2, colours.inkCharcoal)
+        tail: this.add.circle(
+          0, 0,
+          controls.noteRadius * presentation.guide.tailRadiusMultiplier,
+          colours.managementGold,
+        )
+          .setStrokeStyle(presentation.strokes.guide, colours.inkCharcoal)
           .setVisible(false),
       }),
     );
@@ -295,7 +301,7 @@ export class ResistanceScene extends Phaser.Scene {
     this.feedback = this.add
       .text(anchors.feedback.x, anchors.feedback.y, "", {
         ...createTextStyles().status,
-        fontSize: "19px",
+        fontSize: presentation.typography.feedbackSizePx,
       })
       .setOrigin(0.5)
       .setVisible(false);
@@ -304,7 +310,7 @@ export class ResistanceScene extends Phaser.Scene {
       ...createTextStyles().notice,
       align: "center",
       fixedWidth: controls.cueLabelWidth,
-      fontSize: "18px",
+      fontSize: presentation.typography.cueSizePx,
     }).setOrigin(0.5);
   }
 
@@ -430,11 +436,14 @@ export class ResistanceScene extends Phaser.Scene {
     const cancelPointer = () => this.cancelInterruptionHold();
     const canvas = this.game.canvas;
     window.addEventListener("blur", cancel);
-    document.addEventListener("visibilitychange", cancel);
+    const cancelWhenHidden = () => {
+      if (document.hidden) cancel();
+    };
+    document.addEventListener("visibilitychange", cancelWhenHidden);
     canvas.addEventListener("pointercancel", cancelPointer);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       window.removeEventListener("blur", cancel);
-      document.removeEventListener("visibilitychange", cancel);
+      document.removeEventListener("visibilitychange", cancelWhenHidden);
       canvas.removeEventListener("pointercancel", cancelPointer);
     });
   }
@@ -492,14 +501,15 @@ export class ResistanceScene extends Phaser.Scene {
     const gateScale = gateWidth / maximumGateWidth;
     this.leftCue.setScale(gateScale, 1);
     this.rightCue.setScale(gateScale, 1);
-    this.leftCue.setAlpha(0.28);
-    this.rightCue.setAlpha(0.28);
+    const presentation = this.layout.content.rhythmPresentation;
+    this.leftCue.setAlpha(presentation.opacity.inactiveGate);
+    this.rightCue.setAlpha(presentation.opacity.inactiveGate);
     this.leftCueLabel
-      .setAlpha(0.55)
+      .setAlpha(presentation.opacity.inactiveLabel)
       .setColor(getThemeColour("inkCharcoal"))
       .setText(game.mechanics.resistance.leftControl);
     this.rightCueLabel
-      .setAlpha(0.55)
+      .setAlpha(presentation.opacity.inactiveLabel)
       .setColor(getThemeColour("inkCharcoal"))
       .setText(game.mechanics.resistance.rightControl);
     this.leftCue.setStrokeStyle(
@@ -578,6 +588,7 @@ export class ResistanceScene extends Phaser.Scene {
 
   private renderRhythmGuide(guide: readonly RhythmGuideItem[]): void {
     const controls = this.layout.content.controls;
+    const controlsPresentation = this.layout.content.rhythmPresentation;
     const { anchors } = this.layout.content;
     const elapsedMs = this.resistance.state.elapsedMs;
     const actions = guide.filter((item): item is RhythmGuideItem & {
@@ -643,7 +654,7 @@ export class ResistanceScene extends Phaser.Scene {
             / maximumLaneWidth,
           1,
         )
-        .setAlpha(alpha * 0.7)
+        .setAlpha(alpha * controlsPresentation.opacity.holdBarMultiplier)
         .setVisible(true);
       const cue = getNextRhythmCue(this.resistance);
       const holding = cue !== null
@@ -668,7 +679,7 @@ export class ResistanceScene extends Phaser.Scene {
         && Math.abs(item.releaseAtMs - elapsedMs) <= item.timingWindowMs;
       visual.tail
         .setPosition(tailPosition.x, target.y)
-        .setScale(releaseIsNow ? 1.3 : 1)
+        .setScale(releaseIsNow ? controlsPresentation.guide.releaseTailScale : 1)
         .setAlpha(Phaser.Math.Linear(
           controls.noteMinimumAlpha,
           1,
@@ -738,14 +749,15 @@ export class ResistanceScene extends Phaser.Scene {
     const feedbackSide = judgement.actualSide ?? judgement.expectedSide;
     const control = feedbackSide === "left" ? this.leftCue : this.rightCue;
     control.setAlpha(1);
-    this.feedback.setScale(1.12);
+    const presentation = this.layout.content.rhythmPresentation;
+    this.feedback.setScale(presentation.feedback.initialScale);
     this.feedback.setVisible(true);
     this.tweens.add({
       targets: this.feedback,
       scaleX: 1,
       scaleY: 1,
-      duration: 140,
-      ease: "Back.Out",
+      duration: presentation.feedback.durationMs,
+      ease: presentation.feedback.ease,
     });
 
     if (judgement.kind === "hit") {
@@ -792,6 +804,7 @@ export class ResistanceScene extends Phaser.Scene {
   }
 
   private animateSuccessfulNote(side: ResistanceSide): void {
+    const presentation = this.layout.content.rhythmPresentation;
     const target = side === "left"
       ? this.layout.content.anchors.leftControl
       : this.layout.content.anchors.rightControl;
@@ -801,14 +814,14 @@ export class ResistanceScene extends Phaser.Scene {
       this.layout.content.controls.noteRadius,
     )
       .setFillStyle(this.colours().paperWhite, 0)
-      .setStrokeStyle(4, this.colours().workLightBlue)
-      .setDepth(10);
+      .setStrokeStyle(presentation.strokes.successfulNote, this.colours().workLightBlue)
+      .setDepth(presentation.layers.successfulNote);
     this.tweens.add({
       targets: burst,
-      scale: 2,
+      scale: presentation.successfulNote.finalScale,
       alpha: 0,
-      duration: 180,
-      ease: "Quad.Out",
+      duration: presentation.successfulNote.durationMs,
+      ease: presentation.successfulNote.ease,
       onComplete: () => burst.destroy(),
     });
   }
@@ -821,23 +834,29 @@ export class ResistanceScene extends Phaser.Scene {
       : this.layout.content.anchors.rightControl;
     const direction = side === "left" ? -1 : 1;
     const radius = this.layout.content.controls.noteRadius;
+    const presentation = this.layout.content.rhythmPresentation;
+    const expired = presentation.expiredNote;
     const startX = target.x + direction
       * cue.timingWindowMs
       * this.layout.content.controls.noteTravelPixelsPerMs;
     const note = this.add.circle(0, 0, radius, this.colours().resistanceRed)
-      .setStrokeStyle(2, this.colours().inkCharcoal);
-    const crossOne = this.add.rectangle(0, 0, radius * 1.3, 4, this.colours().paperWhite)
-      .setAngle(45);
-    const crossTwo = this.add.rectangle(0, 0, radius * 1.3, 4, this.colours().paperWhite)
-      .setAngle(-45);
+      .setStrokeStyle(presentation.strokes.missedNote, this.colours().inkCharcoal);
+    const crossOne = this.add.rectangle(
+      0, 0, radius * expired.crossWidthMultiplier,
+      expired.crossThickness, this.colours().paperWhite,
+    ).setAngle(expired.crossAngleDegrees);
+    const crossTwo = this.add.rectangle(
+      0, 0, radius * expired.crossWidthMultiplier,
+      expired.crossThickness, this.colours().paperWhite,
+    ).setAngle(-expired.crossAngleDegrees);
     const escaped = this.add.container(startX, target.y, [note, crossOne, crossTwo])
-      .setDepth(12);
+      .setDepth(presentation.layers.missedNote);
     this.tweens.add({
       targets: escaped,
-      x: startX + direction * radius * 4,
+      x: startX + direction * radius * expired.escapeDistanceMultiplier,
       alpha: 0,
-      duration: 360,
-      ease: "Quad.Out",
+      duration: expired.durationMs,
+      ease: expired.ease,
       onComplete: () => escaped.destroy(true),
     });
   }
@@ -849,36 +868,42 @@ export class ResistanceScene extends Phaser.Scene {
       ? this.layout.content.anchors.leftControl
       : this.layout.content.anchors.rightControl;
     const direction = side === "left" ? -1 : 1;
+    const presentation = this.layout.content.rhythmPresentation;
+    const brokenStyle = presentation.brokenHold;
     const fragmentWidth = Math.max(
-      this.layout.content.controls.noteRadius * 1.4,
-      this.gateWidth(cue.timingWindowMs) * 0.42,
+      this.layout.content.controls.noteRadius * brokenStyle.minimumWidthMultiplier,
+      this.gateWidth(cue.timingWindowMs) * brokenStyle.gateWidthMultiplier,
     );
     const leftFragment = this.add.rectangle(
-      -fragmentWidth * 0.58,
-      -4,
+      -fragmentWidth * brokenStyle.fragmentOffsetMultiplier,
+      -brokenStyle.fragmentYOffset,
       fragmentWidth,
       this.layout.content.controls.noteRadius,
       this.colours().resistanceRed,
-    ).setStrokeStyle(2, this.colours().inkCharcoal).setAngle(-8);
+    ).setStrokeStyle(presentation.strokes.missedNote, this.colours().inkCharcoal)
+      .setAngle(-brokenStyle.fragmentAngleDegrees);
     const rightFragment = this.add.rectangle(
-      fragmentWidth * 0.58,
-      4,
+      fragmentWidth * brokenStyle.fragmentOffsetMultiplier,
+      brokenStyle.fragmentYOffset,
       fragmentWidth,
       this.layout.content.controls.noteRadius,
       this.colours().resistanceRed,
-    ).setStrokeStyle(2, this.colours().inkCharcoal).setAngle(8);
+    ).setStrokeStyle(presentation.strokes.missedNote, this.colours().inkCharcoal)
+      .setAngle(brokenStyle.fragmentAngleDegrees);
     const broken = this.add.container(
       target.x,
       target.y,
       [leftFragment, rightFragment],
-    ).setDepth(12);
+    ).setDepth(presentation.layers.missedNote);
     this.tweens.add({
       targets: broken,
-      x: target.x + direction * this.layout.content.controls.noteRadius * 3,
-      y: target.y + this.layout.content.controls.noteRadius * 2,
+      x: target.x + direction * this.layout.content.controls.noteRadius
+        * brokenStyle.escapeXMultiplier,
+      y: target.y + this.layout.content.controls.noteRadius
+        * brokenStyle.escapeYMultiplier,
       alpha: 0,
-      duration: 320,
-      ease: "Quad.In",
+      duration: brokenStyle.durationMs,
+      ease: brokenStyle.ease,
       onComplete: () => broken.destroy(true),
     });
   }
@@ -937,10 +962,11 @@ export class ResistanceScene extends Phaser.Scene {
   private createOutcomeActions(outcome: string, feedback: string): void {
     if (this.transitioning) return;
     const { restart } = this.layout.content.anchors;
-    createButton(this, restart.x - 220, restart.y, 360, game.interface.retryEpisode, () => {
+    const actions = this.layout.content.rhythmPresentation.outcomeActions;
+    createButton(this, restart.x - actions.horizontalOffset, restart.y, actions.width, game.interface.retryEpisode, () => {
       this.restartConfrontation();
     });
-    createButton(this, restart.x + 220, restart.y, 360, game.interface.acceptOutcome, () => {
+    createButton(this, restart.x + actions.horizontalOffset, restart.y, actions.width, game.interface.acceptOutcome, () => {
       this.acceptOutcomeAndContinue();
     });
     this.outcomeActionsAvailable = true;
