@@ -91,6 +91,20 @@ async function listFiles(directory) {
 const packageJson = JSON.parse(
   await readFile(join(projectRoot, "package.json"), "utf8"),
 );
+const packageLock = JSON.parse(
+  await readFile(join(projectRoot, "package-lock.json"), "utf8"),
+);
+const mcpConfig = JSON.parse(
+  await readFile(join(projectRoot, ".mcp.json"), "utf8"),
+);
+const gitignore = await readFile(join(projectRoot, ".gitignore"), "utf8");
+const browserReviewServer =
+  mcpConfig.mcpServers?.["playwright-browser-review"];
+const browserReviewArgs = browserReviewServer?.args ?? [];
+const browserReviewFlagValue = (flag) => {
+  const index = browserReviewArgs.indexOf(flag);
+  return index === -1 ? undefined : browserReviewArgs[index + 1];
+};
 
 const gamePath = join(projectRoot, "src/play/content/game.json");
 const mechanicCataloguePath = join(
@@ -382,6 +396,53 @@ requirePolicy(
 requirePolicy(
   packageJson.license === "AGPL-3.0-or-later",
   'package.json must retain the selected "AGPL-3.0-or-later" software licence.',
+);
+requirePolicy(
+  packageJson.dependencies?.["@playwright/mcp"] === undefined &&
+    /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(
+      packageJson.devDependencies?.["@playwright/mcp"] ?? "",
+    ),
+  "Playwright MCP must remain an exactly pinned development dependency, never a runtime dependency or floating range.",
+);
+const playwrightTestVersion = packageJson.devDependencies?.["@playwright/test"];
+const mcpPlaywrightVersion =
+  packageLock.packages?.["node_modules/@playwright/mcp"]?.dependencies?.playwright;
+requirePolicy(
+  packageJson.dependencies?.["@playwright/test"] === undefined &&
+    /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(playwrightTestVersion ?? "") &&
+    playwrightTestVersion === mcpPlaywrightVersion,
+  "Playwright Test must be an exact development dependency matching the Playwright revision required by Playwright MCP.",
+);
+requirePolicy(
+  browserReviewServer?.type === "stdio" &&
+    browserReviewServer.command === "node" &&
+    browserReviewArgs[0] ===
+      "${CLAUDE_PROJECT_DIR:-.}/node_modules/@playwright/mcp/cli.js",
+  "The shared browser-review MCP server must execute the lockfile-installed project package through Node.",
+);
+requirePolicy(
+  browserReviewArgs.includes("--isolated") &&
+    browserReviewArgs.includes("--headless") &&
+    browserReviewFlagValue("--caps") === "vision" &&
+    browserReviewFlagValue("--viewport-size") === "1280x720",
+  "Browser review must use an isolated headless profile with canvas pointer capability and a stable landscape viewport.",
+);
+requirePolicy(
+  browserReviewFlagValue("--output-dir") ===
+      "${CLAUDE_PROJECT_DIR:-.}/.artifacts/browser-review" &&
+    browserReviewFlagValue("--output-max-size") === "52428800" &&
+    gitignore.split("\n").includes(".artifacts/"),
+  "Browser-review output must be bounded and stored under the ignored .artifacts directory.",
+);
+requirePolicy(
+  [
+    "--allow-unrestricted-file-access",
+    "--extension",
+    "--storage-state",
+    "--user-data-dir",
+  ].every((flag) => !browserReviewArgs.includes(flag)) &&
+    browserReviewArgs.every((argument) => !argument.includes("@latest")),
+  "Browser review must not use personal or persisted browser state, unrestricted file access or floating executable versions.",
 );
 
 const [agplText, creativeCommonsText, licensingGuide, identityPolicy] =

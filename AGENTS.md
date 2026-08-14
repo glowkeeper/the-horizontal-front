@@ -201,6 +201,21 @@ For code changes, run the smallest relevant checks and report the result:
 - Structural and semantic validation for layout, skin and composition data. Tests must cover coordinate bounds, positive dimensions, unique and required semantic parts, compatible layout/skin references, meaningful pivots and motion direction—not merely successful JSON parsing.
 - Browser or device testing only when relevant to the requested change.
 
+When acceptance depends on player-facing browser behaviour, follow
+`docs/browser-verification.md`. AI reviewers must use the repository's isolated,
+credential-free browser configuration rather than a maintainer's personal
+profile or authenticated tabs.
+
+Every verification report must use the exact evidence levels defined in
+`docs/verification-evidence.md`: **Automated/source verified**,
+**Browser-flow verified** and **Human perceptually accepted**. State all three
+levels as **Claimed** with their required evidence or **Not claimed** with the
+reason. Never upgrade one level into another. In particular, an AI
+assistant may record a person's explicit acceptance but must never claim or
+infer human perceptual acceptance from source inspection, automated checks,
+screenshots or browser automation. Require only the levels proportionate to the
+change and preserve the authority document's limitations in the hand-off.
+
 Do not claim a change works without running an appropriate check. Do not turn every small edit into an expansive testing or tooling exercise.
 
 ## Git behaviour

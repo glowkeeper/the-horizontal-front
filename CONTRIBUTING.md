@@ -53,6 +53,16 @@ The build includes the automated project-policy and documentation-integrity
 checks. Run focused unit tests for engine rules and validate episode content
 when those areas change.
 
+Report verification using the three authoritative levels in [verification
+evidence](docs/verification-evidence.md). For each level, state **Claimed** with
+the required evidence or **Not claimed** with the reason; never promote source
+checks into browser evidence or browser automation into human acceptance.
+Acceptance criteria should require only the levels proportionate to the change.
+
+When browser-flow evidence is required, follow the [browser-verification
+guide](docs/browser-verification.md). Run its repeatable smoke suite with
+`npm run test:browser` and use the isolated browser configuration for AI review.
+
 ## Licensing contributions
 
 Software contributions are submitted under `AGPL-3.0-or-later`. Original writing, documentation, artwork, music, sound and other cultural contributions are submitted under `CC-BY-SA-4.0`, unless an explicit asset record establishes a compatible exception.

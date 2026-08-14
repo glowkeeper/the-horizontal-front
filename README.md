@@ -55,7 +55,8 @@ delivery decisions are in the [technical
 architecture](docs/technical-architecture.md); ownership and catalogue rules are
 in the [content architecture](docs/content-architecture.md). Episode authors
 should start with the [episode grammar
-reference](docs/episode-grammar-reference.md).
+reference](docs/episode-grammar-reference.md). Verification reports use the
+three levels defined in [verification evidence](docs/verification-evidence.md).
 
 ## Project status
 
@@ -95,6 +96,8 @@ Useful project commands:
 | Command | Purpose |
 | --- | --- |
 | `npm run dev` | Generate the public-document pages and start Vite. |
+| `npm run browser:install` | Install locked Chromium and any required host dependencies for browser verification. |
+| `npm run test:browser` | Run the repository-owned Chromium smoke tests against the real game. |
 | `npm run build` | Run policy and type checks, build every route and prepare the offline cache. |
 | `npm run preview` | Preview the production build locally. |
 | `npm test` | Run the Vitest test suite. |

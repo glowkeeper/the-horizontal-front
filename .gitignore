@@ -16,6 +16,7 @@ dist/
 
 # Test output
 coverage/
+.artifacts/
 
 # Local environment files
 .env

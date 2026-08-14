@@ -10,6 +10,8 @@
     "check:docs": "node scripts/check-documentation.mjs",
     "check:policy": "node scripts/check-project-policy.mjs",
     "check:static": "node scripts/check-static-build.mjs",
+    "browser:install": "playwright install --with-deps chromium",
+    "test:browser": "playwright test",
     "validate:content": "node scripts/validate-content.mjs",
     "generate:site": "node scripts/generate-site-pages.mjs",
     "test": "vitest run",
@@ -39,6 +41,8 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@playwright/mcp": "0.0.78",
+    "@playwright/test": "1.62.0-alpha-1783623505000",
     "marked": "^16.4.2",
     "typescript": "^7.0.2",
     "vite": "^8.2.1",

@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "playwright-browser-review": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "${CLAUDE_PROJECT_DIR:-.}/node_modules/@playwright/mcp/cli.js",
+        "--isolated",
+        "--headless",
+        "--caps",
+        "vision",
+        "--output-dir",
+        "${CLAUDE_PROJECT_DIR:-.}/.artifacts/browser-review",
+        "--output-max-size",
+        "52428800",
+        "--viewport-size",
+        "1280x720"
+      ]
+    }
+  }
+}

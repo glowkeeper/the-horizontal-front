@@ -25,6 +25,20 @@ architecture](content-architecture.md) when a change touches compilation,
 ownership, catalogues or engine vocabulary. Any grammar expansion must also
 update the [episode grammar reference](episode-grammar-reference.md).
 
+## I want to report what has been verified
+
+Use [verification evidence](verification-evidence.md) as the authoritative
+vocabulary for automated/source verification, browser-flow verification and
+human perceptual acceptance. It defines the evidence each level requires and
+the claims each level cannot support.
+
+## I want to verify the browser experience
+
+Read [browser verification](browser-verification.md) for the operational setup:
+the isolated, credential-free Playwright MCP reviewer, repository-owned browser
+tests, CI execution and diagnostic artefacts. Report the result using the
+authoritative [verification evidence](verification-evidence.md) vocabulary.
+
 ## I want to make or review a design decision
 
 Read the [game concept](game-concept.md), [design
@@ -46,6 +60,8 @@ substitute for that context.
 | Accepted episode vocabulary | [Episode grammar reference](episode-grammar-reference.md) |
 | Content hierarchy, ownership and expansion | [Content architecture](content-architecture.md) |
 | Runtime and delivery architecture | [Technical architecture](technical-architecture.md) |
+| Verification claims and evidence levels | [Verification evidence](verification-evidence.md) |
+| Browser-review tooling and safety | [Browser verification](browser-verification.md) |
 | Evidence and design inferences | [Research index](research/README.md) |
 
 Some defining constraints are intentionally repeated for the audience that
