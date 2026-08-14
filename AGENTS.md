@@ -28,7 +28,7 @@ These instructions apply to every AI coding assistant working in this repository
 
 ## Product intent
 
-The Horizontal Front is a satirical, rhythm-based 2D web and mobile game about working extremely hard to remain in bed while an authoritarian Orange Fella tries to force the player into work.
+The Horizontal Front is a satirical, rhythm-based 2D web and mobile game about working extremely hard to remain in bed while Management, a grotesque embodiment of capitalism at its worst, tries to force the player into work.
 
 It is a free, open-source game about collective power, mutual aid and resistance to hierarchical systems. Develop it as a digital commons: freely accessible, community-supported and accountable to its players rather than investors or advertisers.
 
@@ -148,7 +148,7 @@ AI-generated artwork may be used for prototypes and may be considered for produc
 Follow this production-conscious workflow:
 
 1. Start from an original project art brief. Do not request imitation of a living artist or named entertainment property.
-2. Keep the Orange Fella a fictional political and corporate archetype rather than reproducing a real person's face.
+2. Keep Management a broadly recognisable grotesque embodiment of capitalism rather than reproducing or evoking a particular politician or other real person.
 3. Review every generated asset for recognisable characters, logos, branding, signatures, watermarks and suspiciously specific similarities.
 4. Apply meaningful human art direction through selection, iteration, editing, repainting, compositing and adaptation to the project's visual system.
 5. Preserve provenance: prompts, source generations, generation date and tool, edits, licences, contributors and replacement status.
@@ -171,7 +171,7 @@ Procedural synthesis is the default direction for prototype audio and may remain
 - Treat any externally sourced sound as a licensed asset and record its creator, source, licence, attribution requirements and permitted uses in the asset manifest.
 - Avoid imitating a named musician, performer, politician or other identifiable person's voice or musical style.
 
-The Orange Fella should communicate through an original, unintelligible synthesised rumble or bluster. Speech bubbles carry the actual words. His vocal sound may convey timing, mood, interruption and comic emphasis, but it must not clone or closely reproduce a real person's voice.
+Management should communicate through an original, unintelligible synthesised rumble or bluster. Speech bubbles carry the actual words. The vocal sound may convey timing, mood, interruption and comic emphasis, but it must not clone or closely reproduce a real person's voice.
 
 This approach is both an aesthetic choice and a provenance choice: the boss becomes a noisy embodiment of managerial power rather than a voiced impersonation, while all politically important dialogue remains readable and accessible.
 

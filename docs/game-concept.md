@@ -8,7 +8,7 @@ The Horizontal Front is a satirical arcade game for web and mobile. The player i
 
 To resist, the player must perform rhythmic patterns through taps, clicks, or keys. The irony is the heart of the game: the player has to work extremely hard to avoid work.
 
-The satire targets exploitative work culture, compulsory productivity, corporate euphemisms, and executive power. The boss is a fictional, Trumpesque tycoon archetype rather than a direct depiction of a real person: orange-tinted, golden-haired, power-tied, vain, loud, and absurdly self-important.
+The satire targets exploitative work culture, compulsory productivity, corporate euphemisms, and executive power. The recurring boss is Management: a fictional, broadly recognisable and grotesque embodiment of capitalism at its worst rather than a depiction or coded stand-in for any particular politician or other real person.
 
 ## Player fantasy
 
@@ -81,7 +81,7 @@ The game should not become a collection of unrelated minigames. Some sameness is
 - Victory is temporary.
 - Capitalism endlessly rebrands repetition as transformation.
 
-The Orange Fella might announce, “This is a completely unprecedented productivity framework,” before launching essentially the same attack under a new logo. The player recognises the repetition even though the boss does not.
+Management might announce, “This is a completely unprecedented productivity framework,” before launching essentially the same attack under a new logo. The player recognises the repetition even though Management does not.
 
 ## Sources of variety
 
@@ -137,7 +137,7 @@ The bedroom remains recognisable while its presentation changes:
 - A video call projected onto the wall.
 - Office furniture invading the room.
 - Corporate banners covering personal possessions.
-- Multiple Orange Fellas appearing on screens.
+- Multiple Management broadcasts appearing on screens.
 - A shareholder meeting outside the window.
 - The bedroom becoming increasingly office-like.
 - Management presenting the same initiative under a new colour scheme.
@@ -311,7 +311,7 @@ The preferred style is a colourful editorial cartoon with revolutionary-poster e
 - Corporate objects should be sharp, loud, intrusive, and faintly ridiculous.
 - Visual motifs could include raised fists gripping pillows, crossed alarm clocks, duvet-red banners, and management propaganda.
 
-The boss should be a wholly fictional caricature of an authoritarian executive. A Trumpesque flavour can come from the tan, sculpted golden hair, small hands, long tie, bluster, vanity, and gaudy taste, without copying a real person's face or identity.
+Management should be a wholly fictional grotesque of authoritarian executive power and capital accumulation. The figure may combine impossible corporate polish, acquisitive anatomy, predatory machinery, vanity, bluster and gaudy excess, but must not use a recognisable politician's face, hair, gestures, costume or signature traits as visual shorthand.
 
 The game's logo and art direction should be original.
 
@@ -323,7 +323,7 @@ The first intentional palette establishes a semantic opposition between warmth, 
 - **Ink charcoal (`#201C19`)** — readable text and structural line work.
 - **Resistance red (`#B8322A`)** — collective action, primary emphasis and calls to resist.
 - **Work-light blue (`#3E6F8F`)** — corporate intrusion, danger and forced verticalisation.
-- **Management gold (`#C8952E`)** — vanity, executive spectacle and the Orange Fella's authority.
+- **Management gold (`#C8952E`)** — vanity, accumulation and executive spectacle.
 - **Paper white (`#FFFDF7`)** — documents, cards and quiet readable surfaces.
 
 These are intentional starting roles rather than a claim that every final shade is settled. Public HTML and Phaser must consume the same shared design tokens for colour and typography so visual meaning does not drift between the site and game. Canvas-specific sizes and wrapping remain in the Phaser adapter because they respond to the fixed game coordinate system rather than the document layout.
@@ -334,7 +334,7 @@ Every successful action needs satisfying feedback: mattress movement, duvet snap
 
 The default audio direction is original procedural synthesis rather than sampled effects. Duvet pulls, rhythm ticks, notification chirps, warning alarms, victory and failure stings, and fluorescent office hum can be generated mathematically and tuned with the gameplay. This provides especially clear provenance and may remain suitable for production if the resulting sound design is strong enough.
 
-The Orange Fella does not need intelligible recorded dialogue. He can rumble, bluster and punctuate scenes through an original, unintelligible synthesised voice while speech bubbles carry his actual words. This makes him sound like noisy managerial power without cloning or impersonating a real person. It also keeps politically important dialogue readable.
+Management does not need intelligible recorded dialogue. The figure can rumble, bluster and punctuate scenes through an original, unintelligible synthesised voice while speech bubbles carry the actual words. This makes Management sound like noisy institutional power without cloning or impersonating a real person. It also keeps politically important dialogue readable.
 
 Mobile vibration should be optional. Sound, colour, and motion cues should never be the sole way critical information is communicated.
 
@@ -380,7 +380,7 @@ Questions that remain genuinely open include:
 - How should the first set of episodes vary in rhythm, dramatic shape and emotion?
 - Which appearance choices, if any, should the protagonist eventually offer?
 - How much narrative should occur between confrontations without weakening the arcade pace?
-- What should the recurring Orange Fella be called?
+- Which original recurring visual and sonic traits make Management recognisable without evoking a particular real person?
 
 ## Naming note
 

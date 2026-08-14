@@ -65,19 +65,21 @@ initial direction because collection can quietly reintroduce grinding and
 acquisition. Any future appearance choices must remain lightweight, freely
 available and unrelated to repetitive progression.
 
-## The Orange Fella is a recurring boss
+## Management is a recurring boss
 
-One recurring fictional boss is stronger than a sequence of disposable
-managers. He embodies capital's ability to survive every embarrassment and
-rebrand the same demand as transformation. He may return under titles such as
-Founder and CEO, Chief Motivation Officer, Majority Shareholder, Productivity
-Mentor, Chairman of the Alarm or Secretary for Forced Verticalisation.
+One recurring fictional embodiment of Management is stronger than a sequence of
+disposable managers. The figure embodies capital's ability to survive every
+embarrassment and rebrand the same demand as transformation. Management may
+return under titles such as Founder and CEO, Chief Motivation Officer, Majority
+Shareholder, Productivity Mentor, Chairman of the Alarm or Secretary for Forced
+Verticalisation.
 
-Every defeat damages his dignity but not his confidence. A new tie, title,
-initiative and explanation can vary the satire without pretending the system
-has changed. His eventual name and final visual identity remain open creative
-decisions; he must stay an original archetype rather than a reproduction of a
-real person's face.
+Every defeat damages Management's dignity but not its confidence. A new title,
+initiative, apparatus and explanation can vary the satire without pretending
+the system has changed. The final visual identity must remain an original,
+broadly recognisable grotesque of capitalism at its worst rather than a coded
+portrait assembled from a real politician's face, hair, gestures, costume or
+signature traits.
 
 ## Promotion is a trap, not an upgrade path
 
@@ -132,7 +134,7 @@ Forced verticalisation lands in three beats:
 Pure slapstick would make the political point weightless. Failure should briefly
 show the human cost—lost time, autonomy and energy—before inviting another act
 of resistance. The game has no permanent victory and no nihilistic defeat: it
-offers repeated moments of time reclaimed from the Orange Fella.
+offers repeated moments of time reclaimed from Management.
 
 ## Adaptive difficulty is not the default
 

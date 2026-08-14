@@ -11,6 +11,10 @@ summary cannot silently turn a tentative finding into a universal claim.
   UI](interruption-mechanics-and-accessible-rhythm-ui.md) — phrase-boundary
   interruption timing, warning and recovery, input cancellation, multimodal
   rhythm cues and the resulting Quick Call and Urgent Email constraints.
+- [Political satire and radical print art
+  direction](political-satire-art-direction.md) — political-cartoon techniques,
+  radical print traditions, five complementary reference practices, their
+  limitations and the resulting first-production-draft hypotheses.
 
 Research informs decisions but does not override the project charter, the
 implemented episode grammar or observed playtesting results.
