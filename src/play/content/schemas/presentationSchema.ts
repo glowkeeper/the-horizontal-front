@@ -121,6 +121,7 @@ const imagePartSchema = z.object({
   originX: unitIntervalSchema.optional(),
   originY: unitIntervalSchema.optional(),
   angleDegrees: z.number().min(-360).max(360).optional(),
+  flipX: z.boolean().optional(),
   asset: ownedContentReferenceSchema,
 }).strict();
 
@@ -364,9 +365,72 @@ export const resistanceSkinSchema = z.object({
     staticParts: z.array(shapePartSchema).min(1),
     sleeperParts: z.array(shapePartSchema).min(1),
     duvet: shapePartSchema,
+    duvetOverlayParts: z.array(shapePartSchema).default([]),
+    duvetStates: z.array(z.object({
+      minimumDanger: unitIntervalSchema,
+      asset: ownedContentReferenceSchema,
+    }).strict()).default([]),
   }).strict(),
+  environment: z.object({
+    replacesLayoutBackdrop: z.boolean(),
+    baseParts: z.array(shapePartSchema),
+    intensityParts: z.array(z.object({
+      part: shapePartSchema,
+      restAlpha: unitIntervalSchema,
+      dangerAlpha: unitIntervalSchema,
+      restOffsetX: z.number(),
+      dangerOffsetX: z.number(),
+    }).strict()),
+  }).strict().default({
+    replacesLayoutBackdrop: false,
+    baseParts: [],
+    intensityParts: [],
+  }),
   managementParts: z.array(shapePartSchema).min(1),
-}).strict();
+  managementStates: z.array(z.object({
+    minimumIntensity: unitIntervalSchema,
+    assets: z.array(z.object({
+      partId: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+      asset: ownedContentReferenceSchema,
+    }).strict()).min(1),
+  }).strict()).default([]),
+}).strict().superRefine((skin, context) => {
+  const thresholds = skin.bed.duvetStates.map(({ minimumDanger }) => minimumDanger);
+  if (thresholds.length > 0 && thresholds[0] !== 0) {
+    context.addIssue({ code: "custom", message: "duvet states must begin at zero danger" });
+  }
+  if (thresholds.some((threshold, index) => index > 0 && threshold <= thresholds[index - 1])) {
+    context.addIssue({ code: "custom", message: "duvet-state danger thresholds must increase" });
+  }
+  const managementThresholds = skin.managementStates.map(({ minimumIntensity }) => minimumIntensity);
+  if (managementThresholds.length > 0 && managementThresholds[0] !== 0) {
+    context.addIssue({ code: "custom", message: "management states must begin at zero intensity" });
+  }
+  if (managementThresholds.some(
+    (threshold, index) => index > 0 && threshold <= managementThresholds[index - 1],
+  )) {
+    context.addIssue({ code: "custom", message: "management-state intensity thresholds must increase" });
+  }
+  for (const [index, state] of skin.managementStates.entries()) {
+    const partIds = state.assets.map(({ partId }) => partId);
+    if (new Set(partIds).size !== partIds.length) {
+      context.addIssue({
+        code: "custom",
+        message: "management state part IDs must be unique",
+        path: ["managementStates", index, "assets"],
+      });
+    }
+  }
+  for (const [index, layer] of skin.environment.intensityParts.entries()) {
+    if (layer.dangerAlpha < layer.restAlpha) {
+      context.addIssue({
+        code: "custom",
+        message: "intensity layer must not become less visible as danger rises",
+        path: ["environment", "intensityParts", index],
+      });
+    }
+  }
+});
 
 export type ResistanceLayoutContent = z.infer<typeof resistanceLayoutSchema>;
 export type ResistanceSkin = z.infer<typeof resistanceSkinSchema>;

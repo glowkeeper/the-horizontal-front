@@ -19,13 +19,18 @@ export function createBedHeadRightLayout(
   const { backdrop, anchors, motion } = layout;
 
   scene.cameras.main.setBackgroundColor(colours.duvetCream);
-  createRectangle(scene, backdrop.floor, colours.paperWhite)
-    .setStrokeStyle(5, colours.inkCharcoal);
+  skin.environment.baseParts.forEach((part) => createShape(scene, part));
+  if (!skin.environment.replacesLayoutBackdrop) {
+    createRectangle(scene, backdrop.floor, colours.paperWhite)
+      .setStrokeStyle(5, colours.inkCharcoal);
+  }
   const workLight = createRectangle(
     scene,
     backdrop.workLight,
     colours.workLightBlue,
   ).setAlpha(motion.rest.workLightAlpha);
+  const intensityParts = skin.environment.intensityParts.map(({ part }) =>
+    createShape(scene, part));
 
   const bedContainer = scene.add.container(
     anchors.bedFootPivot.x,
@@ -41,16 +46,19 @@ export function createBedHeadRightLayout(
   const sleeperParts = skin.bed.sleeperParts.map((part) =>
     createShape(scene, part));
   const duvet = createShape(scene, skin.bed.duvet);
+  const duvetOverlayParts = skin.bed.duvetOverlayParts.map((part) =>
+    createShape(scene, part));
 
   sleeper.add(sleeperParts);
-  bedContents.add([...staticParts, sleeper, duvet]);
+  bedContents.add([...staticParts, duvet, sleeper, ...duvetOverlayParts]);
   bedContainer.add(bedContents);
 
   const management = scene.add.container(
     anchors.management.x,
     anchors.management.y,
   );
-  management.add(skin.managementParts.map((part) => createShape(scene, part)));
+  const managementParts = skin.managementParts.map((part) => createShape(scene, part));
+  management.add(managementParts);
   management.add(
     scene.add.text(0, 45, skin.copy.managementLabel, {
       ...createTextStyles().notice,
@@ -75,10 +83,42 @@ export function createBedHeadRightLayout(
 
     render(duvetSafety, dramaticIntensity): void {
       const state = getResistancePresentation(duvetSafety, dramaticIntensity, motion);
+      const physicalDanger = 1 - clamp01(duvetSafety);
       bedContainer.setRotation(Phaser.Math.DegToRad(state.bedAngleDegrees));
+      const duvetState = [...skin.bed.duvetStates]
+        .reverse()
+        .find(({ minimumDanger }) => physicalDanger >= minimumDanger);
+      if (duvetState && duvet instanceof Phaser.GameObjects.Image) {
+        duvet.setTexture(duvetState.asset.id)
+          .setDisplaySize(skin.bed.duvet.shape === "image" ? skin.bed.duvet.width : duvet.displayWidth, skin.bed.duvet.shape === "image" ? skin.bed.duvet.height : duvet.displayHeight);
+      }
       duvet.setX(skin.bed.duvetRestingX + state.duvetPullX);
+      skin.bed.duvetOverlayParts.forEach((part, index) => {
+        duvetOverlayParts[index].setX(part.x + state.duvetPullX);
+      });
       sleeper.setX(skin.bed.sleeperRestingX + state.sleeperSlideX);
       workLight.setAlpha(state.workLightAlpha);
+      skin.environment.intensityParts.forEach((layer, index) => {
+        intensityParts[index]
+          .setAlpha(linear(layer.restAlpha, layer.dangerAlpha, clamp01(dramaticIntensity)))
+          .setX(layer.part.x + linear(
+            layer.restOffsetX,
+            layer.dangerOffsetX,
+            clamp01(dramaticIntensity),
+          ));
+      });
+      const managementState = [...skin.managementStates]
+        .reverse()
+        .find(({ minimumIntensity }) => dramaticIntensity >= minimumIntensity);
+      managementState?.assets.forEach(({ partId, asset }) => {
+        const partIndex = skin.managementParts.findIndex((part) => part.id === partId);
+        const authoredPart = skin.managementParts[partIndex];
+        const renderedPart = managementParts[partIndex];
+        if (authoredPart?.shape === "image" && renderedPart instanceof Phaser.GameObjects.Image) {
+          renderedPart.setTexture(asset.id)
+            .setDisplaySize(authoredPart.width, authoredPart.height);
+        }
+      });
     },
 
     animateVictory(): void {
@@ -91,6 +131,13 @@ export function createBedHeadRightLayout(
         x: skin.bed.duvetRestingX,
         duration: motion.victory.durationMs,
         ease: motion.victory.ease,
+      });
+      skin.bed.duvetOverlayParts.forEach((part, index) => {
+        addTween(scene, duvetOverlayParts[index], {
+          x: part.x,
+          duration: motion.victory.durationMs,
+          ease: motion.victory.ease,
+        });
       });
       addTween(scene, sleeper, {
         x: skin.bed.sleeperRestingX,
@@ -123,6 +170,14 @@ export function createBedHeadRightLayout(
         duration: forced.duvetDurationMs,
         ease: forced.duvetEase,
       });
+      skin.bed.duvetOverlayParts.forEach((part, index) => {
+        addTween(scene, duvetOverlayParts[index], {
+          x: part.x + forced.duvetX - skin.bed.duvetRestingX,
+          alpha: forced.duvetAlpha,
+          duration: forced.duvetDurationMs,
+          ease: forced.duvetEase,
+        });
+      });
     },
   };
 }
@@ -132,6 +187,7 @@ function createShape(scene: Phaser.Scene, part: ShapePart) {
     return scene.add.image(part.x, part.y, part.asset.id)
       .setDisplaySize(part.width, part.height)
       .setOrigin(part.originX ?? 0.5, part.originY ?? 0.5)
+      .setFlipX(part.flipX ?? false)
       .setRotation(Phaser.Math.DegToRad(part.angleDegrees ?? 0));
   }
 
@@ -196,4 +252,12 @@ function getColours() {
 
 function colour(role: Parameters<typeof getThemeColour>[0]): number {
   return Phaser.Display.Color.HexStringToColor(getThemeColour(role)).color;
+}
+
+function linear(from: number, to: number, amount: number): number {
+  return from + (to - from) * amount;
+}
+
+function clamp01(value: number): number {
+  return Math.min(1, Math.max(0, value));
 }

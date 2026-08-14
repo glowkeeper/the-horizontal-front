@@ -166,6 +166,9 @@ export function assertAssetOwnership(
     ...skin.bed.staticParts,
     ...skin.bed.sleeperParts,
     skin.bed.duvet,
+    ...skin.bed.duvetOverlayParts,
+    ...skin.environment.baseParts,
+    ...skin.environment.intensityParts.map(({ part }) => part),
     ...skin.managementParts,
   ];
 
@@ -184,6 +187,32 @@ export function assertAssetOwnership(
     }
     if (part.asset.source === "episode" && !ownedByEpisode) {
       throw new Error(`asset ${part.asset.id} is not owned by episode ${episodeId}`);
+    }
+  }
+  for (const state of skin.bed.duvetStates) {
+    const asset = assetsById.get(state.asset.id);
+    if (asset === undefined) continue;
+    const shared = asset.file.startsWith("shared/");
+    const ownedByEpisode = asset.file.startsWith(`episodes/${episodeId}/`);
+    if (state.asset.source === "shared" && !shared) {
+      throw new Error(`asset ${state.asset.id} is marked shared but is episode-owned`);
+    }
+    if (state.asset.source === "episode" && !ownedByEpisode) {
+      throw new Error(`asset ${state.asset.id} is not owned by episode ${episodeId}`);
+    }
+  }
+  for (const state of skin.managementStates) {
+    for (const reference of state.assets) {
+      const asset = assetsById.get(reference.asset.id);
+      if (asset === undefined) continue;
+      const shared = asset.file.startsWith("shared/");
+      const ownedByEpisode = asset.file.startsWith(`episodes/${episodeId}/`);
+      if (reference.asset.source === "shared" && !shared) {
+        throw new Error(`asset ${reference.asset.id} is marked shared but is episode-owned`);
+      }
+      if (reference.asset.source === "episode" && !ownedByEpisode) {
+        throw new Error(`asset ${reference.asset.id} is not owned by episode ${episodeId}`);
+      }
     }
   }
 }

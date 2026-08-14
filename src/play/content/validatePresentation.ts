@@ -120,10 +120,24 @@ export function assertSensiblePresentation(
 
   assertUniquePartIds("bed static parts", skin.bed.staticParts);
   assertUniquePartIds("sleeper parts", skin.bed.sleeperParts);
+  assertUniquePartIds("duvet overlay parts", skin.bed.duvetOverlayParts);
   assertUniquePartIds("management parts", skin.managementParts);
+  assertUniquePartIds("environment base parts", skin.environment.baseParts);
+  assertUniquePartIds(
+    "environment intensity parts",
+    skin.environment.intensityParts.map(({ part }) => part),
+  );
   assertRequiredParts(skin.bed.staticParts, ["frame", "mattress", "pillow"]);
-  assertRequiredParts(skin.bed.sleeperParts, ["body", "head"]);
-  assertRequiredParts(skin.managementParts, ["body", "head", "lifting-arm"]);
+  assertCharacterComposition(
+    "sleeper parts",
+    skin.bed.sleeperParts,
+    ["body", "head"],
+  );
+  assertCharacterComposition(
+    "management parts",
+    skin.managementParts,
+    ["body", "head", "lifting-arm"],
+  );
 
   if (skin.bed.duvet.id !== "duvet") {
     throw new Error('bed duvet part must have the semantic ID "duvet"');
@@ -136,10 +150,33 @@ export function assertSensiblePresentation(
     ...skin.bed.staticParts,
     ...skin.bed.sleeperParts,
     skin.bed.duvet,
+    ...skin.bed.duvetOverlayParts,
+    ...skin.environment.baseParts,
+    ...skin.environment.intensityParts.map(({ part }) => part),
     ...skin.managementParts,
   ]) {
     if (part.shape === "image" && !assetIds.has(part.asset.id)) {
       throw new Error(`unknown presentation asset: ${part.asset.id}`);
+    }
+  }
+  for (const state of skin.bed.duvetStates) {
+    if (!assetIds.has(state.asset.id)) {
+      throw new Error(`unknown presentation asset: ${state.asset.id}`);
+    }
+  }
+  const managementPartsById = new Map(skin.managementParts.map((part) => [part.id, part]));
+  for (const state of skin.managementStates) {
+    for (const reference of state.assets) {
+      const part = managementPartsById.get(reference.partId);
+      if (part === undefined) {
+        throw new Error(`management state references unknown part: ${reference.partId}`);
+      }
+      if (part.shape !== "image") {
+        throw new Error(`management state part must be an image: ${reference.partId}`);
+      }
+      if (!assetIds.has(reference.asset.id)) {
+        throw new Error(`unknown presentation asset: ${reference.asset.id}`);
+      }
     }
   }
 
@@ -147,6 +184,7 @@ export function assertSensiblePresentation(
     ...skin.bed.staticParts,
     ...skin.bed.sleeperParts,
     skin.bed.duvet,
+    ...skin.bed.duvetOverlayParts,
   ];
   for (const part of initialParts) {
     const bounds = getPartBounds(part);
@@ -158,6 +196,16 @@ export function assertSensiblePresentation(
       throw new Error(`bed part ${part.id} starts outside the design canvas`);
     }
   }
+}
+
+function assertCharacterComposition(
+  label: string,
+  parts: ShapePart[],
+  articulatedIds: string[],
+): void {
+  const ids = new Set(parts.map(({ id }) => id));
+  if (ids.has("figure")) return;
+  assertRequiredParts(parts, articulatedIds);
 }
 
 function assertWithinCanvas(

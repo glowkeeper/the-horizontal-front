@@ -76,6 +76,30 @@ describe("presentation content", () => {
     const presentation = loadPresentation(game.entryEpisode);
 
     expect(presentation.skin.id).toBe("the-alarm-bedroom");
+    expect(presentation.skin.bed.sleeperParts.map(({ id }) => id))
+      .toEqual(["figure"]);
+    expect(presentation.skin.bed.duvetOverlayParts).toEqual([]);
+    expect(presentation.skin.bed.duvetStates.map(({ minimumDanger, asset }) => [
+      minimumDanger, asset.id,
+    ])).toEqual([
+      [0, "duvet-rest"],
+      [0.28, "duvet-tension-low"],
+      [0.58, "duvet-tension-high"],
+      [0.9, "duvet-forced-verticalisation"],
+    ]);
+    expect(presentation.skin.environment.baseParts.map(({ id }) => id))
+      .toEqual(["bedroom-base"]);
+    expect(presentation.skin.environment.intensityParts.map(({ part }) => part.id))
+      .toEqual(["office-incursion"]);
+    expect(presentation.skin.managementParts.map(({ id }) => id))
+      .toEqual(["figure"]);
+    expect(presentation.skin.managementStates.map(({ minimumIntensity, assets }) => [
+      minimumIntensity,
+      assets.map(({ partId, asset }) => [partId, asset.id]),
+    ])).toEqual([
+      [0, [["figure", "management-rest-pose"]]],
+      [0.22, [["figure", "management-lifting-pose"]]],
+    ]);
     expect([...presentation.interruptionSkins.entries()].map(([id, value]) => [
       id, value.id,
     ])).toEqual([
@@ -431,21 +455,18 @@ describe("presentation content", () => {
       layout,
       {
         ...skin,
-        managementParts: skin.managementParts.map((part) =>
-          part.id === "head"
-            ? {
-                id: "head",
-                shape: "image" as const,
-                x: 0,
-                y: -85,
-                width: 136,
-                height: 136,
-                asset: { source: "episode", id: "missing-management-head" },
-              }
-            : part),
+        managementParts: [{
+          id: "figure",
+          shape: "image" as const,
+          x: -40,
+          y: 15,
+          width: 340,
+          height: 425,
+          asset: { source: "episode", id: "missing-management-figure" },
+        }],
       },
       assetIds,
-    )).toThrow(/unknown presentation asset: missing-management-head/);
+    )).toThrow(/unknown presentation asset: missing-management-figure/);
   });
 
   it("prevents shared skins from using episode-owned assets", () => {

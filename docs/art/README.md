@@ -25,3 +25,15 @@ The preserved comparison currently contains:
 The authoritative current brief is [Art direction](../art-direction.md), and
 its evidence basis is [Political satire and radical print art
 direction](../research/political-satire-art-direction.md).
+
+The production-facing layer, state and pivot hypothesis for the first playable
+episode is [The Alarm playable-scene production
+specification](the-alarm-playable-scene-production-spec.md).
+Its first protagonist and Management hypotheses are preserved in [First
+playable character production sheets](first-playable-character-sheets.md).
+The generated source sheets, runtime crops and provenance for the first bed,
+duvet and environment enactment are recorded in [First playable bed, duvet and
+environment assets](first-playable-environment-assets.md).
+The replacement whole-composition hypothesis for keeping the protagonist,
+duvet, mattress and frame on one perspective plane is preserved in [The Alarm
+bed-tableau state sheet](the-alarm-bed-tableau-state-sheet.md).
