@@ -113,9 +113,9 @@ export function compileResistanceConfig(
       pressurePerSecond: phase.pressurePerSecond,
       recoveryPerAction: phase.recoveryPerAction,
       safetyPenaltyPerMiss: phase.safetyPenaltyPerMiss,
-      momentumGain: phase.momentumGain,
-      momentumLoss: phase.momentumLoss,
-      momentumRecoveryBonus: phase.momentumRecoveryBonus,
+      resistanceGainPerHit: phase.resistanceGainPerHit,
+      resistanceLossPerMiss: phase.resistanceLossPerMiss,
+      resistanceRecoveryBonus: phase.resistanceRecoveryBonus,
       presentationIntensity: phase.presentationIntensity,
     };
     startsAtMs = compiled.endsAtMs;
@@ -199,9 +199,9 @@ function compilePhaseCues(
   const phaseEndMs = phaseStartMs + phase.durationMs;
   const cycleMs = rhythm.cycleBeats * phase.beatIntervalMs;
   const firstCycleMs = phaseStartMs + phase.leadInBeats * phase.beatIntervalMs;
-  if (firstCycleMs > phaseStartMs) {
+  if (phaseIndex === 0 && firstCycleMs > phaseStartMs) {
     guideTarget.push({
-      action: phaseIndex === 0 ? "count-in" : "rest",
+      action: "count-in",
       atMs: phaseStartMs,
       endsAtMs: firstCycleMs,
       phaseIndex,
@@ -228,6 +228,7 @@ function compilePhaseCues(
         target.push({ ...base, action: "tap", releaseAtMs: null });
         guideTarget.push({
           action: "tap", side: event.side, atMs,
+          timingWindowMs: phase.timingWindowMs,
           endsAtMs: atMs + phase.timingWindowMs,
           phaseIndex,
         });
@@ -238,7 +239,9 @@ function compilePhaseCues(
       target.push({ ...base, action: "hold", releaseAtMs });
       guideTarget.push({
         action: "hold", side: event.side, atMs,
-        endsAtMs: releaseAtMs,
+        timingWindowMs: phase.timingWindowMs,
+        releaseAtMs,
+        endsAtMs: Math.min(releaseAtMs + phase.timingWindowMs, phaseEndMs),
         phaseIndex,
       });
     }

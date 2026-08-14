@@ -18,7 +18,7 @@ export function createResistance(config: ResistanceConfig): Resistance {
     config,
     state: {
       duvetSafety: config.startingSafety,
-      rhythmMomentum: 0,
+      resistanceStrength: 0,
       nextRhythmStep: 0,
       activeHold: null,
       elapsedMs: 0,
@@ -36,7 +36,7 @@ export function advanceResistance(resistance: Resistance, toMs: number): Resista
   const effectiveToMs = Math.min(toMs, resistance.config.durationMs);
   let cursorMs = resistance.state.elapsedMs;
   let duvetSafety = resistance.state.duvetSafety;
-  let rhythmMomentum = resistance.state.rhythmMomentum;
+  let resistanceStrength = resistance.state.resistanceStrength;
   let nextRhythmStep = resistance.state.nextRhythmStep;
   let activeHold = resistance.state.activeHold;
   let lastRhythmJudgement = resistance.state.lastRhythmJudgement;
@@ -49,10 +49,15 @@ export function advanceResistance(resistance: Resistance, toMs: number): Resista
       : cue.atMs + cue.timingWindowMs;
     if (deadline >= effectiveToMs) break;
 
-    const pressureLoss = integratePressure(resistance.config, cursorMs, deadline);
+    const pressureLoss = integratePressure(
+      resistance.config,
+      cursorMs,
+      deadline,
+      resistanceStrength,
+    );
     if (pressureLoss >= duvetSafety) {
       return pressureFailure(resistance, cursorMs, deadline, duvetSafety, {
-        rhythmMomentum,
+        resistanceStrength,
         nextRhythmStep,
         activeHold,
         lastRhythmJudgement,
@@ -63,7 +68,9 @@ export function advanceResistance(resistance: Resistance, toMs: number): Resista
 
     const phase = resistance.config.phases[cue.phaseIndex];
     duvetSafety = clamp01(duvetSafety - phase.safetyPenaltyPerMiss);
-    rhythmMomentum = clamp01(rhythmMomentum - phase.momentumLoss);
+    resistanceStrength = clamp01(
+      resistanceStrength - phase.resistanceLossPerMiss,
+    );
     lastRhythmJudgement = {
       kind: "miss",
       reason: "expired",
@@ -78,7 +85,7 @@ export function advanceResistance(resistance: Resistance, toMs: number): Resista
       return withState(resistance, {
         ...resistance.state,
         duvetSafety: 0,
-        rhythmMomentum,
+        resistanceStrength,
         nextRhythmStep,
         activeHold,
         elapsedMs: deadline,
@@ -89,10 +96,15 @@ export function advanceResistance(resistance: Resistance, toMs: number): Resista
     }
   }
 
-  const finalPressureLoss = integratePressure(resistance.config, cursorMs, effectiveToMs);
+  const finalPressureLoss = integratePressure(
+    resistance.config,
+    cursorMs,
+    effectiveToMs,
+    resistanceStrength,
+  );
   if (finalPressureLoss >= duvetSafety) {
     return pressureFailure(resistance, cursorMs, effectiveToMs, duvetSafety, {
-      rhythmMomentum,
+      resistanceStrength,
       nextRhythmStep,
       activeHold,
       lastRhythmJudgement,
@@ -102,7 +114,7 @@ export function advanceResistance(resistance: Resistance, toMs: number): Resista
   const nextState: ResistanceState = {
     ...resistance.state,
     duvetSafety: clamp01(duvetSafety),
-    rhythmMomentum,
+    resistanceStrength,
     nextRhythmStep,
     activeHold,
     elapsedMs: effectiveToMs,
@@ -152,8 +164,16 @@ export function getRhythmGuide(
 ): readonly RhythmGuideItem[] {
   if (resistance.state.outcome !== "active" || length <= 0) return [];
   const elapsedMs = resistance.state.elapsedMs;
+  let actionIndex = 0;
   const visible = resistance.config.guideEvents
-    .filter((event) => event.endsAtMs > elapsedMs)
+    .filter((event) => {
+      if (event.action === "rest" || event.action === "count-in") {
+        return event.endsAtMs > elapsedMs;
+      }
+      const completed = actionIndex < resistance.state.nextRhythmStep;
+      actionIndex += 1;
+      return !completed && event.endsAtMs > elapsedMs;
+    })
     .slice(0, length);
   let futureIndex = 0;
   return visible.map((event) => {
@@ -214,14 +234,17 @@ function resolveHoldInput(resistance: Resistance, input: ResistanceInput, cue: S
 
 function hit(resistance: Resistance, cue: ScoredRhythmCue, step: number, side: "left" | "right", accuracy: number): Resistance {
   const phase = resistance.config.phases[cue.phaseIndex];
-  const momentum = clamp01(resistance.state.rhythmMomentum + phase.momentumGain * accuracy);
+  const resistanceStrength = clamp01(
+    resistance.state.resistanceStrength
+      + phase.resistanceGainPerHit * accuracy,
+  );
   const recovery = phase.recoveryPerAction * (0.5 + accuracy * 0.5)
-    * (0.35 + momentum * 0.65)
-    * (1 + momentum * phase.momentumRecoveryBonus);
+    * (0.35 + resistanceStrength * 0.65)
+    * (1 + resistanceStrength * phase.resistanceRecoveryBonus);
   return withState(resistance, {
     ...resistance.state,
     duvetSafety: clamp01(resistance.state.duvetSafety + recovery),
-    rhythmMomentum: momentum,
+    resistanceStrength,
     nextRhythmStep: step + 1,
     activeHold: null,
     lastRhythmJudgement: {
@@ -238,7 +261,9 @@ function miss(resistance: Resistance, cue: ScoredRhythmCue, step: number, reason
   return withState(resistance, {
     ...resistance.state,
     duvetSafety,
-    rhythmMomentum: clamp01(resistance.state.rhythmMomentum - phase.momentumLoss),
+    resistanceStrength: clamp01(
+      resistance.state.resistanceStrength - phase.resistanceLossPerMiss,
+    ),
     nextRhythmStep: step + (consume ? 1 : 0),
     activeHold: null,
     lastRhythmJudgement: {
@@ -250,13 +275,20 @@ function miss(resistance: Resistance, cue: ScoredRhythmCue, step: number, reason
   });
 }
 
-function integratePressure(config: ResistanceConfig, fromMs: number, toMs: number): number {
+function integratePressure(
+  config: ResistanceConfig,
+  fromMs: number,
+  toMs: number,
+  resistanceStrength: number,
+): number {
+  const exposedFraction = 1 - clamp01(resistanceStrength);
   return config.phases.reduce((total, phase) => {
     const start = Math.max(fromMs, phase.startsAtMs);
     const end = Math.min(toMs, phase.endsAtMs);
     if (end <= start) return total;
     const activeDuration = getUnpausedDuration(config, start, end);
-    return total + phase.pressurePerSecond * activeDuration / MILLISECONDS_PER_SECOND;
+    return total + phase.pressurePerSecond * exposedFraction
+      * activeDuration / MILLISECONDS_PER_SECOND;
   }, 0);
 }
 
@@ -266,13 +298,14 @@ function pressureFailure(
   toMs: number,
   safety: number,
   progress: Pick<ResistanceState,
-    "rhythmMomentum" | "nextRhythmStep" | "activeHold" | "lastRhythmJudgement">,
+    "resistanceStrength" | "nextRhythmStep" | "activeHold" | "lastRhythmJudgement">,
 ): Resistance {
   const failureAtMs = findFailureTime(
     resistance.config,
     fromMs,
     toMs,
     safety,
+    progress.resistanceStrength,
   );
   return withState(resistance, {
     ...resistance.state,
@@ -289,12 +322,18 @@ function findFailureTime(
   fromMs: number,
   toMs: number,
   safety: number,
+  resistanceStrength: number,
 ): number {
   let low = fromMs;
   let high = toMs;
   for (let iteration = 0; iteration < 48; iteration += 1) {
     const middle = (low + high) / 2;
-    if (integratePressure(config, fromMs, middle) >= safety) {
+    if (integratePressure(
+      config,
+      fromMs,
+      middle,
+      resistanceStrength,
+    ) >= safety) {
       high = middle;
     } else {
       low = middle;

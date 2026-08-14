@@ -17,14 +17,16 @@ const config: ResistanceConfig = {
       id: "opening", startsAtMs: 0, endsAtMs: 2_000,
       pressurePerSecond: 0.1, recoveryPerAction: 0.08,
       safetyPenaltyPerMiss: 0.02,
-      momentumGain: 0.2, momentumLoss: 0.15, momentumRecoveryBonus: 0.5,
+      resistanceGainPerHit: 0.2, resistanceLossPerMiss: 0.15,
+      resistanceRecoveryBonus: 0.5,
       presentationIntensity: { from: 0, to: 0.4 },
     },
     {
       id: "crisis", startsAtMs: 2_000, endsAtMs: 4_000,
       pressurePerSecond: 0.2, recoveryPerAction: 0.1,
       safetyPenaltyPerMiss: 0.04,
-      momentumGain: 0.1, momentumLoss: 0.2, momentumRecoveryBonus: 0.5,
+      resistanceGainPerHit: 0.1, resistanceLossPerMiss: 0.2,
+      resistanceRecoveryBonus: 0.5,
       presentationIntensity: { from: 0.4, to: 1 },
     },
   ],
@@ -34,16 +36,16 @@ const config: ResistanceConfig = {
     { action: "hold", side: "left", atMs: 2_500, releaseAtMs: 3_000, timingWindowMs: 100, phaseIndex: 1 },
   ],
   guideEvents: [
-    { action: "tap", side: "left", atMs: 500, endsAtMs: 600, phaseIndex: 0 },
-    { action: "tap", side: "right", atMs: 1_000, endsAtMs: 1_100, phaseIndex: 0 },
-    { action: "hold", side: "left", atMs: 2_500, endsAtMs: 3_000, phaseIndex: 1 },
+    { action: "tap", side: "left", atMs: 500, timingWindowMs: 100, endsAtMs: 600, phaseIndex: 0 },
+    { action: "tap", side: "right", atMs: 1_000, timingWindowMs: 100, endsAtMs: 1_100, phaseIndex: 0 },
+    { action: "hold", side: "left", atMs: 2_500, timingWindowMs: 100, releaseAtMs: 3_000, endsAtMs: 3_100, phaseIndex: 1 },
   ],
 };
 
 describe("resistance engine", () => {
   it("creates bounded state from a finite resolved score", () => {
     expect(createResistance(config).state).toMatchObject({
-      duvetSafety: 0.8, rhythmMomentum: 0, nextRhythmStep: 0,
+      duvetSafety: 0.8, resistanceStrength: 0, nextRhythmStep: 0,
       activeHold: null, elapsedMs: 0, dramaticIntensity: 0, outcome: "active",
     });
   });
@@ -56,6 +58,22 @@ describe("resistance engine", () => {
     expect(once.state.duvetSafety).toBeCloseTo(0.32);
   });
 
+  it("lets earned resistance protect the player between slow beats", () => {
+    const exposed: ResistanceConfig = {
+      ...config,
+      cues: [],
+      guideEvents: [],
+    };
+    const initial = createResistance(exposed);
+    const protectedResistance: Resistance = {
+      ...initial,
+      state: { ...initial.state, resistanceStrength: 0.75 },
+    };
+    const afterOneSecond = advanceResistance(protectedResistance, 1_000);
+    expect(afterOneSecond.state.duvetSafety).toBeCloseTo(0.775);
+    expect(afterOneSecond.state.resistanceStrength).toBe(0.75);
+  });
+
   it("orders passive pressure and expired cues independently of update frequency", () => {
     const once = advanceResistance(createResistance(config), 3_500);
     let stepped = createResistance(config);
@@ -63,7 +81,8 @@ describe("resistance engine", () => {
       stepped = advanceResistance(stepped, atMs);
     }
     expect(stepped.state.duvetSafety).toBeCloseTo(once.state.duvetSafety);
-    expect(stepped.state.rhythmMomentum).toBeCloseTo(once.state.rhythmMomentum);
+    expect(stepped.state.resistanceStrength)
+      .toBeCloseTo(once.state.resistanceStrength);
     expect(stepped.state.nextRhythmStep).toBe(once.state.nextRhythmStep);
     expect(stepped.state.outcome).toBe(once.state.outcome);
   });
@@ -77,9 +96,15 @@ describe("resistance engine", () => {
         { action: "rest", atMs: 1_000, endsAtMs: 1_500, phaseIndex: 0 },
       ],
     };
-    const duringReady = advanceResistance(createResistance(paused), 250);
+    const initial = createResistance(paused);
+    const earned: Resistance = {
+      ...initial,
+      state: { ...initial.state, resistanceStrength: 0.6 },
+    };
+    const duringReady = advanceResistance(earned, 250);
     expect(duringReady.state.duvetSafety).toBeCloseTo(0.8);
     expect(duringReady.state.dramaticIntensity).toBeCloseTo(0);
+    expect(duringReady.state.resistanceStrength).toBe(0.6);
 
     const atRestStart = advanceResistance(duringReady, 1_000);
     const duringRest = advanceResistance(atRestStart, 1_250);
@@ -89,6 +114,7 @@ describe("resistance engine", () => {
     );
     expect(advanceResistance(duringRest, 1_500).state.duvetSafety)
       .toBeCloseTo(atRestStart.state.duvetSafety);
+    expect(duringRest.state.resistanceStrength).toBe(0.6);
   });
 
   it("interpolates the authored dramatic curve", () => {
@@ -122,9 +148,12 @@ describe("resistance engine", () => {
   it("rewards an accurately timed tap", () => {
     const result = press(createResistance(config), "left", 500);
     expect(result.state.nextRhythmStep).toBe(1);
-    expect(result.state.rhythmMomentum).toBeCloseTo(0.2);
+    expect(result.state.resistanceStrength).toBeCloseTo(0.2);
     expect(result.state.lastRhythmJudgement).toMatchObject({
       kind: "hit", action: "tap", accuracy: 1,
+    });
+    expect(getRhythmGuide(result)[0]).toMatchObject({
+      action: "tap", side: "right",
     });
   });
 
@@ -137,11 +166,11 @@ describe("resistance engine", () => {
     expect(wrong.state.nextRhythmStep).toBe(1);
   });
 
-  it("expires missed cues and removes momentum", () => {
+  it("expires missed cues and weakens earned resistance", () => {
     const built = press(createResistance(config), "left", 500);
     const expired = advanceResistance(built, 1_101);
     expect(expired.state.nextRhythmStep).toBe(2);
-    expect(expired.state.rhythmMomentum).toBeCloseTo(0.05);
+    expect(expired.state.resistanceStrength).toBeCloseTo(0.05);
     expect(expired.state.lastRhythmJudgement).toMatchObject({ kind: "miss", reason: "expired" });
   });
 

@@ -68,6 +68,24 @@ describe("presentation content", () => {
       .toThrow(/Missing shared presentation skin/);
   });
 
+  it("rejects an episode timing window wider than its layout can display", () => {
+    const tooWide = loadEpisode({
+      ...episodeContent,
+      definitions: {
+        ...episodeContent.definitions,
+        dramaticCurves: [{
+          ...episodeContent.definitions.dramaticCurves[0],
+          phases: episodeContent.definitions.dramaticCurves[0].phases.map(
+            (phase, index) => index === 0
+              ? { ...phase, timingWindowMs: 401 }
+              : phase,
+          ),
+        }],
+      },
+    }, mechanics);
+    expect(() => loadPresentation(tooWide)).toThrow(/cannot display.*timing tolerance/);
+  });
+
   it("rejects non-positive primitive dimensions", () => {
     expect(() => resistanceSkinSchema.parse({
       ...skinContent,
@@ -98,7 +116,7 @@ describe("presentation content", () => {
         ...layout,
         anchors: {
           ...layout.anchors,
-          leftControl: { x: 10, y: 630 },
+          leftControl: { x: 10, y: layout.anchors.rightControl.y },
         },
       },
       skin,
@@ -106,43 +124,74 @@ describe("presentation content", () => {
     )).toThrow(/leftControl must fit/);
   });
 
-  it("rejects a timing approach ring clipped by the canvas", () => {
+  it("rejects controls which cannot form a horizontal rhythm lane", () => {
     expect(() => assertSensiblePresentation(
       {
         ...layout,
         anchors: {
           ...layout.anchors,
-          leftControl: { x: 70, y: layout.anchors.leftControl.y },
+          rightControl: {
+            ...layout.anchors.rightControl,
+            y: layout.anchors.leftControl.y - 20,
+          },
         },
       },
       skin,
       assetIds,
-    )).toThrow(/leftControl timing approach must fit/);
+    )).toThrow(/share a horizontal rhythm lane/);
   });
 
-  it("rejects a central rhythm cue which does not fit", () => {
+  it("rejects a timing gate clipped by the canvas", () => {
     expect(() => assertSensiblePresentation(
       {
         ...layout,
-        controls: { ...layout.controls, cueLabelWidth: 1_400 },
+        anchors: {
+          ...layout.anchors,
+          leftControl: { x: 50, y: layout.anchors.leftControl.y },
+        },
       },
       skin,
       assetIds,
-    )).toThrow(/central rhythm cue must fit/);
+    )).toThrow(/leftControl must fit/);
   });
 
-  it("rejects timing rings without a visible approach", () => {
+  it("rejects a central pause band which does not fit", () => {
+    expect(() => assertSensiblePresentation(
+      {
+        ...layout,
+        controls: { ...layout.controls, pauseBandWidth: 1_400 },
+      },
+      skin,
+      assetIds,
+    )).toThrow(/central pause band must fit/);
+  });
+
+  it("rejects a gate too short to contain its notes", () => {
     expect(() => assertSensiblePresentation(
       {
         ...layout,
         controls: {
           ...layout.controls,
-          timingApproachRadius: layout.controls.timingTargetRadius,
+          gateHeight: layout.controls.noteRadius * 2,
         },
       },
       skin,
       assetIds,
-    )).toThrow(/surround the control and express an approach/);
+    )).toThrow(/contain distinct travelling notes/);
+  });
+
+  it("rejects a centre emitter which dominates its controls", () => {
+    expect(() => assertSensiblePresentation(
+      {
+        ...layout,
+        controls: {
+          ...layout.controls,
+          emitterHeight: layout.controls.gateHeight + 1,
+        },
+      },
+      skin,
+      assetIds,
+    )).toThrow(/emitter must remain subordinate/);
   });
 
   it("rejects reversed lift and downhill motion", () => {

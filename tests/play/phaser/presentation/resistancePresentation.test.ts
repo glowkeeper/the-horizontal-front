@@ -34,8 +34,13 @@ describe("resistance presentation", () => {
     );
   });
 
-  it("caps authored intensity below maximum physical danger", () => {
-    expect(getResistancePresentation(1, 1, motion).bedAngleDegrees)
-      .toBe(motion.danger.bedAngleDegrees * 0.5);
+  it("uses authored intensity for atmosphere without faking physical danger", () => {
+    const dramaticButSafe = getResistancePresentation(1, 1, motion);
+    expect(dramaticButSafe.bedAngleDegrees).toBe(-0);
+    expect(dramaticButSafe.duvetPullX).toBe(0);
+    expect(dramaticButSafe.sleeperSlideX).toBe(-0);
+    expect(dramaticButSafe.workLightAlpha).toBeGreaterThan(
+      motion.rest.workLightAlpha,
+    );
   });
 });

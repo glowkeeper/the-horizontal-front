@@ -99,6 +99,13 @@ export function loadPresentation(episode: Episode): LoadedPresentation {
   if (skin.layout !== layout.id) {
     throw new Error(`Skin ${skin.id} is incompatible with layout ${layout.id}`);
   }
+  if (episode.confrontation.resistance.cues.some(
+    ({ timingWindowMs }) => timingWindowMs > layout.controls.maximumTimingWindowMs,
+  )) {
+    throw new Error(
+      `Layout ${layout.id} cannot display this episode's timing tolerance`,
+    );
+  }
 
   const assetIds = new Set(presentationAssets.map(({ id }) => id));
   assertSensiblePresentation(layout, skin, assetIds);

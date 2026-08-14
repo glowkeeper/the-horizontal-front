@@ -26,6 +26,7 @@ describe("catalogued resistance composition", () => {
       "managerial-waltz",
       "syncopated-counterpull",
       "deliberate-rests",
+      "three-and-rest",
       "sustained-grip",
       "call-and-response",
     ]);
@@ -33,6 +34,8 @@ describe("catalogued resistance composition", () => {
       .toContainEqual({ action: "hold", side: "left", atBeat: 0, durationBeats: 2 });
     expect(mechanics.rhythms.get("deliberate-rests")?.events)
       .toContainEqual({ action: "rest", atBeat: 2, durationBeats: 2 });
+    expect(mechanics.rhythms.get("three-and-rest")?.events)
+      .toContainEqual({ action: "rest", atBeat: 3, durationBeats: 1 });
   });
 
   it("compiles The Alarm into four contiguous phases and a finite cue score", () => {
@@ -52,7 +55,21 @@ describe("catalogued resistance composition", () => {
       config.cues[0].atMs - config.cues[0].timingWindowMs,
     );
     expect(config.guideEvents.some((event) =>
-      event.action === "rest" && event.phaseIndex > 0)).toBe(true);
+      event.action === "rest" && event.phaseIndex === 2)).toBe(true);
+    expect(config.guideEvents.some((event) =>
+      event.action === "rest" && event.phaseIndex === 3)).toBe(false);
+    const establishmentIndex = config.phases.findIndex(
+      ({ id }) => id === "establishment",
+    );
+    const holds = config.cues.filter(
+      (cue) => cue.phaseIndex === establishmentIndex && cue.action === "hold",
+    );
+    expect(holds.length).toBeGreaterThan(0);
+    expect(config.guideEvents).toContainEqual(expect.objectContaining({
+      action: "hold",
+      timingWindowMs: 320,
+      releaseAtMs: holds[0].releaseAtMs,
+    }));
     expect(config.cues.every((cue, index) => index === 0 || cue.atMs >= config.cues[index - 1].atMs))
       .toBe(true);
   });
@@ -69,7 +86,7 @@ describe("catalogued resistance composition", () => {
     const config = game.entryEpisode.confrontation.resistance;
     const inactive = advanceResistance(createResistance(config), config.durationMs);
     expect(inactive.state.outcome).toBe("forced-verticalisation");
-    expect(inactive.state.elapsedMs).toBeGreaterThan(18_000);
+    expect(inactive.state.elapsedMs).toBeGreaterThan(17_000);
 
     let resisted = createResistance(config);
     for (const cue of config.cues) {
@@ -113,6 +130,13 @@ describe("catalogued resistance composition", () => {
         action: "press",
         atMs: cue.atMs,
       });
+      if (cue.action === "hold") {
+        indifferent = applyResistanceInput(indifferent, {
+          side: cue.side,
+          action: "release",
+          atMs: cue.releaseAtMs,
+        });
+      }
     }
     indifferent = advanceResistance(indifferent, config.durationMs);
     expect(indifferent.state.outcome).toBe("forced-verticalisation");
@@ -128,6 +152,13 @@ describe("catalogued resistance composition", () => {
         action: "press",
         atMs: cue.atMs,
       });
+      if (cue.action === "hold") {
+        resisted = applyResistanceInput(resisted, {
+          side: cue.side,
+          action: "release",
+          atMs: cue.releaseAtMs,
+        });
+      }
     }
     resisted = advanceResistance(resisted, config.durationMs);
     expect(resisted.state.outcome).toBe("victory");
@@ -143,9 +174,47 @@ describe("catalogued resistance composition", () => {
         action: "press",
         atMs: cue.atMs,
       });
+      if (cue.action === "hold") {
+        resisted = applyResistanceInput(resisted, {
+          side: cue.side,
+          action: "release",
+          atMs: cue.releaseAtMs,
+        });
+      }
     }
     resisted = advanceResistance(resisted, config.durationMs);
     expect(resisted.state.outcome).toBe("victory");
+  });
+
+  it("lets an accurate final phrase recover a threatened player", () => {
+    const config = game.entryEpisode.confrontation.resistance;
+    const crisisPhaseIndex = config.phases.findIndex(({ id }) => id === "crisis");
+    const crisis = config.phases[crisisPhaseIndex];
+    const firstCrisisStep = config.cues.findIndex(
+      ({ phaseIndex }) => phaseIndex === crisisPhaseIndex,
+    );
+    const initial = createResistance(config);
+    let resisted = {
+      ...initial,
+      state: {
+        ...initial.state,
+        duvetSafety: 0.18,
+        resistanceStrength: 0.4,
+        nextRhythmStep: firstCrisisStep,
+        elapsedMs: crisis.startsAtMs,
+        dramaticIntensity: crisis.presentationIntensity.from,
+      },
+    };
+    for (const cue of config.cues.slice(firstCrisisStep)) {
+      resisted = applyResistanceInput(resisted, {
+        side: cue.side,
+        action: "press",
+        atMs: cue.atMs,
+      });
+    }
+    resisted = advanceResistance(resisted, config.durationMs);
+    expect(resisted.state.outcome).toBe("victory");
+    expect(resisted.state.duvetSafety).toBeGreaterThan(0.18);
   });
 
   it("compiles genuine press-and-release holds from the same finite vocabulary", () => {
@@ -162,7 +231,8 @@ describe("catalogued resistance composition", () => {
           beatIntervalMs: 500, timingWindowMs: 100, leadInBeats: 0,
           pressurePerSecond: 0, recoveryPerAction: 0.1,
           safetyPenaltyPerMiss: 0,
-          momentumGain: 0.1, momentumLoss: 0.1, momentumRecoveryBonus: 0,
+          resistanceGainPerHit: 0.1, resistanceLossPerMiss: 0.1,
+          resistanceRecoveryBonus: 0,
           presentationIntensity: { from: 0, to: 1 },
         }],
       })],
@@ -328,7 +398,8 @@ function phase(id: string, from: number, to: number) {
     beatIntervalMs: 500, timingWindowMs: 100, leadInBeats: 0,
     pressurePerSecond: 0, recoveryPerAction: 0,
     safetyPenaltyPerMiss: 0,
-    momentumGain: 0, momentumLoss: 0, momentumRecoveryBonus: 0,
+    resistanceGainPerHit: 0, resistanceLossPerMiss: 0,
+    resistanceRecoveryBonus: 0,
     presentationIntensity: { from, to },
   };
 }

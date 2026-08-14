@@ -23,45 +23,49 @@ export function assertSensiblePresentation(
   if (!(leftControl.x < feedback.x && feedback.x < rightControl.x)) {
     throw new Error("control anchors must read left, feedback, right");
   }
+  if (leftControl.y !== rightControl.y) {
+    throw new Error("control anchors must share a horizontal rhythm lane");
+  }
   for (const [name, control] of [
     ["leftControl", leftControl],
     ["rightControl", rightControl],
   ] as const) {
-    const radius = layout.controls.radius + layout.controls.strokeWidth;
+    const halfGateWidth = layout.controls.maximumTimingWindowMs
+      * layout.controls.noteTravelPixelsPerMs
+      + layout.controls.gateStrokeWidth;
+    const halfGateHeight = layout.controls.gateHeight / 2
+      + layout.controls.gateStrokeWidth;
     if (
-      control.x - radius < 0 || control.x + radius > width
-      || control.y - radius < 0 || control.y + radius > height
+      control.x - halfGateWidth < 0 || control.x + halfGateWidth > width
+      || control.y - halfGateHeight < 0
+      || control.y + layout.controls.controlLabelOffsetY > height
     ) {
       throw new Error(`${name} must fit within the design canvas`);
     }
-    const approachRadius = layout.controls.timingApproachRadius
-      + layout.controls.timingRingStrokeWidth;
-    if (
-      control.x - approachRadius < 0
-      || control.x + approachRadius > width
-      || control.y - approachRadius < 0
-      || control.y + approachRadius > height
-    ) {
-      throw new Error(`${name} timing approach must fit within the design canvas`);
-    }
   }
-  const markerHalfWidth = layout.controls.cueLabelWidth / 2;
-  const markerTop = feedback.y - layout.controls.cueOffsetY
-    - layout.controls.timingApproachRadius;
+  const markerHalfWidth = Math.max(
+    layout.controls.cueLabelWidth,
+    layout.controls.pauseBandWidth,
+  ) / 2;
+  const markerTop = feedback.y - layout.controls.pauseBandHeight / 2;
   if (
     feedback.x - markerHalfWidth < 0
     || feedback.x + markerHalfWidth > width
     || markerTop < 0
   ) {
-    throw new Error("central rhythm cue must fit within the design canvas");
+    throw new Error("central pause band must fit within the design canvas");
   }
   if (
-    layout.controls.activeStrokeWidth < layout.controls.strokeWidth
-    || layout.controls.timingTargetRadius
-      <= layout.controls.radius + layout.controls.activeStrokeWidth
-    || layout.controls.timingApproachRadius <= layout.controls.timingTargetRadius
+    layout.controls.activeGateStrokeWidth < layout.controls.gateStrokeWidth
+    || layout.controls.noteRadius * 2 >= layout.controls.gateHeight
   ) {
-    throw new Error("rhythm cue sizes must surround the control and express an approach");
+    throw new Error("rhythm gate must contain distinct travelling notes");
+  }
+  if (
+    layout.controls.emitterWidth >= layout.controls.pauseBandWidth
+    || layout.controls.emitterHeight > layout.controls.gateHeight
+  ) {
+    throw new Error("centre emitter must remain subordinate to rhythm controls");
   }
 
   if (bedFromFoot.x <= 0) {

@@ -15,26 +15,29 @@ type Motion = {
   readonly rest: { readonly workLightAlpha: number };
 };
 
-const MAXIMUM_AUTHORED_DANGER_FLOOR = 0.5;
+const MAXIMUM_AUTHORED_LIGHT_INTRUSION = 0.5;
 
 export function getResistancePresentation(
   duvetSafety: number,
   dramaticIntensity: number,
   motion: Motion,
 ): ResistancePresentation {
-  const danger = Math.max(
-    1 - clamp01(duvetSafety),
-    clamp01(dramaticIntensity) * MAXIMUM_AUTHORED_DANGER_FLOOR,
+  const physicalDanger = 1 - clamp01(duvetSafety);
+  const lightIntrusion = Math.max(
+    physicalDanger,
+    clamp01(dramaticIntensity) * MAXIMUM_AUTHORED_LIGHT_INTRUSION,
   );
 
   return {
-    bedAngleDegrees: motion.danger.bedAngleDegrees * danger,
-    duvetPullX: danger === 0 ? 0 : motion.danger.duvetX * danger,
-    sleeperSlideX: motion.danger.sleeperX * danger,
+    bedAngleDegrees: motion.danger.bedAngleDegrees * physicalDanger,
+    duvetPullX: physicalDanger === 0
+      ? 0
+      : motion.danger.duvetX * physicalDanger,
+    sleeperSlideX: motion.danger.sleeperX * physicalDanger,
     workLightAlpha: linear(
       motion.rest.workLightAlpha,
       motion.danger.workLightAlpha,
-      danger,
+      lightIntrusion,
     ),
   };
 }

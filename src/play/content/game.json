@@ -29,6 +29,8 @@
       "now": "NOW: {side}",
       "cueTap": "{side}",
       "cueHold": "HOLD {side}",
+      "cueHolding": "HOLD",
+      "cueReleaseNow": "RELEASE NOW",
       "cueRest": "REST",
       "cueCountIn": "READY",
       "cueHitNow": "HIT NOW",

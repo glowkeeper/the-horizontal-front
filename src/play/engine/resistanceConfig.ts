@@ -14,9 +14,9 @@ export function assertValidResistanceConfig(config: ResistanceConfig): void {
     assertNonNegative(`phases[${index}].pressurePerSecond`, phase.pressurePerSecond);
     assertNonNegative(`phases[${index}].recoveryPerAction`, phase.recoveryPerAction);
     assertNonNegative(`phases[${index}].safetyPenaltyPerMiss`, phase.safetyPenaltyPerMiss);
-    assertUnitInterval(`phases[${index}].momentumGain`, phase.momentumGain);
-    assertUnitInterval(`phases[${index}].momentumLoss`, phase.momentumLoss);
-    assertNonNegative(`phases[${index}].momentumRecoveryBonus`, phase.momentumRecoveryBonus);
+    assertUnitInterval(`phases[${index}].resistanceGainPerHit`, phase.resistanceGainPerHit);
+    assertUnitInterval(`phases[${index}].resistanceLossPerMiss`, phase.resistanceLossPerMiss);
+    assertNonNegative(`phases[${index}].resistanceRecoveryBonus`, phase.resistanceRecoveryBonus);
     assertUnitInterval(`phases[${index}].presentationIntensity.from`, phase.presentationIntensity.from);
     assertUnitInterval(`phases[${index}].presentationIntensity.to`, phase.presentationIntensity.to);
     boundary = phase.endsAtMs;
@@ -42,6 +42,12 @@ export function assertValidResistanceConfig(config: ResistanceConfig): void {
     }
     if (!config.phases[event.phaseIndex]) {
       throw new Error(`guideEvents[${index}] has an invalid phaseIndex`);
+    }
+    if (
+      event.action === "hold"
+      && (event.releaseAtMs <= event.atMs || event.releaseAtMs > event.endsAtMs)
+    ) {
+      throw new Error(`guideEvents[${index}] hold must contain its releaseAtMs`);
     }
   }
 }

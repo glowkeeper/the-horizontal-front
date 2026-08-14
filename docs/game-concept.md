@@ -24,8 +24,8 @@ Possible opening copy:
 ## Core loop
 
 1. A level begins with the player safely in bed.
-2. The boss continuously tips the bed and pulls the duvet away from the player.
-3. Successful rhythmic inputs pull the duvet back toward safety.
+2. The boss applies continuous pressure, but earned resistance suppresses its mechanical effect between beats.
+3. Successful rhythmic inputs strengthen that persistent resistance and pull the duvet back toward safety.
 4. Corporate attacks periodically interrupt, complicate, or replace the current rhythm.
 5. Pressure increases throughout the level.
 6. The final ten seconds become a frantic morning offensive.
@@ -33,7 +33,7 @@ Possible opening copy:
 
 The duvet and bed communicate danger directly: the duvet is progressively pulled down, the mattress tilts, the player becomes exposed, and cold work light invades the room. A small optional accessibility indicator may supplement this presentation, but a conventional Tilt Meter is not the primary interface.
 
-The duration, pressure curve, and recovery per input all require playtesting. Thirty seconds is the current starting point, not a final rule.
+The authored pressure curve controls management's attack, not an unavoidable damage rate. Net safety loss is the unresisted fraction of that pressure: accurate performance must remain mechanically effective even when the authored rhythm is slow. The duration, pressure curve, resistance gains and recovery per input all require playtesting. Thirty seconds is the current starting point, not a final rule.
 
 ## Basic input
 
@@ -41,9 +41,11 @@ Normal tapping represents pulling the duvet back, gripping the mattress, or othe
 
 The first episode begins with a simple alternating left-right pattern, but alternation is only the first member of the implemented rhythm catalogue. The same validated vocabulary already expresses rests, sustained holds, waltz groupings, syncopation, call-and-response and deliberately awkward managerial rhythms. Episodes and dramatic phases select and combine those reusable patterns as data. Difficulty should come from listening, anticipation, coordination, interruptions, and pattern changes as well as pressure. It should not primarily scale by demanding ever more inputs per second.
 
+Accurate hits build persistent resistance strength. Authored pressure acts only on the remaining exposed fraction, so resistance continues between beats rather than behaving like discrete healing against continuous unavoidable damage. Misses weaken resistance; READY and REST freeze both safety and earned strength. Beat frequency therefore does not determine whether an episode gives the player enough opportunities to survive.
+
 The required rhythm, player input, procedural audio, visual timing cues, and optional haptic cues should share one timing source. Music can therefore teach and enforce a pattern rather than merely accompany it. Critical timing must never be communicated by music alone: equivalent visual cues must support deaf and hard-of-hearing players, while clear audio cues should support players who cannot rely on the visual presentation.
 
-Complex rhythms must be taught before they are tested. During play, the required control becomes visually dominant in advance, then explicitly says `HIT NOW` throughout its valid input window; a contracting ring provides anticipation rather than carrying the meaning alone. The centre is reserved for instructions without a button target: one opening READY and authored REST intervals. Passive danger and its animation pause during both, so following an instruction never harms the player. Phrase previews, rehearsal, audio, and optional haptics may teach anticipation, but must reinforce this readable timing source rather than rescue an otherwise unreadable mechanic.
+Complex rhythms must be taught before they are tested. During play, notes emerge from a clipped centre emitter and travel horizontally outward at one constant layout-authored speed through a compact gate at the actual left or right control. Tempo determines spacing, hold duration determines long-note length, and timing tolerance determines gate width. The gate's shaded width is the real early-to-late timing window: entering it permits input, its centre line is the ideal beat, and leaving it is too late. Position is the primary timing channel, opacity strengthens the approach, and the control explicitly says `HIT NOW` throughout the valid window. A hold is one continuous outlined note: press when its head crosses the gate, keep holding as the gate latches and the sustained portion changes colour, and release when its emphasized tail crosses. Long notes stream from the centre without entering the opposite lane; their visible geometry is clipped to the lane even when the authored hold is longer than the available screen width. An early release visibly breaks the note, an expired note escapes as a red crossed miss, and a successful input is absorbed in a brief burst. The centre also carries compact targetless instructions: one opening READY and authored REST intervals. Passive danger and its animation pause during both, so following an instruction never harms the player. Phrase previews, rehearsal, audio, and optional haptics may teach anticipation, but must reinforce this readable timing source rather than rescue an otherwise unreadable mechanic.
 
 Difficulty should be calibrated per input method. Five taps per second on a touchscreen does not necessarily represent the same effort as five alternating keyboard presses. The experience should feel equivalently demanding across devices rather than using identical numerical thresholds. Complex rhythms should usually trade physical speed for cognitive or coordinative difficulty, and reduced-input options should preserve the rhythmic idea without requiring unsafe repetition.
 

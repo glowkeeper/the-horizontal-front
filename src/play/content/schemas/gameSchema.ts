@@ -94,6 +94,8 @@ export const gameSchema = z.object({
       now: copyTemplate("side"),
       cueTap: copyTemplate("side"),
       cueHold: copyTemplate("side"),
+      cueHolding: shortCopy,
+      cueReleaseNow: shortCopy,
       cueRest: shortCopy,
       cueCountIn: shortCopy,
       cueHitNow: shortCopy,

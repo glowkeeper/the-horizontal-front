@@ -21,54 +21,54 @@
             "pressurePerSecond": 0.018,
             "recoveryPerAction": 0.045,
             "safetyPenaltyPerMiss": 0.012,
-            "momentumGain": 0.14,
-            "momentumLoss": 0.10,
-            "momentumRecoveryBonus": 0.4,
+            "resistanceGainPerHit": 0.14,
+            "resistanceLossPerMiss": 0.10,
+            "resistanceRecoveryBonus": 0.4,
             "presentationIntensity": { "from": 0, "to": 0.12 }
           },
           {
             "id": "establishment",
             "durationMs": 6000,
-            "rhythm": { "source": "shared", "id": "straight-alternation" },
+            "rhythm": { "source": "shared", "id": "sustained-grip" },
             "beatIntervalMs": 820,
             "timingWindowMs": 320,
             "leadInBeats": 1,
             "pressurePerSecond": 0.028,
             "recoveryPerAction": 0.048,
             "safetyPenaltyPerMiss": 0.025,
-            "momentumGain": 0.12,
-            "momentumLoss": 0.13,
-            "momentumRecoveryBonus": 0.45,
+            "resistanceGainPerHit": 0.12,
+            "resistanceLossPerMiss": 0.13,
+            "resistanceRecoveryBonus": 0.45,
             "presentationIntensity": { "from": 0.12, "to": 0.32 }
           },
           {
             "id": "pressure",
             "durationMs": 8000,
-            "rhythm": { "source": "shared", "id": "deliberate-rests" },
+            "rhythm": { "source": "shared", "id": "three-and-rest" },
             "beatIntervalMs": 700,
             "timingWindowMs": 280,
             "leadInBeats": 1,
             "pressurePerSecond": 0.028,
             "recoveryPerAction": 0.048,
-            "safetyPenaltyPerMiss": 0.04,
-            "momentumGain": 0.11,
-            "momentumLoss": 0.16,
-            "momentumRecoveryBonus": 0.5,
+            "safetyPenaltyPerMiss": 0.027,
+            "resistanceGainPerHit": 0.11,
+            "resistanceLossPerMiss": 0.16,
+            "resistanceRecoveryBonus": 0.5,
             "presentationIntensity": { "from": 0.32, "to": 0.68 }
           },
           {
             "id": "crisis",
             "durationMs": 5000,
-            "rhythm": { "source": "shared", "id": "deliberate-rests" },
+            "rhythm": { "source": "shared", "id": "straight-alternation" },
             "beatIntervalMs": 650,
             "timingWindowMs": 250,
             "leadInBeats": 1,
             "pressurePerSecond": 0.25,
-            "recoveryPerAction": 0.057,
+            "recoveryPerAction": 0.09,
             "safetyPenaltyPerMiss": 0.075,
-            "momentumGain": 0.10,
-            "momentumLoss": 0.20,
-            "momentumRecoveryBonus": 0.55,
+            "resistanceGainPerHit": 0.18,
+            "resistanceLossPerMiss": 0.20,
+            "resistanceRecoveryBonus": 0.55,
             "presentationIntensity": { "from": 0.68, "to": 1 }
           }
         ]
@@ -86,7 +86,7 @@
     },
     "copy": {
       "headline": "HOLD THE LINE",
-      "instructionsStatus": "Hold the line. Watch the highlighted control and press when it says HIT NOW. Do nothing during REST."
+      "instructionsStatus": "Hold the line. Tap when a note crosses its gate. For a long note, hold from its head to its tail. Do nothing during REST."
     }
   },
   "results": {

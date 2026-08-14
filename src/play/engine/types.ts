@@ -25,9 +25,19 @@ export type ScoredRhythmCue =
 
 export type RhythmGuideEvent =
   | {
-      readonly action: "tap" | "hold";
+      readonly action: "tap";
       readonly side: ResistanceSide;
       readonly atMs: number;
+      readonly timingWindowMs: number;
+      readonly endsAtMs: number;
+      readonly phaseIndex: number;
+    }
+  | {
+      readonly action: "hold";
+      readonly side: ResistanceSide;
+      readonly atMs: number;
+      readonly timingWindowMs: number;
+      readonly releaseAtMs: number;
       readonly endsAtMs: number;
       readonly phaseIndex: number;
     }
@@ -45,9 +55,9 @@ export type ResistancePhase = {
   readonly pressurePerSecond: number;
   readonly recoveryPerAction: number;
   readonly safetyPenaltyPerMiss: number;
-  readonly momentumGain: number;
-  readonly momentumLoss: number;
-  readonly momentumRecoveryBonus: number;
+  readonly resistanceGainPerHit: number;
+  readonly resistanceLossPerMiss: number;
+  readonly resistanceRecoveryBonus: number;
   readonly presentationIntensity: {
     readonly from: number;
     readonly to: number;
@@ -91,7 +101,7 @@ export type ActiveHold = {
 
 export type ResistanceState = {
   readonly duvetSafety: number;
-  readonly rhythmMomentum: number;
+  readonly resistanceStrength: number;
   readonly nextRhythmStep: number;
   readonly activeHold: ActiveHold | null;
   readonly elapsedMs: number;

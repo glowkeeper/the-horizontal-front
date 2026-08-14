@@ -95,9 +95,9 @@ function createPhaseSchema<T extends z.ZodType>(referenceSchema: T) {
   pressurePerSecond: z.number().nonnegative(),
   recoveryPerAction: z.number().nonnegative(),
   safetyPenaltyPerMiss: z.number().nonnegative().default(0),
-  momentumGain: z.number().min(0).max(1),
-  momentumLoss: z.number().min(0).max(1),
-  momentumRecoveryBonus: z.number().nonnegative(),
+  resistanceGainPerHit: z.number().min(0).max(1),
+  resistanceLossPerMiss: z.number().min(0).max(1),
+  resistanceRecoveryBonus: z.number().nonnegative(),
   presentationIntensity: z.object({
     from: z.number().min(0).max(1),
     to: z.number().min(0).max(1),

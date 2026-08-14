@@ -5,6 +5,7 @@
     { "id": "managerial-waltz", "file": "managerial-waltz.json" },
     { "id": "syncopated-counterpull", "file": "syncopated-counterpull.json" },
     { "id": "deliberate-rests", "file": "deliberate-rests.json" },
+    { "id": "three-and-rest", "file": "three-and-rest.json" },
     { "id": "sustained-grip", "file": "sustained-grip.json" },
     { "id": "call-and-response", "file": "call-and-response.json" }
   ],

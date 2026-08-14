@@ -19,18 +19,24 @@
     "nextCue": { "x": 640, "y": 145 },
     "leftControl": { "x": 410, "y": 610 },
     "rightControl": { "x": 870, "y": 610 },
-    "feedback": { "x": 640, "y": 630 }
+    "feedback": { "x": 640, "y": 690 }
   },
   "controls": {
-    "radius": 55,
-    "strokeWidth": 7,
-    "activeStrokeWidth": 12,
+    "gateHeight": 76,
+    "gateStrokeWidth": 4,
+    "activeGateStrokeWidth": 7,
+    "gateBeatLineWidth": 4,
+    "noteTravelPixelsPerMs": 0.14,
+    "maximumTimingWindowMs": 400,
+    "controlLabelOffsetY": 58,
+    "emitterWidth": 8,
+    "emitterHeight": 48,
     "cueLabelWidth": 180,
-    "cueOffsetY": 100,
-    "timingTargetRadius": 70,
-    "timingApproachRadius": 100,
-    "timingRingStrokeWidth": 5,
-    "timingApproachDurationMs": 900
+    "noteRadius": 18,
+    "noteMinimumAlpha": 0.18,
+    "visibleGuideEvents": 3,
+    "pauseBandWidth": 154,
+    "pauseBandHeight": 44
   },
   "motion": {
     "danger": { "bedAngleDegrees": -18, "duvetX": -300, "sleeperX": -130, "workLightAlpha": 0.62 },

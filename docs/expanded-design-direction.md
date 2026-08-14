@@ -39,7 +39,7 @@ On desktop:
 
 The reusable rhythm catalogue expresses accents through timing and side composition, explicit rests, sustained holds, waltz groupings, syncopation, changing patterns and rhythms framed as absurd corporate initiatives. Confrontations select these capabilities through their catalogued dramatic curves. A synthetic musical piece may teach and enforce the rhythm when its beat clock is shared with the game rules. Control-local timing targets, animation, and optional haptics should express the same timing so music is never the sole critical cue.
 
-The first episode teaches one phrase before applying pressure: alternating left and right, then an explicit breath. Its later phases repeat that learned phrase rather than introducing syncopation during crisis. More complex catalogue rhythms belong in episodes whose composition visibly introduces and rehearses them.
+The first episode teaches straight left-right taps, introduces alternating sustained grips, develops into three taps followed by one explicit breath, then removes the internal rest for a continuous alternating final phrase. Holds are introduced during establishment, where timing is generous and pressure remains moderate, so their head/body/tail grammar is rehearsed before the crisis. The curve changes action type and density without introducing syncopation or an unsafe jump in speed. More complex catalogue rhythms belong in episodes whose composition visibly introduces and rehearses them.
 
 This creates something that can feel demanding while still requiring coordination. Difficulty can increase through:
 
@@ -51,9 +51,9 @@ This creates something that can feel demanding while still requiring coordinatio
 - Longer attack combinations.
 - Shorter recovery windows.
 
-Difficulty should not primarily become a race toward higher input rates. Complex patterns should usually exchange speed for listening, anticipation, memory, or coordination. This preserves variety, reinforces the rhythm-and-resistance identity, and reduces the risk of repetitive strain. Missing a beat should weaken resistance rather than provoke an unsafe burst of frantic recovery.
+Difficulty should not primarily become a race toward higher input rates. Complex patterns should usually exchange speed for listening, anticipation, memory, or coordination. This preserves variety, reinforces the rhythm-and-resistance identity, and reduces the risk of repetitive strain. Missing a beat should weaken resistance rather than provoke an unsafe burst of frantic recovery. Accurate rhythm builds resistance that persists between beats and suppresses the corresponding fraction of management pressure. A slow authored beat must therefore remain as mechanically viable as a fast one; difficulty comes from performing the phrase, not from being denied recovery opportunities while unavoidable damage accumulates.
 
-Each confrontation can have an authored pressure and rhythm curve, so overcoming a hard level feels meaningful without relying on adaptive difficulty or relentless acceleration.
+Each confrontation can have an authored pressure and rhythm curve, so overcoming a hard level feels meaningful without relying on adaptive difficulty or relentless acceleration. Presentation intensity is separate: atmosphere may become more alarming while bed angle, duvet loss and sleeper displacement continue to report actual safety. Correct final-phrase play can therefore visibly arrest or reverse the lift even during the most dramatic presentation.
 
 ## Rewards without productivity ideology
 
