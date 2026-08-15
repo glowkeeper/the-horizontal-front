@@ -3,7 +3,7 @@ import type Phaser from "phaser";
 import type { Episode } from "../../content/loadEpisode";
 import type { ResistanceLayoutContent } from "../../content/schemas/presentationSchema";
 import type { InterruptionSkin } from "../../content/schemas/presentationSchema";
-import { createBedHeadRightLayout } from "./bedHeadRightLayout";
+import { createEpisodeConfrontationLayout } from "./episodeConfrontationLayout";
 
 export type ResistanceLayout = {
   readonly content: ResistanceLayoutContent;
@@ -19,7 +19,7 @@ export function createResistanceLayout(
 ): ResistanceLayout {
   const presentation = episode.confrontation.presentation;
   switch (presentation.layout.id) {
-    case "bed-head-right":
-      return createBedHeadRightLayout(scene, episode);
+    case "episode-confrontation":
+      return createEpisodeConfrontationLayout(scene, episode);
   }
 }

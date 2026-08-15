@@ -162,6 +162,14 @@ excessive managerial apparatus attempts forced verticalisation. Symbolic props
 and recurring details can reward inspection, but must not compete with rhythm
 cues, hands, expressions, dialogue or the physical danger state.
 
+The project uses the existing game hierarchy to name this artwork in content:
+an episode contains a `confrontation`; its playable visual focus is
+`confrontation.resistance`; the force acting against it is
+`confrontation.opposingActor`; and surrounding change belongs to
+`confrontation.environment`. These are production roles, not prescriptions for
+what later community-created episodes must depict. Briefing and debriefing
+graphics remain `illustrations`, a separate narrative-art family.
+
 ### Print character is a material suggestion, not imitation
 
 Rough ink contours, limited colour, decisive silhouettes, cut-paper edges and

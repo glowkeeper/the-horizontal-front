@@ -95,9 +95,8 @@ describe("game content loading", () => {
       "orientation", "establishment", "pressure", "crisis",
     ]);
     expect(episode.confrontation.presentation).toEqual({
-      layout: { source: "shared", id: "bed-head-right" },
+      layout: { source: "shared", id: "episode-confrontation" },
       skin: { source: "episode", id: "the-alarm-bedroom" },
-      managementAction: "lift-head",
     });
   });
 

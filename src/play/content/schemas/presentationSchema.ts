@@ -227,12 +227,35 @@ const easeSchema = z.enum([
   "Sine.Out", "Back.In", "Back.Out", "Quad.In", "Quad.Out",
 ]);
 
+const resistanceVisualSchema = z.object({
+  x: z.number(),
+  y: z.number(),
+  width: positiveSizeSchema,
+  height: positiveSizeSchema,
+  originX: unitIntervalSchema.optional(),
+  originY: unitIntervalSchema.optional(),
+  dangerAngleDegrees: z.number().min(-90).max(-1),
+  states: z.array(z.object({
+    minimumDanger: unitIntervalSchema,
+    asset: ownedContentReferenceSchema,
+  }).strict()).min(1),
+  transition: z.object({
+    crossfadeDurationMs: z.number().int().positive().max(1_000),
+    rotationResponseMs: z.number().int().positive().max(2_000),
+    ease: easeSchema,
+    joltX: z.number().min(-40).max(40),
+    joltY: z.number().min(-40).max(40),
+    shakeAmplitude: z.number().nonnegative().max(20),
+    shakeDurationMs: z.number().int().positive().max(1_000),
+  }).strict(),
+  reducedMotion: z.object({
+    crossfadeDurationMs: z.number().int().nonnegative().max(200),
+  }).strict(),
+}).strict();
+
 export const resistanceLayoutSchema = z.object({
   schemaVersion: z.literal(1),
-  id: z.literal("bed-head-right"),
-  copy: z.object({
-    managementCaption: z.string().trim().min(1).max(120),
-  }).strict(),
+  id: z.literal("episode-confrontation"),
   designSize: z.object({
     width: z.number().int().positive(),
     height: z.number().int().positive(),
@@ -241,11 +264,16 @@ export const resistanceLayoutSchema = z.object({
     floor: rectangleSchema,
     workLight: rectangleSchema,
   }).strict(),
+  statusPanel: z.object({
+    frame: rectangleSchema,
+    fill: colourRoleSchema,
+    fillAlpha: unitIntervalSchema,
+    stroke: colourRoleSchema,
+    strokeWidth: z.number().nonnegative(),
+  }).strict(),
   anchors: z.object({
-    bedFootPivot: pointSchema,
-    bedFromFoot: pointSchema,
-    management: pointSchema,
-    managementCaption: pointSchema,
+    opposingActor: pointSchema,
+    pressureCaption: pointSchema,
     title: pointSchema,
     time: pointSchema,
     result: pointSchema,
@@ -331,9 +359,6 @@ export const resistanceLayoutSchema = z.object({
   }).strict(),
   motion: z.object({
     danger: z.object({
-      bedAngleDegrees: z.number().min(-90).max(0),
-      duvetX: z.number().max(0),
-      sleeperX: z.number().max(0),
       workLightAlpha: unitIntervalSchema,
     }).strict(),
     rest: z.object({ workLightAlpha: unitIntervalSchema }).strict(),
@@ -341,13 +366,7 @@ export const resistanceLayoutSchema = z.object({
       durationMs: z.number().int().positive(), ease: easeSchema,
     }).strict(),
     forcedVerticalisation: z.object({
-      bedAngleDegrees: z.number().min(-90).max(0),
-      bedDurationMs: z.number().int().positive(), bedEase: easeSchema,
-      sleeperX: z.number().max(0), sleeperY: z.number(),
-      sleeperAngleDegrees: z.number().min(-360).max(360),
-      sleeperDurationMs: z.number().int().positive(), sleeperEase: easeSchema,
-      duvetX: z.number().max(0), duvetAlpha: unitIntervalSchema,
-      duvetDurationMs: z.number().int().positive(), duvetEase: easeSchema,
+      durationMs: z.number().int().positive(), ease: easeSchema,
     }).strict(),
   }).strict(),
 }).strict();
@@ -355,73 +374,66 @@ export const resistanceLayoutSchema = z.object({
 export const resistanceSkinSchema = z.object({
   schemaVersion: z.literal(1),
   id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
-  layout: z.literal("bed-head-right"),
-  copy: z.object({
-    managementLabel: z.string().trim().min(1).max(80),
+  layout: z.literal("episode-confrontation"),
+  confrontation: z.object({
+    copy: z.object({
+      opposingActorLabel: z.string().trim().min(1).max(80),
+      pressureCaption: z.string().trim().min(1).max(120),
+    }).strict(),
+    resistance: resistanceVisualSchema,
+    environment: z.object({
+      replacesLayoutBackdrop: z.boolean(),
+      baseParts: z.array(shapePartSchema),
+      intensityParts: z.array(z.object({
+        part: shapePartSchema,
+        restAlpha: unitIntervalSchema,
+        dangerAlpha: unitIntervalSchema,
+        restOffsetX: z.number(),
+        dangerOffsetX: z.number(),
+      }).strict()),
+    }).strict(),
+    opposingActor: z.object({
+      parts: z.array(shapePartSchema).min(1),
+      states: z.array(z.object({
+        minimumIntensity: unitIntervalSchema,
+        assets: z.array(z.object({
+          partId: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+          asset: ownedContentReferenceSchema,
+        }).strict()).min(1),
+      }).strict()).min(1),
+    }).strict(),
   }).strict(),
-  bed: z.object({
-    duvetRestingX: z.number(),
-    sleeperRestingX: z.number(),
-    staticParts: z.array(shapePartSchema).min(1),
-    sleeperParts: z.array(shapePartSchema).min(1),
-    duvet: shapePartSchema,
-    duvetOverlayParts: z.array(shapePartSchema).default([]),
-    duvetStates: z.array(z.object({
-      minimumDanger: unitIntervalSchema,
-      asset: ownedContentReferenceSchema,
-    }).strict()).default([]),
-  }).strict(),
-  environment: z.object({
-    replacesLayoutBackdrop: z.boolean(),
-    baseParts: z.array(shapePartSchema),
-    intensityParts: z.array(z.object({
-      part: shapePartSchema,
-      restAlpha: unitIntervalSchema,
-      dangerAlpha: unitIntervalSchema,
-      restOffsetX: z.number(),
-      dangerOffsetX: z.number(),
-    }).strict()),
-  }).strict().default({
-    replacesLayoutBackdrop: false,
-    baseParts: [],
-    intensityParts: [],
-  }),
-  managementParts: z.array(shapePartSchema).min(1),
-  managementStates: z.array(z.object({
-    minimumIntensity: unitIntervalSchema,
-    assets: z.array(z.object({
-      partId: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
-      asset: ownedContentReferenceSchema,
-    }).strict()).min(1),
-  }).strict()).default([]),
 }).strict().superRefine((skin, context) => {
-  const thresholds = skin.bed.duvetStates.map(({ minimumDanger }) => minimumDanger);
-  if (thresholds.length > 0 && thresholds[0] !== 0) {
-    context.addIssue({ code: "custom", message: "duvet states must begin at zero danger" });
+  const { resistance, opposingActor, environment } = skin.confrontation;
+  const resistanceThresholds = resistance.states.map(({ minimumDanger }) => minimumDanger);
+  if (resistanceThresholds[0] !== 0) {
+    context.addIssue({ code: "custom", message: "resistance states must begin at zero danger" });
   }
-  if (thresholds.some((threshold, index) => index > 0 && threshold <= thresholds[index - 1])) {
-    context.addIssue({ code: "custom", message: "duvet-state danger thresholds must increase" });
-  }
-  const managementThresholds = skin.managementStates.map(({ minimumIntensity }) => minimumIntensity);
-  if (managementThresholds.length > 0 && managementThresholds[0] !== 0) {
-    context.addIssue({ code: "custom", message: "management states must begin at zero intensity" });
-  }
-  if (managementThresholds.some(
-    (threshold, index) => index > 0 && threshold <= managementThresholds[index - 1],
+  if (resistanceThresholds.some(
+    (threshold, index) => index > 0 && threshold <= resistanceThresholds[index - 1],
   )) {
-    context.addIssue({ code: "custom", message: "management-state intensity thresholds must increase" });
+    context.addIssue({ code: "custom", message: "resistance-state danger thresholds must increase" });
   }
-  for (const [index, state] of skin.managementStates.entries()) {
+  const actorThresholds = opposingActor.states.map(({ minimumIntensity }) => minimumIntensity);
+  if (actorThresholds[0] !== 0) {
+    context.addIssue({ code: "custom", message: "opposing-actor states must begin at zero intensity" });
+  }
+  if (actorThresholds.some(
+    (threshold, index) => index > 0 && threshold <= actorThresholds[index - 1],
+  )) {
+    context.addIssue({ code: "custom", message: "opposing-actor state intensity thresholds must increase" });
+  }
+  for (const [index, state] of opposingActor.states.entries()) {
     const partIds = state.assets.map(({ partId }) => partId);
     if (new Set(partIds).size !== partIds.length) {
       context.addIssue({
         code: "custom",
-        message: "management state part IDs must be unique",
-        path: ["managementStates", index, "assets"],
+        message: "opposing-actor state part IDs must be unique",
+        path: ["opposingActor", "states", index, "assets"],
       });
     }
   }
-  for (const [index, layer] of skin.environment.intensityParts.entries()) {
+  for (const [index, layer] of environment.intensityParts.entries()) {
     if (layer.dangerAlpha < layer.restAlpha) {
       context.addIssue({
         code: "custom",

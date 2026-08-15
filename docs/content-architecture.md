@@ -91,10 +91,10 @@ mechanics/
   interruptions/
     quick-call.json
     urgent-email.json
-presentation/
+  presentation/
   asset-catalog.json
   layouts/
-    bed-head-right.json
+    episode-confrontation.json
   skins/
     shared/
     episodes/the-alarm/
@@ -195,6 +195,29 @@ Interruption definitions follow the same two-level ownership rule as rhythms and
 
 Interruption presentation skins are a separate validated content family under `presentation/interruption-skins/shared/` and `presentation/interruption-skins/episodes/<episode-id>/`. Every interruption composition explicitly selects one with `{ source, id }`. A skin declares the mechanic kinds it supports and owns semantic appearance: theme roles, typography roles and sizes, layer depth, panel treatment, choice emphasis, hold progress styling, and warning/active/success/failure/cancelled/returning state treatments. Layout data continues to own anchors, dimensions and spatial offsets. The Phaser adapter interprets those two resolved inputs and contains no authored appearance values.
 
+Resistance skins supply a complete resistance-state sequence when several
+visual elements must share one authored perspective. Resistance
+states use ordered physical-danger thresholds and ownership-qualified semantic
+asset references. One shared display frame and pivot register every state on a
+normalized local plane. The skin authors the maximum danger angle so Phaser can
+rotate continuously with physical danger, plus the small threshold-transition
+vocabulary—crossfade, jolt, shake and a reduced-motion crossfade. The generic
+adapter performs the motion without knowing the episode or asset IDs.
+Environment and opposing-actor layers remain independently authored so lighting,
+spatial pressure and the antagonist's effort can change without being baked into
+the primary artwork. The shared resistance layout also owns a semantic status-panel
+frame and theme roles, protecting the headline and countdown from busy episode
+art without embedding copy or episode-specific presentation in TypeScript.
+
+The data-driven boundary applies to names as well as values. Shared schemas,
+renderers and layout IDs describe reusable visual roles
+(`confrontation.resistance`, `confrontation.opposingActor`,
+`confrontation.environment` and state transitions); they must not
+name an episode's furniture, character action or asset. Episode-owned skins and
+catalogue entries may use story-specific language because that is authored
+content, while ownership-qualified paths remain mandatory. A new episode changes
+JSON and catalogued media, never TypeScript or renderer registration.
+
 Shared interruption skins are globally reusable. Episode-owned interruption skins are private, cannot shadow shared IDs and are resolved only for their owning episode. Content loading and repository policy checks reject invalid paths, filename/ID mismatches, unresolved ownership references and mechanic/skin incompatibility.
 
 ## JSON must not become programming
@@ -221,9 +244,8 @@ Cartoon scenes should use reusable layouts and semantic slots rather than making
 
 ```json
 {
-  "layout": { "source": "shared", "id": "bed-head-right" },
-  "skin": { "source": "episode", "id": "the-alarm-bedroom" },
-  "managementAction": "lift-head"
+  "layout": { "source": "shared", "id": "episode-confrontation" },
+  "skin": { "source": "episode", "id": "the-alarm-bedroom" }
 }
 ```
 

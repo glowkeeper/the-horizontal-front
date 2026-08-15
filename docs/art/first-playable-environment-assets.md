@@ -25,14 +25,16 @@ not contain episode-specific file paths or TypeScript branches.
   dry print texture and warm restrained palette; flat #00ff00 background; no
   characters, text, logos, signatures, watermarks or photorealism.”
 - Edits: local chroma removal, despill and component crops without resizing.
-  The runtime flips the bed-frame crop horizontally to preserve the authored
-  bed-head-right layout.
+  These early cut-out components are retained with their provenance but were
+  superseded in the playable episode by the authored
+  `confrontation.resistance` state sequence.
 - Runtime IDs: `bed-frame`, `bed-mattress`, `pillow-near`, `pillow-far`,
   `duvet-rest`, `duvet-tension-low`, `duvet-tension-high` and
   `duvet-forced-verticalisation`.
 
-The four duvet silhouettes are discrete authored states selected by validated
-danger thresholds. They are not procedural cloth deformation.
+The four duvet silhouettes were discrete authored hypotheses rather than
+procedural cloth deformation. They are not selected by the current episode
+skin.
 
 ## Empty bedroom
 

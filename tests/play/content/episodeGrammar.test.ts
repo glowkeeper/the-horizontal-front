@@ -165,10 +165,7 @@ describe("minimum validated episode grammar", () => {
   it("enforces the current finite presentation capabilities", () => {
     expect(() => load(episodeWith(
       ["confrontation", "presentation", "layout", "id"], "office-left",
-    ))).toThrow(/bed-head-right/);
-    expect(() => load(episodeWith(
-      ["confrontation", "presentation", "managementAction"], "push-foot",
-    ))).toThrow(/lift-head/);
+    ))).toThrow(/episode-confrontation/);
   });
 
   it("rejects invalid interruption placement and duration", () => {

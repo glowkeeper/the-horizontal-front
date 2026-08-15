@@ -178,6 +178,24 @@ export class ResistanceScene extends Phaser.Scene {
     );
     const { anchors } = this.layout.content;
     const presentation = this.layout.content.rhythmPresentation;
+    const statusPanel = this.layout.content.statusPanel;
+
+    this.add.rectangle(
+      statusPanel.frame.x,
+      statusPanel.frame.y,
+      statusPanel.frame.width,
+      statusPanel.frame.height,
+      this.colour(statusPanel.fill),
+      statusPanel.fillAlpha,
+    )
+      .setOrigin(
+        statusPanel.frame.originX ?? 0.5,
+        statusPanel.frame.originY ?? 0.5,
+      )
+      .setStrokeStyle(
+        statusPanel.strokeWidth,
+        this.colour(statusPanel.stroke),
+      );
 
     this.add
       .text(anchors.title.x, anchors.title.y, this.episode.confrontation.copy.headline, {

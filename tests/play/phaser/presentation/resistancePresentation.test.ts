@@ -1,26 +1,20 @@
 import { describe, expect, it } from "vitest";
 
 import { getResistancePresentation } from "../../../../src/play/phaser/presentation/resistancePresentation";
-import layoutContent from "../../../../src/play/content/presentation/layouts/bed-head-right.json";
+import layoutContent from "../../../../src/play/content/presentation/layouts/episode-confrontation.json";
 import { resistanceLayoutSchema } from "../../../../src/play/content/schemas/presentationSchema";
 
 const motion = resistanceLayoutSchema.parse(layoutContent).motion;
 
 describe("resistance presentation", () => {
-  it("keeps a safe bed level and the duvet over the sleeper", () => {
+  it("keeps the environment calm while resistance is safe", () => {
     expect(getResistancePresentation(1, 0, motion)).toEqual({
-      bedAngleDegrees: -0,
-      duvetPullX: 0,
-      sleeperSlideX: -0,
       workLightAlpha: 0.08,
     });
   });
 
-  it("lifts the head, separates the duvet, and slides the sleeper at danger", () => {
+  it("increases environmental pressure at danger", () => {
     expect(getResistancePresentation(0, 1, motion)).toEqual({
-      bedAngleDegrees: -18,
-      duvetPullX: -300,
-      sleeperSlideX: -130,
       workLightAlpha: 0.62,
     });
   });
@@ -34,11 +28,8 @@ describe("resistance presentation", () => {
     );
   });
 
-  it("uses authored intensity for atmosphere without faking physical danger", () => {
+  it("uses authored intensity for atmosphere", () => {
     const dramaticButSafe = getResistancePresentation(1, 1, motion);
-    expect(dramaticButSafe.bedAngleDegrees).toBe(-0);
-    expect(dramaticButSafe.duvetPullX).toBe(0);
-    expect(dramaticButSafe.sleeperSlideX).toBe(-0);
     expect(dramaticButSafe.workLightAlpha).toBeGreaterThan(
       motion.rest.workLightAlpha,
     );

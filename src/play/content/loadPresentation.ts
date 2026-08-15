@@ -163,13 +163,9 @@ export function assertAssetOwnership(
     assets.map((asset) => [asset.id, asset]),
   );
   const parts = [
-    ...skin.bed.staticParts,
-    ...skin.bed.sleeperParts,
-    skin.bed.duvet,
-    ...skin.bed.duvetOverlayParts,
-    ...skin.environment.baseParts,
-    ...skin.environment.intensityParts.map(({ part }) => part),
-    ...skin.managementParts,
+    ...skin.confrontation.environment.baseParts,
+    ...skin.confrontation.environment.intensityParts.map(({ part }) => part),
+    ...skin.confrontation.opposingActor.parts,
   ];
 
   for (const part of parts) {
@@ -189,11 +185,14 @@ export function assertAssetOwnership(
       throw new Error(`asset ${part.asset.id} is not owned by episode ${episodeId}`);
     }
   }
-  for (const state of skin.bed.duvetStates) {
+  for (const state of skin.confrontation.resistance.states) {
     const asset = assetsById.get(state.asset.id);
     if (asset === undefined) continue;
     const shared = asset.file.startsWith("shared/");
     const ownedByEpisode = asset.file.startsWith(`episodes/${episodeId}/`);
+    if (skinOwner === "shared" && !shared) {
+      throw new Error(`shared skin ${skin.id} cannot use episode asset ${state.asset.id}`);
+    }
     if (state.asset.source === "shared" && !shared) {
       throw new Error(`asset ${state.asset.id} is marked shared but is episode-owned`);
     }
@@ -201,7 +200,7 @@ export function assertAssetOwnership(
       throw new Error(`asset ${state.asset.id} is not owned by episode ${episodeId}`);
     }
   }
-  for (const state of skin.managementStates) {
+  for (const state of skin.confrontation.opposingActor.states) {
     for (const reference of state.assets) {
       const asset = assetsById.get(reference.asset.id);
       if (asset === undefined) continue;

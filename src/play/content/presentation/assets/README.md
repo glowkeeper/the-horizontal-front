@@ -24,6 +24,17 @@ back from one ownership level to the other.
 A skin's authored image width and height describe the complete image frame,
 including intentional transparent padding—not only the opaque pixels.
 
+A resistance skin supplies a registered resistance-states sequence. Every
+state uses the same transparent production canvas and is selected by an ordered
+physical-danger threshold. Every image is normalized to a shared local plane
+around the same authored pivot so Phaser can rotate the resistance composition continuously.
+The skin owns semantic asset references, display bounds, maximum danger angle,
+elapsed-time rotation response, crossfade timing, jolt and shake values, plus a
+reduced-motion crossfade. The generic Phaser renderer interprets that finite
+vocabulary; it does not branch on an episode or asset ID. Furniture, character
+actions and other episode-specific nouns belong only in episode-owned content
+and provenance—not in shared schema fields, layout IDs or TypeScript renderers.
+
 Catalogue provenance is origin-specific: AI-generated work records date, tool
 and prompt; human-created work records its creator; licensed-source work also
 records source, attribution and permitted uses. Cultural assets use the

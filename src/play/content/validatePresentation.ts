@@ -12,14 +12,23 @@ export function assertSensiblePresentation(
   const { width, height } = layout.designSize;
 
   for (const [name, point] of Object.entries(layout.anchors)) {
-    if (name === "bedFromFoot") {
-      continue;
-    }
     assertWithinCanvas(`anchor ${name}`, point.x, point.y, width, height);
   }
 
-  const { leftControl, feedback, rightControl, bedFootPivot, bedFromFoot } =
-    layout.anchors;
+  const { leftControl, feedback, rightControl } = layout.anchors;
+  const statusPanel = layout.statusPanel.frame;
+  const statusLeft = statusPanel.x
+    - statusPanel.width * (statusPanel.originX ?? 0.5);
+  const statusTop = statusPanel.y
+    - statusPanel.height * (statusPanel.originY ?? 0.5);
+  if (
+    statusLeft < 0
+    || statusTop < 0
+    || statusLeft + statusPanel.width > width
+    || statusTop + statusPanel.height > height
+  ) {
+    throw new Error("status panel must fit within the design canvas");
+  }
   if (!(leftControl.x < feedback.x && feedback.x < rightControl.x)) {
     throw new Error("control anchors must read left, feedback, right");
   }
@@ -92,25 +101,6 @@ export function assertSensiblePresentation(
     throw new Error("interruption controls must provide enhanced pointer targets");
   }
 
-  if (bedFromFoot.x <= 0) {
-    throw new Error("bedFromFoot must place the head to the right of the foot");
-  }
-  if (layout.anchors.management.x <= bedFootPivot.x) {
-    throw new Error("management must stand at the head side of the bed");
-  }
-  if (
-    layout.motion.danger.bedAngleDegrees >= 0
-    || layout.motion.forcedVerticalisation.bedAngleDegrees
-      > layout.motion.danger.bedAngleDegrees
-  ) {
-    throw new Error("lift-head motion must raise the right-hand head");
-  }
-  if (
-    layout.motion.danger.duvetX > 0
-    || layout.motion.danger.sleeperX > 0
-  ) {
-    throw new Error("duvet and sleeper must slide downhill toward the left foot");
-  }
   if (
     layout.motion.danger.workLightAlpha
     < layout.motion.rest.workLightAlpha
@@ -118,61 +108,42 @@ export function assertSensiblePresentation(
     throw new Error("work light must not weaken as danger increases");
   }
 
-  assertUniquePartIds("bed static parts", skin.bed.staticParts);
-  assertUniquePartIds("sleeper parts", skin.bed.sleeperParts);
-  assertUniquePartIds("duvet overlay parts", skin.bed.duvetOverlayParts);
-  assertUniquePartIds("management parts", skin.managementParts);
-  assertUniquePartIds("environment base parts", skin.environment.baseParts);
+  assertUniquePartIds("opposing actor parts", skin.confrontation.opposingActor.parts);
+  assertUniquePartIds("environment base parts", skin.confrontation.environment.baseParts);
   assertUniquePartIds(
     "environment intensity parts",
-    skin.environment.intensityParts.map(({ part }) => part),
+    skin.confrontation.environment.intensityParts.map(({ part }) => part),
   );
-  assertRequiredParts(skin.bed.staticParts, ["frame", "mattress", "pillow"]);
-  assertCharacterComposition(
-    "sleeper parts",
-    skin.bed.sleeperParts,
-    ["body", "head"],
-  );
-  assertCharacterComposition(
-    "management parts",
-    skin.managementParts,
-    ["body", "head", "lifting-arm"],
-  );
-
-  if (skin.bed.duvet.id !== "duvet") {
-    throw new Error('bed duvet part must have the semantic ID "duvet"');
-  }
-  if (skin.bed.duvet.x !== skin.bed.duvetRestingX) {
-    throw new Error("duvetRestingX must match the duvet composition position");
-  }
-
   for (const part of [
-    ...skin.bed.staticParts,
-    ...skin.bed.sleeperParts,
-    skin.bed.duvet,
-    ...skin.bed.duvetOverlayParts,
-    ...skin.environment.baseParts,
-    ...skin.environment.intensityParts.map(({ part }) => part),
-    ...skin.managementParts,
+    ...skin.confrontation.environment.baseParts,
+    ...skin.confrontation.environment.intensityParts.map(({ part }) => part),
+    ...skin.confrontation.opposingActor.parts,
   ]) {
     if (part.shape === "image" && !assetIds.has(part.asset.id)) {
       throw new Error(`unknown presentation asset: ${part.asset.id}`);
     }
   }
-  for (const state of skin.bed.duvetStates) {
+  assertWithinCanvas(
+    "confrontation resistance anchor",
+    skin.confrontation.resistance.x,
+    skin.confrontation.resistance.y,
+    width,
+    height,
+  );
+  for (const state of skin.confrontation.resistance.states) {
     if (!assetIds.has(state.asset.id)) {
       throw new Error(`unknown presentation asset: ${state.asset.id}`);
     }
   }
-  const managementPartsById = new Map(skin.managementParts.map((part) => [part.id, part]));
-  for (const state of skin.managementStates) {
+  const actorPartsById = new Map(skin.confrontation.opposingActor.parts.map((part) => [part.id, part]));
+  for (const state of skin.confrontation.opposingActor.states) {
     for (const reference of state.assets) {
-      const part = managementPartsById.get(reference.partId);
+      const part = actorPartsById.get(reference.partId);
       if (part === undefined) {
-        throw new Error(`management state references unknown part: ${reference.partId}`);
+        throw new Error(`opposing-actor state references unknown part: ${reference.partId}`);
       }
       if (part.shape !== "image") {
-        throw new Error(`management state part must be an image: ${reference.partId}`);
+        throw new Error(`opposing-actor state part must be an image: ${reference.partId}`);
       }
       if (!assetIds.has(reference.asset.id)) {
         throw new Error(`unknown presentation asset: ${reference.asset.id}`);
@@ -180,32 +151,6 @@ export function assertSensiblePresentation(
     }
   }
 
-  const initialParts = [
-    ...skin.bed.staticParts,
-    ...skin.bed.sleeperParts,
-    skin.bed.duvet,
-    ...skin.bed.duvetOverlayParts,
-  ];
-  for (const part of initialParts) {
-    const bounds = getPartBounds(part);
-    const left = bedFootPivot.x + bedFromFoot.x + bounds.left;
-    const right = bedFootPivot.x + bedFromFoot.x + bounds.right;
-    const top = bedFootPivot.y + bedFromFoot.y + bounds.top;
-    const bottom = bedFootPivot.y + bedFromFoot.y + bounds.bottom;
-    if (left < 0 || right > width || top < 0 || bottom > height) {
-      throw new Error(`bed part ${part.id} starts outside the design canvas`);
-    }
-  }
-}
-
-function assertCharacterComposition(
-  label: string,
-  parts: ShapePart[],
-  articulatedIds: string[],
-): void {
-  const ids = new Set(parts.map(({ id }) => id));
-  if (ids.has("figure")) return;
-  assertRequiredParts(parts, articulatedIds);
 }
 
 function assertWithinCanvas(
@@ -225,43 +170,4 @@ function assertUniquePartIds(name: string, parts: readonly ShapePart[]): void {
   if (new Set(ids).size !== ids.length) {
     throw new Error(`${name} must have unique semantic IDs`);
   }
-}
-
-function assertRequiredParts(
-  parts: readonly ShapePart[],
-  requiredIds: readonly string[],
-): void {
-  const ids = new Set(parts.map(({ id }) => id));
-  for (const id of requiredIds) {
-    if (!ids.has(id)) {
-      throw new Error(`composition is missing required part: ${id}`);
-    }
-  }
-}
-
-function getPartBounds(part: ShapePart) {
-  if (part.shape === "circle") {
-    return {
-      left: part.x - part.radius,
-      right: part.x + part.radius,
-      top: part.y - part.radius,
-      bottom: part.y + part.radius,
-    };
-  }
-  if (part.shape === "triangle") {
-    const xs = [part.points[0], part.points[2], part.points[4]];
-    const ys = [part.points[1], part.points[3], part.points[5]];
-    return {
-      left: part.x + Math.min(...xs),
-      right: part.x + Math.max(...xs),
-      top: part.y + Math.min(...ys),
-      bottom: part.y + Math.max(...ys),
-    };
-  }
-  return {
-    left: part.x - part.width / 2,
-    right: part.x + part.width / 2,
-    top: part.y - part.height / 2,
-    bottom: part.y + part.height / 2,
-  };
 }

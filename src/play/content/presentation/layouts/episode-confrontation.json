@@ -1,17 +1,21 @@
 {
   "schemaVersion": 1,
-  "id": "bed-head-right",
-  "copy": { "managementCaption": "LIFTING THE HEAD\nOF THE BED" },
+  "id": "episode-confrontation",
   "designSize": { "width": 1280, "height": 720 },
   "backdrop": {
     "floor": { "x": 640, "y": 590, "width": 1280, "height": 260 },
     "workLight": { "x": 1280, "y": 360, "width": 1280, "height": 720, "originX": 1, "originY": 0.5 }
   },
+  "statusPanel": {
+    "frame": { "x": 640, "y": 66, "width": 350, "height": 108 },
+    "fill": "duvetCream",
+    "fillAlpha": 0.86,
+    "stroke": "inkCharcoal",
+    "strokeWidth": 2
+  },
   "anchors": {
-    "bedFootPivot": { "x": 180, "y": 512 },
-    "bedFromFoot": { "x": 850, "y": -42 },
-    "management": { "x": 1155, "y": 365 },
-    "managementCaption": { "x": 1120, "y": 180 },
+    "opposingActor": { "x": 1155, "y": 365 },
+    "pressureCaption": { "x": 1120, "y": 180 },
     "title": { "x": 640, "y": 42 },
     "time": { "x": 640, "y": 84 },
     "result": { "x": 640, "y": 245 },
@@ -69,22 +73,12 @@
     "outcomeActions": { "horizontalOffset": 220, "width": 360 }
   },
   "motion": {
-    "danger": { "bedAngleDegrees": -18, "duvetX": -300, "sleeperX": -130, "workLightAlpha": 0.62 },
+    "danger": { "workLightAlpha": 0.62 },
     "rest": { "workLightAlpha": 0.08 },
     "victory": { "durationMs": 650, "ease": "Sine.Out" },
     "forcedVerticalisation": {
-      "bedAngleDegrees": -22,
-      "bedDurationMs": 500,
-      "bedEase": "Back.In",
-      "sleeperX": -330,
-      "sleeperY": 160,
-      "sleeperAngleDegrees": -16,
-      "sleeperDurationMs": 700,
-      "sleeperEase": "Quad.In",
-      "duvetX": -760,
-      "duvetAlpha": 0.35,
-      "duvetDurationMs": 650,
-      "duvetEase": "Quad.In"
+      "durationMs": 500,
+      "ease": "Back.In"
     }
   }
 }

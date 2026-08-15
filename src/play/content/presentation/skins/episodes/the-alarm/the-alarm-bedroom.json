@@ -1,30 +1,38 @@
 {
   "schemaVersion": 1,
   "id": "the-alarm-bedroom",
-  "layout": "bed-head-right",
-  "copy": { "managementLabel": "MANAGEMENT" },
-  "bed": {
-    "duvetRestingX": -430,
-    "sleeperRestingX": 0,
-    "staticParts": [
-      { "id": "frame", "shape": "image", "x": -430, "y": 36, "width": 860, "height": 285, "flipX": true, "asset": { "source": "episode", "id": "bed-frame" } },
-      { "id": "mattress", "shape": "image", "x": -430, "y": -17, "width": 830, "height": 125, "asset": { "source": "episode", "id": "bed-mattress" } },
-      { "id": "pillow", "shape": "image", "x": -135, "y": -77, "width": 170, "height": 79, "asset": { "source": "episode", "id": "pillow-near" } },
-      { "id": "pillow-far", "shape": "image", "x": -245, "y": -66, "width": 175, "height": 71, "asset": { "source": "episode", "id": "pillow-far" } }
-    ],
-    "sleeperParts": [
-      { "id": "figure", "shape": "image", "x": -300, "y": -145, "width": 500, "height": 333, "asset": { "source": "episode", "id": "protagonist-gameplay-pose" } }
-    ],
-    "duvet": { "id": "duvet", "shape": "image", "x": -430, "y": -63, "width": 520, "height": 190, "asset": { "source": "episode", "id": "duvet-rest" } },
-    "duvetOverlayParts": [],
-    "duvetStates": [
-      { "minimumDanger": 0, "asset": { "source": "episode", "id": "duvet-rest" } },
-      { "minimumDanger": 0.28, "asset": { "source": "episode", "id": "duvet-tension-low" } },
-      { "minimumDanger": 0.58, "asset": { "source": "episode", "id": "duvet-tension-high" } },
-      { "minimumDanger": 0.9, "asset": { "source": "episode", "id": "duvet-forced-verticalisation" } }
-    ]
+  "layout": "episode-confrontation",
+  "confrontation": {
+    "copy": {
+      "opposingActorLabel": "MANAGEMENT",
+      "pressureCaption": "LIFTING THE HEAD\nOF THE BED"
+    },
+    "resistance": {
+      "x": 220,
+      "y": 480,
+      "width": 850,
+      "height": 850,
+      "originX": 0.217778,
+      "originY": 0.734444,
+      "dangerAngleDegrees": -34.1,
+      "states": [
+        { "minimumDanger": 0, "asset": { "source": "episode", "id": "the-alarm-resistance-states-rest" } },
+        { "minimumDanger": 0.28, "asset": { "source": "episode", "id": "the-alarm-resistance-states-early-pressure" } },
+        { "minimumDanger": 0.58, "asset": { "source": "episode", "id": "the-alarm-resistance-states-high-pressure" } },
+        { "minimumDanger": 0.9, "asset": { "source": "episode", "id": "the-alarm-resistance-states-final-pressure" } }
+      ],
+      "transition": {
+        "crossfadeDurationMs": 280,
+        "rotationResponseMs": 240,
+        "ease": "Sine.Out",
+        "joltX": -3,
+        "joltY": 3,
+        "shakeAmplitude": 2,
+        "shakeDurationMs": 120
+      },
+      "reducedMotion": { "crossfadeDurationMs": 80 }
   },
-  "environment": {
+    "environment": {
     "replacesLayoutBackdrop": true,
     "baseParts": [
       { "id": "bedroom-base", "shape": "image", "x": 640, "y": 360, "width": 1280, "height": 720, "asset": { "source": "episode", "id": "bedroom-base" } }
@@ -39,10 +47,11 @@
       }
     ]
   },
-  "managementParts": [
-    { "id": "figure", "shape": "image", "x": -40, "y": 15, "width": 340, "height": 425, "asset": { "source": "episode", "id": "management-rest-pose" } }
-  ],
-  "managementStates": [
+    "opposingActor": {
+    "parts": [
+      { "id": "figure", "shape": "image", "x": -40, "y": 15, "width": 340, "height": 425, "asset": { "source": "episode", "id": "management-rest-pose" } }
+    ],
+    "states": [
     {
       "minimumIntensity": 0,
       "assets": [
@@ -55,5 +64,7 @@
         { "partId": "figure", "asset": { "source": "episode", "id": "management-lifting-pose" } }
       ]
     }
-  ]
+    ]
+    }
+  }
 }

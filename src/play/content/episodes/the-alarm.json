@@ -135,9 +135,8 @@
       }
     ],
     "presentation": {
-      "layout": { "source": "shared", "id": "bed-head-right" },
-      "skin": { "source": "episode", "id": "the-alarm-bedroom" },
-      "managementAction": "lift-head"
+      "layout": { "source": "shared", "id": "episode-confrontation" },
+      "skin": { "source": "episode", "id": "the-alarm-bedroom" }
     },
     "copy": {
       "headline": "HOLD THE LINE",

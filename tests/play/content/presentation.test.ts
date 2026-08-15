@@ -1,9 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import layoutContent from "../../../src/play/content/presentation/layouts/bed-head-right.json";
+import layoutContent from "../../../src/play/content/presentation/layouts/episode-confrontation.json";
 import illustratedLayoutContent from "../../../src/play/content/presentation/layouts/illustration-left.json";
 import skinContent from "../../../src/play/content/presentation/skins/episodes/the-alarm/the-alarm-bedroom.json";
-import sharedSkinContent from "../../../src/play/content/presentation/skins/shared/shape-bedroom.json";
 import catalogContent from "../../../src/play/content/presentation/asset-catalog.json";
 import episodeContent from "../../../src/play/content/episodes/the-alarm.json";
 import { loadEpisode } from "../../../src/play/content/loadEpisode";
@@ -32,7 +31,6 @@ import { game, mechanics } from "../../../src/play/content/game";
 
 const layout = resistanceLayoutSchema.parse(layoutContent);
 const skin = resistanceSkinSchema.parse(skinContent);
-const sharedSkin = resistanceSkinSchema.parse(sharedSkinContent);
 const assetIds = new Set(presentationAssets.map(({ id }) => id));
 const illustratedLayout = illustratedPanelLayoutSchema.parse(illustratedLayoutContent);
 
@@ -76,24 +74,36 @@ describe("presentation content", () => {
     const presentation = loadPresentation(game.entryEpisode);
 
     expect(presentation.skin.id).toBe("the-alarm-bedroom");
-    expect(presentation.skin.bed.sleeperParts.map(({ id }) => id))
-      .toEqual(["figure"]);
-    expect(presentation.skin.bed.duvetOverlayParts).toEqual([]);
-    expect(presentation.skin.bed.duvetStates.map(({ minimumDanger, asset }) => [
+    expect(presentation.skin.confrontation.resistance.states.map(({ minimumDanger, asset }) => [
       minimumDanger, asset.id,
     ])).toEqual([
-      [0, "duvet-rest"],
-      [0.28, "duvet-tension-low"],
-      [0.58, "duvet-tension-high"],
-      [0.9, "duvet-forced-verticalisation"],
+      [0, "the-alarm-resistance-states-rest"],
+      [0.28, "the-alarm-resistance-states-early-pressure"],
+      [0.58, "the-alarm-resistance-states-high-pressure"],
+      [0.9, "the-alarm-resistance-states-final-pressure"],
     ]);
-    expect(presentation.skin.environment.baseParts.map(({ id }) => id))
+    expect(presentation.skin.confrontation.resistance.transition).toMatchObject({
+      crossfadeDurationMs: 280,
+      rotationResponseMs: 240,
+      shakeAmplitude: 2,
+    });
+    expect(presentation.skin.confrontation.resistance).toMatchObject({
+      x: 220,
+      y: 480,
+      width: 850,
+      height: 850,
+      dangerAngleDegrees: -34.1,
+    });
+    expect(presentation.skin.confrontation.resistance.reducedMotion).toEqual({
+      crossfadeDurationMs: 80,
+    });
+    expect(presentation.skin.confrontation.environment.baseParts.map(({ id }) => id))
       .toEqual(["bedroom-base"]);
-    expect(presentation.skin.environment.intensityParts.map(({ part }) => part.id))
+    expect(presentation.skin.confrontation.environment.intensityParts.map(({ part }) => part.id))
       .toEqual(["office-incursion"]);
-    expect(presentation.skin.managementParts.map(({ id }) => id))
+    expect(presentation.skin.confrontation.opposingActor.parts.map(({ id }) => id))
       .toEqual(["figure"]);
-    expect(presentation.skin.managementStates.map(({ minimumIntensity, assets }) => [
+    expect(presentation.skin.confrontation.opposingActor.states.map(({ minimumIntensity, assets }) => [
       minimumIntensity,
       assets.map(({ partId, asset }) => [partId, asset.id]),
     ])).toEqual([
@@ -110,19 +120,13 @@ describe("presentation content", () => {
       id: "pillow-prototype",
       file: "episodes/the-alarm/pillow-prototype.png",
     });
-    expect(layout.anchors.bedFootPivot).toEqual({ x: 180, y: 512 });
-    expect(skin.bed.staticParts.map(({ id }) => id)).toContain("frame");
+    expect(layout.anchors.opposingActor).toEqual({ x: 1155, y: 365 });
+    expect(layout.statusPanel).toMatchObject({
+      fill: "duvetCream",
+      fillAlpha: 0.86,
+      stroke: "inkCharcoal",
+    });
     expect(() => assertSensiblePresentation(layout, skin, assetIds)).not.toThrow();
-  });
-
-  it("keeps the reusable shape skin independent of episode artwork", () => {
-    expect(sharedSkin.bed.staticParts.find(({ id }) => id === "pillow"))
-      .toMatchObject({ shape: "ellipse" });
-    expect(() => assertSensiblePresentation(
-      layout,
-      sharedSkin,
-      assetIds,
-    )).not.toThrow();
   });
 
   it("does not fall back between shared and episode skin ownership", () => {
@@ -247,9 +251,9 @@ describe("presentation content", () => {
   it("rejects non-positive primitive dimensions", () => {
     expect(() => resistanceSkinSchema.parse({
       ...skinContent,
-      bed: {
-        ...skinContent.bed,
-        duvet: { ...skinContent.bed.duvet, width: 0 },
+      confrontation: {
+        ...skinContent.confrontation,
+        resistance: { ...skinContent.confrontation.resistance, width: 0 },
       },
     })).toThrow();
   });
@@ -260,12 +264,26 @@ describe("presentation content", () => {
         ...layout,
         anchors: {
           ...layout.anchors,
-          bedFootPivot: { x: -1, y: 512 },
+          opposingActor: { x: -1, y: 512 },
         },
       },
       skin,
       assetIds,
-    )).toThrow(/anchor bedFootPivot must be within/);
+    )).toThrow(/anchor opposingActor must be within/);
+  });
+
+  it("keeps the status panel within the design canvas", () => {
+    expect(() => assertSensiblePresentation(
+      {
+        ...layout,
+        statusPanel: {
+          ...layout.statusPanel,
+          frame: { ...layout.statusPanel.frame, y: -1 },
+        },
+      },
+      skin,
+      assetIds,
+    )).toThrow(/status panel must fit/);
   });
 
   it("rejects controls which do not fit within the canvas", () => {
@@ -374,58 +392,21 @@ describe("presentation content", () => {
     )).toThrow(/enhanced pointer targets/);
   });
 
-  it("rejects reversed lift and downhill motion", () => {
-    expect(() => assertSensiblePresentation(
-      {
-        ...layout,
-        motion: {
-          ...layout.motion,
-          danger: { ...layout.motion.danger, duvetX: 300 },
-        },
-      },
-      skin,
-      assetIds,
-    )).toThrow(/slide downhill toward the left foot/);
-  });
-
-  it("rejects duplicate or missing semantic parts", () => {
+  it("rejects duplicate opposing-actor semantic parts", () => {
     expect(() => assertSensiblePresentation(
       layout,
       {
         ...skin,
-        bed: {
-          ...skin.bed,
-          sleeperParts: [skin.bed.sleeperParts[0], skin.bed.sleeperParts[0]],
+        confrontation: {
+          ...skin.confrontation,
+          opposingActor: {
+            ...skin.confrontation.opposingActor,
+            parts: [skin.confrontation.opposingActor.parts[0], skin.confrontation.opposingActor.parts[0]],
+          },
         },
       },
       assetIds,
     )).toThrow(/unique semantic IDs/);
-  });
-
-  it("rejects initial bed geometry outside the design canvas", () => {
-    const frame = skin.bed.staticParts[0];
-    expect(() => assertSensiblePresentation(
-      layout,
-      {
-        ...skin,
-        bed: {
-          ...skin.bed,
-          staticParts: [{ ...frame, x: -2_000 }, ...skin.bed.staticParts.slice(1)],
-        },
-      },
-      assetIds,
-    )).toThrow(/bed part frame starts outside/);
-  });
-
-  it("requires the duvet resting coordinate to match its composition", () => {
-    expect(() => assertSensiblePresentation(
-      layout,
-      {
-        ...skin,
-        bed: { ...skin.bed, duvetRestingX: 0 },
-      },
-      assetIds,
-    )).toThrow(/duvetRestingX must match/);
   });
 
   it("rejects image parts which do not resolve through the asset catalog", () => {
@@ -433,16 +414,15 @@ describe("presentation content", () => {
       layout,
       {
         ...skin,
-        bed: {
-          ...skin.bed,
-          duvet: {
-            id: "duvet",
-            shape: "image",
-            x: skin.bed.duvetRestingX,
-            y: -56,
-            width: 440,
-            height: 120,
-            asset: { source: "episode", id: "missing-duvet-art" },
+        confrontation: {
+          ...skin.confrontation,
+          opposingActor: {
+            ...skin.confrontation.opposingActor,
+            parts: [{
+              id: "figure", shape: "image", x: 0, y: 0,
+              width: 100, height: 100,
+              asset: { source: "episode", id: "missing-actor-art" },
+            }],
           },
         },
       },
@@ -450,23 +430,63 @@ describe("presentation content", () => {
     )).toThrow(/unknown presentation asset/);
   });
 
-  it("validates image references in management parts", () => {
+  it("rejects unordered, unanchored and unknown resistance states", () => {
+    expect(() => resistanceSkinSchema.parse({
+      ...skinContent,
+      confrontation: { ...skinContent.confrontation, resistance: {
+          ...skinContent.confrontation.resistance,
+          states: skinContent.confrontation.resistance.states.map((state, index) => ({
+            ...state,
+            minimumDanger: index === 0 ? 0.1 : state.minimumDanger,
+          })),
+      } },
+    })).toThrow(/resistance states must begin at zero danger/);
+
+    expect(() => resistanceSkinSchema.parse({
+      ...skinContent,
+      confrontation: { ...skinContent.confrontation, resistance: {
+          ...skinContent.confrontation.resistance,
+          states: skinContent.confrontation.resistance.states.map((state, index) => ({
+            ...state,
+            minimumDanger: index === 2 ? 0.2 : state.minimumDanger,
+          })),
+      } },
+    })).toThrow(/resistance-state danger thresholds must increase/);
+
     expect(() => assertSensiblePresentation(
       layout,
       {
         ...skin,
-        managementParts: [{
-          id: "figure",
-          shape: "image" as const,
-          x: -40,
-          y: 15,
-          width: 340,
-          height: 425,
-          asset: { source: "episode", id: "missing-management-figure" },
-        }],
+        confrontation: { ...skin.confrontation, resistance: {
+            ...skin.confrontation.resistance,
+            states: skin.confrontation.resistance.states.map((state, index) => index === 0
+              ? { ...state, asset: { source: "episode", id: "missing-resistance-state" } }
+              : state),
+        } },
       },
       assetIds,
-    )).toThrow(/unknown presentation asset: missing-management-figure/);
+    )).toThrow(/unknown presentation asset: missing-resistance-state/);
+  });
+
+  it("validates image references in opposing-actor parts", () => {
+    expect(() => assertSensiblePresentation(
+      layout,
+      {
+        ...skin,
+        confrontation: {
+          ...skin.confrontation,
+          opposingActor: {
+            ...skin.confrontation.opposingActor,
+            parts: [{
+              id: "figure", shape: "image" as const, x: -40, y: 15,
+              width: 340, height: 425,
+              asset: { source: "episode", id: "missing-opposing-actor" },
+            }],
+          },
+        },
+      },
+      assetIds,
+    )).toThrow(/unknown presentation asset: missing-opposing-actor/);
   });
 
   it("prevents shared skins from using episode-owned assets", () => {

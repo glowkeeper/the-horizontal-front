@@ -292,16 +292,21 @@ const skinRecords = await Promise.all(skinFiles.map(async (file) => {
   );
 
   const parts = [
-    ...content.bed.staticParts,
-    ...content.bed.sleeperParts,
-    content.bed.duvet,
-    ...content.managementParts,
+    ...content.confrontation.environment.baseParts,
+    ...content.confrontation.environment.intensityParts.map(({ part }) => part),
+    ...content.confrontation.opposingActor.parts,
   ];
-  for (const part of parts.filter(({ shape }) => shape === "image")) {
-    const asset = assetsById.get(part.asset.id);
+  const references = [
+    ...parts.filter(({ shape }) => shape === "image").map(({ asset }) => asset),
+    ...content.confrontation.resistance.states.map(({ asset }) => asset),
+    ...content.confrontation.opposingActor.states.flatMap(({ assets }) =>
+      assets.map(({ asset }) => asset)),
+  ];
+  for (const reference of references) {
+    const asset = assetsById.get(reference.id);
     requirePolicy(
       asset !== undefined,
-      `Presentation skin ${content.id} references unknown asset ${part.asset.id}.`,
+      `Presentation skin ${content.id} references unknown asset ${reference.id}.`,
     );
     if (asset === undefined) continue;
     const sharedAsset = asset.file.startsWith("shared/");
@@ -310,8 +315,8 @@ const skinRecords = await Promise.all(skinFiles.map(async (file) => {
       `Presentation skin ${content.id} references an asset outside its ownership boundary.`,
     );
     requirePolicy(
-      part.asset.source === (sharedAsset ? "shared" : "episode"),
-      `Presentation skin ${content.id} asset ${part.asset.id} must explicitly name its ownership source.`,
+      reference.source === (sharedAsset ? "shared" : "episode"),
+      `Presentation skin ${content.id} asset ${reference.id} must explicitly name its ownership source.`,
     );
   }
   return { path, content, owner };
@@ -598,8 +603,16 @@ const presentationLoader = await readFile(
   join(projectRoot, "src/play/content/loadPresentation.ts"),
   "utf8",
 );
-const bedLayout = await readFile(
-  join(projectRoot, "src/play/phaser/layouts/bedHeadRightLayout.ts"),
+const episodeConfrontationLayout = await readFile(
+  join(projectRoot, "src/play/phaser/layouts/episodeConfrontationLayout.ts"),
+  "utf8",
+);
+const presentationSchemaSource = await readFile(
+  join(projectRoot, "src/play/content/schemas/presentationSchema.ts"),
+  "utf8",
+);
+const episodeConfrontationContent = await readFile(
+  join(projectRoot, "src/play/content/presentation/layouts/episode-confrontation.json"),
   "utf8",
 );
 
@@ -619,9 +632,10 @@ requirePolicy(
   presentationLoader.includes('import.meta.glob("./presentation/layouts/*.json"') &&
     presentationLoader.includes('"./presentation/skins/{shared,episodes/*}/*.json"') &&
     presentationLoader.includes("assertSensiblePresentation") &&
-    bedLayout.includes("loadPresentation") &&
-    !bedLayout.includes("FOOT_PIVOT_X") &&
-    !bedLayout.includes("DUVET_RESTING_X"),
+    episodeConfrontationLayout.includes("loadPresentation") &&
+    !/\b(?:bed|duvet|sleeper|headboard|the-alarm|tableau)\b|primaryTableau|pressureScene|pressure-tableau/i.test(
+      episodeConfrontationLayout + presentationSchemaSource + episodeConfrontationContent,
+    ),
   "Presentation layouts and skins must be discovered, validated and interpreted as data rather than embedded composition constants.",
 );
 requirePolicy(

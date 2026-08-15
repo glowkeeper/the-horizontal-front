@@ -1,15 +1,9 @@
 export type ResistancePresentation = {
-  readonly bedAngleDegrees: number;
-  readonly duvetPullX: number;
-  readonly sleeperSlideX: number;
   readonly workLightAlpha: number;
 };
 
 type Motion = {
   readonly danger: {
-    readonly bedAngleDegrees: number;
-    readonly duvetX: number;
-    readonly sleeperX: number;
     readonly workLightAlpha: number;
   };
   readonly rest: { readonly workLightAlpha: number };
@@ -29,11 +23,6 @@ export function getResistancePresentation(
   );
 
   return {
-    bedAngleDegrees: motion.danger.bedAngleDegrees * physicalDanger,
-    duvetPullX: physicalDanger === 0
-      ? 0
-      : motion.danger.duvetX * physicalDanger,
-    sleeperSlideX: motion.danger.sleeperX * physicalDanger,
     workLightAlpha: linear(
       motion.rest.workLightAlpha,
       motion.danger.workLightAlpha,

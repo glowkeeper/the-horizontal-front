@@ -36,4 +36,4 @@ duvet and environment enactment are recorded in [First playable bed, duvet and
 environment assets](first-playable-environment-assets.md).
 The replacement whole-composition hypothesis for keeping the protagonist,
 duvet, mattress and frame on one perspective plane is preserved in [The Alarm
-bed-tableau state sheet](the-alarm-bed-tableau-state-sheet.md).
+resistance-state sheet](the-alarm-resistance-state-sheet.md).

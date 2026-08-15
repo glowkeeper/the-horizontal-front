@@ -201,9 +201,11 @@ before the art commit; this decision record preserves why they must not be
 reintroduced.
 
 Neither candidate was selected by the episode skin. The
-replacement direction is a set of complete authored bed tableaux: frame,
+replacement direction is a set of complete authored resistance compositions: frame,
 mattress, pillows, duvet and protagonist composed together at rest, early lift,
 high danger and near verticalisation. A full-scene comparison sheet must first
 establish those shared planes and the relative scale and mechanical connection
-of a much larger Management figure. Runtime derivation must wait for explicit
-perceptual acceptance of that sheet.
+of a much larger Management figure. The maintainer subsequently accepted the
+corrected v5 resistance-state sheet, and its registered runtime derivation and generic
+limited-animation transition are recorded in [The Alarm resistance-state
+sheet](the-alarm-resistance-state-sheet.md).
