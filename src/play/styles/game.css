@@ -1,5 +1,117 @@
 @import "../../shared/theme/tokens.css";
 
+:root {
+  /*
+   * The game's button contract. The public site owns its own equivalent in
+   * src/site/styles/site.css; both reference the shared colour roles, so the
+   * two surfaces start identical and may diverge deliberately.
+   *
+   * Lengths are px because these are canvas design pixels, read at runtime by
+   * src/play/theme/theme.ts and drawn into a 1280x720 design space that is
+   * scaled to fit. They must not scale with the root font size, or the drawn
+   * chrome would drift away from the composition it sits on.
+   *
+   * Every token here is required: the game throws on a missing one, and
+   * `npm run check:policy` rejects a set that no longer covers what the theme
+   * adapter reads.
+   */
+  --button-border-width: 2px;
+  --button-shadow-offset: 4px;
+  --button-hover-shadow-offset: 6px;
+  --button-hover-lift: 2px;
+  --button-active-shadow-offset: 1px;
+  --button-active-press: 3px;
+  --button-border: var(--colour-ink-charcoal);
+  --button-shadow: var(--colour-ink-charcoal);
+  --button-primary-fill: var(--colour-resistance-red);
+  --button-primary-label: var(--colour-paper-white);
+  --button-secondary-fill: var(--colour-paper-white);
+  --button-secondary-label: var(--colour-ink-charcoal);
+  --button-label-size: 16px;
+  --button-label-tracking: 3px;
+}
+
+/*
+ * Interface chrome layered over the canvas as real controls. The overlay is a
+ * design-space surface scaled onto the canvas by src/play/phaser/chromeOverlay.ts,
+ * so every length below is a 1280x720 design pixel and scales with the game.
+ */
+.game-chrome {
+  position: absolute;
+  width: 1280px;
+  height: 720px;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+.game-action {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6em;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1em;
+  border: var(--button-border-width) solid var(--button-border);
+  box-shadow: var(--button-shadow-offset) var(--button-shadow-offset) 0 var(--button-shadow);
+  font: 800 var(--button-label-size) / 1.2 var(--font-game);
+  letter-spacing: var(--button-label-tracking);
+  text-align: center;
+  text-transform: uppercase;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.game-action[data-variant="primary"] {
+  color: var(--button-primary-label);
+  background: var(--button-primary-fill);
+}
+
+.game-action[data-variant="secondary"] {
+  color: var(--button-secondary-label);
+  background: var(--button-secondary-fill);
+}
+
+.game-action-label {
+  font: inherit;
+}
+
+.game-action-description {
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.game-action:hover {
+  box-shadow: var(--button-hover-shadow-offset) var(--button-hover-shadow-offset) 0 var(--button-shadow);
+  transform: translate(
+    calc(-1 * var(--button-hover-lift)),
+    calc(-1 * var(--button-hover-lift))
+  );
+}
+
+.game-action:focus-visible {
+  outline: 3px solid var(--colour-resistance-red);
+  outline-offset: 3px;
+}
+
+.game-action:active {
+  box-shadow: var(--button-active-shadow-offset) var(--button-active-shadow-offset) 0 var(--button-shadow);
+  transform: translate(var(--button-active-press), var(--button-active-press));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-action {
+    transition: none;
+  }
+
+  .game-action:hover,
+  .game-action:active {
+    transform: none;
+  }
+}
+
 *,
 *::before,
 *::after {

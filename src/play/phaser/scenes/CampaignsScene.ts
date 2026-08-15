@@ -1,17 +1,16 @@
 import Phaser from "phaser";
 
 import { game } from "../../content/game";
-import { formatCopy } from "../../content/formatCopy";
 import type { Campaign } from "../../content/loadGame";
 import { getMenuAction, moveSelection } from "../../input/menuInput";
 import { createTextStyles, getThemeColour } from "../../theme/theme";
 import { getCampaignCardPlacements } from "../campaignMenuLayout";
+import { addChromeButton } from "../chromeOverlay";
 import { CHROME_MENU, CHROME_PANEL, GAME_CENTRE_X } from "../design";
-import { announce, toColour } from "../sceneChrome";
 
 export class CampaignsScene extends Phaser.Scene {
   private selectedIndex = 0;
-  private cards: Phaser.GameObjects.Container[] = [];
+  private cards: HTMLButtonElement[] = [];
   private transitioning = false;
 
   public constructor() {
@@ -29,75 +28,65 @@ export class CampaignsScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     const placements = getCampaignCardPlacements(game.campaigns.length);
-    game.campaigns.forEach((campaign, index) => {
-      const card = this.createCampaignCard(
-        campaign,
-        index,
-        placements[index].centreY,
-        placements[index],
-      );
-      this.cards.push(card);
-    });
+    this.cards = game.campaigns.map((campaign, index) =>
+      this.createCampaignCard(campaign, index, placements[index]));
     this.add.text(GAME_CENTRE_X, 665, game.interface.campaignsInstructions, {
       ...createTextStyles().notice,
       fontSize: `${CHROME_MENU.headingSizePx}px`,
     }).setOrigin(0.5);
 
+    // Arrows move focus between the real controls, and Enter opens the
+    // selected campaign whether or not it holds focus, so the on-screen
+    // instructions hold. Space is handled natively by a focused button.
+    //
+    // Focus is deliberately not taken on arrival. A browser treats programmatic
+    // focus on a freshly loaded document as keyboard intent, so auto-focusing
+    // painted a focus ring on players who had just clicked in from the site,
+    // and none on players returning from the game within the same document.
     this.input.keyboard?.on("keydown", (event: KeyboardEvent) => {
       const action = getMenuAction(event);
-      if (action === "previous" || action === "next") {
-        this.selectedIndex = moveSelection(
-          this.selectedIndex,
-          action,
-          game.campaigns.length,
-        );
-        this.renderSelection();
-      } else if (action === "select") {
+      if (action === "select") {
         this.openCampaign(game.campaigns[this.selectedIndex]);
+        return;
       }
+      if (action !== "previous" && action !== "next") return;
+      this.selectedIndex = moveSelection(
+        this.selectedIndex,
+        action,
+        game.campaigns.length,
+      );
+      this.cards[this.selectedIndex]?.focus();
     });
-    this.renderSelection();
   }
 
+  /**
+   * Each campaign is a real control. Selection is focus: a screen reader
+   * announces the campaign on arrival, and the focus ring shows sighted
+   * keyboard users where they are, so no separate selected-fill state or live
+   * region message is needed.
+   */
   private createCampaignCard(
     campaign: Campaign,
     index: number,
-    y: number,
     placement: ReturnType<typeof getCampaignCardPlacements>[number],
-  ): Phaser.GameObjects.Container {
-    const { height, titleOffset, summaryOffset, titleFontSize, summaryFontSize } = placement;
-    const background = this.add.rectangle(0, 0, 900, height)
-      .setStrokeStyle(CHROME_MENU.cardStrokeWidth, toColour(CHROME_MENU.cardStroke));
-    const title = this.add.text(0, titleOffset, campaign.title.toUpperCase(), {
-      ...createTextStyles().notice,
-      fontSize: `${titleFontSize}px`,
-    }).setOrigin(0.5);
-    const summary = this.add.text(0, summaryOffset, campaign.briefing.headline, {
-      ...createTextStyles().body,
-      fontSize: `${summaryFontSize}px`,
-    }).setOrigin(0.5);
-    const card = this.add.container(GAME_CENTRE_X, y, [background, title, summary]);
-    background.setInteractive({ useHandCursor: true }).on("pointerdown", () => {
+  ): HTMLButtonElement {
+    const { centreY, height, titleFontSize, summaryFontSize } = placement;
+    const card = addChromeButton(this, {
+      x: GAME_CENTRE_X,
+      y: centreY,
+      width: 900,
+      height,
+      label: campaign.title.toUpperCase(),
+      description: campaign.briefing.headline,
+      labelSizePx: titleFontSize,
+      descriptionSizePx: summaryFontSize,
+      variant: "primary",
+      onSelect: () => this.openCampaign(campaign),
+    });
+    card.addEventListener("focus", () => {
       this.selectedIndex = index;
-      this.openCampaign(campaign);
     });
     return card;
-  }
-
-  private renderSelection(): void {
-    this.cards.forEach((card, index) => {
-      const background = card.list[0] as Phaser.GameObjects.Rectangle;
-      background.setFillStyle(
-        index === this.selectedIndex
-          ? toColour(CHROME_MENU.cardSelectedFill)
-          : toColour(CHROME_MENU.cardFill),
-      );
-    });
-    const campaign = game.campaigns[this.selectedIndex];
-    announce(formatCopy(game.interface.campaignsStatus, {
-      title: campaign.title,
-      headline: campaign.briefing.headline,
-    }));
   }
 
   private openCampaign(campaign: Campaign): void {

@@ -384,7 +384,13 @@ change, while genuinely new visual structure remains an engine expansion.
 
 The play page's static identity is also data-owned. Vite injects title, description, exit label, initial live-region status and application label from `game.json` while transforming the HTML entry. The production static-build check verifies the emitted page contains those values and no unresolved placeholders, so tab titles and navigation remain meaningful before the Phaser bundle executes.
 
-The canvas navigation is adequate prototype input scaffolding, not the final accessibility surface. The live region and equivalent keyboard/pointer actions are real; semantic DOM campaign cards, buttons, focus management and mobile screen-reader behaviour remain required production work.
+Interface chrome is rendered as real DOM controls layered over the canvas rather than drawn into it. Chrome is engine furniture that no episode restyles, so it can be ordinary HTML: buttons are reachable by keyboard, show a visible focus state, respond to Enter and Space, and are announced by assistive technology with an accurate accessible name. They are styled by the game's own stylesheet, so their appearance is authored once rather than maintained twice.
+
+The overlay is a design-space surface. It is exactly the design size, then scaled and offset onto the canvas that `Scale.FIT` letterboxes, so controls are positioned in the same coordinates the scenes already use and every drawn dimension scales with the composition beneath them instead of drifting away from it. The overlay ignores pointer events so canvas input is unaffected, sits outside the `role="application"` region so its controls remain ordinary buttons to a screen reader, and removes its controls when their scene shuts down.
+
+In-world controls are not affected. The rhythm gates, notes and emitter are authored world composition and remain on the canvas.
+
+Campaign selection is still canvas-drawn, and mobile screen-reader behaviour has not been verified on device. Both remain production work.
 
 Reusable scenes receive the validated episode as scene data; they do not import an episode file or choose an episode ID themselves. Episode presentation data selects a layout and skin. Validated layout JSON owns design-space anchors, pivots, interface slots and reusable motion parameters; validated skin JSON owns prototype primitive geometry or semantic layered-asset references. Phaser code interprets this finite vocabulary and applies runtime state—it does not contain the authored composition coordinates.
 

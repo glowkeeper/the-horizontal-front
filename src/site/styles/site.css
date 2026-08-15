@@ -6,6 +6,28 @@
   font-family: var(--font-interface);
   font-synthesis: none;
   line-height: 1.6;
+
+  /*
+   * The site's button contract. The game owns its own equivalent in
+   * src/play/styles/game.css; both reference the shared colour roles, so the
+   * two surfaces start identical and may diverge deliberately.
+   *
+   * Lengths are rem here because this is a document surface: the offsets
+   * should scale with the reader's root font size along with the padding and
+   * type they sit against.
+   */
+  --button-border-width: 2px;
+  --button-shadow-offset: 0.25rem;
+  --button-hover-shadow-offset: 0.35rem;
+  --button-hover-lift: 0.1rem;
+  --button-active-shadow-offset: 0.08rem;
+  --button-active-press: 0.17rem;
+  --button-border: var(--colour-ink-charcoal);
+  --button-shadow: var(--colour-ink-charcoal);
+  --button-primary-fill: var(--colour-resistance-red);
+  --button-primary-label: var(--colour-paper-white);
+  --button-secondary-fill: var(--colour-paper-white);
+  --button-secondary-label: var(--colour-ink-charcoal);
 }
 
 *,

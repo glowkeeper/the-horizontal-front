@@ -60,7 +60,7 @@ describe("game content loading", () => {
     expect(() => loadTestGame(
       {
         ...gameContent,
-        interface: { ...gameContent.interface, campaignsStatus: "No selection" },
+        interface: { ...gameContent.interface, briefingStatus: "No placeholders" },
       },
       campaignModules,
       episodeModules,

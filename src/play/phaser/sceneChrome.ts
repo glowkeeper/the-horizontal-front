@@ -1,11 +1,7 @@
 import Phaser from "phaser";
 
-import {
-  createTextStyles,
-  getButtonStyle,
-  getThemeColour,
-  type ButtonVariant,
-} from "../theme/theme";
+import { getThemeColour, type ButtonVariant } from "../theme/theme";
+import { addChromeButton } from "./chromeOverlay";
 import { CHROME_BUTTON } from "./design";
 
 export function announce(message: string): void {
@@ -23,6 +19,13 @@ export function hexToColour(hex: string): number {
   return Phaser.Display.Color.HexStringToColor(hex).color;
 }
 
+/**
+ * Adds one interface-chrome control in design-space coordinates.
+ *
+ * The control is a real DOM button layered over the canvas rather than drawn
+ * into it, so it is keyboard operable and announced by assistive technology.
+ * Callers keep working in design coordinates and need not know the difference.
+ */
 export function createButton(
   scene: Phaser.Scene,
   x: number,
@@ -32,42 +35,9 @@ export function createButton(
   action: () => void,
   height: number = CHROME_BUTTON.height,
   variant: ButtonVariant = "primary",
-): Phaser.GameObjects.Rectangle {
-  const style = getButtonStyle(variant);
-  const shadow = scene.add.rectangle(
-    x + style.shadowOffset,
-    y + style.shadowOffset,
-    width,
-    height,
-    hexToColour(style.shadow),
-  ).setDepth(CHROME_BUTTON.backgroundDepth - 1);
-  const background = scene.add.rectangle(
-    x,
-    y,
-    width,
-    height,
-    hexToColour(style.fill),
-  ).setStrokeStyle(style.borderWidth, hexToColour(style.border))
-    .setInteractive({ useHandCursor: true })
-    .setDepth(CHROME_BUTTON.backgroundDepth);
-  const text = scene.add.text(x, y, label, {
-    ...createTextStyles().notice,
-    color: style.label,
-    fontSize: `${CHROME_BUTTON.labelSizePx}px`,
-  }).setOrigin(0.5).setDepth(CHROME_BUTTON.labelDepth);
-
-  // Mirror the site's lift-on-hover and press-on-active affordance.
-  const place = (offset: number, shadowOffset: number) => {
-    background.setPosition(x + offset, y + offset);
-    text.setPosition(x + offset, y + offset);
-    shadow.setPosition(x + shadowOffset, y + shadowOffset);
-  };
-  background.on("pointerover", () => place(-style.hoverLift, style.hoverShadowOffset));
-  background.on("pointerout", () => place(0, style.shadowOffset));
-  background.on("pointerdown", () => {
-    place(style.activePress, style.activeShadowOffset);
-    action();
+  description?: string,
+): HTMLButtonElement {
+  return addChromeButton(scene, {
+    x, y, width, height, label, description, variant, onSelect: action,
   });
-  background.on("pointerup", () => place(-style.hoverLift, style.hoverShadowOffset));
-  return background;
 }

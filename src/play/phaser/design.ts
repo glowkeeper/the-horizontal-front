@@ -15,33 +15,19 @@ export const GAME_CENTRE_X = GAME_WIDTH / 2;
 export const CHROME_BACKGROUND: ColourRole = "duvetCream";
 
 /**
- * Canvas-only button geometry. Appearance — fill, label, border, shadow and the
- * hover/active motion — is not restated here: it comes from the shared button
- * contract in `src/shared/theme/tokens.css`, which the public site consumes
- * directly and the canvas reads through `getButtonStyle`. Only values with no
- * CSS equivalent live here, because the canvas has no text-flow layout to
- * derive a height from.
+ * Default height for an interface-chrome control, in design pixels.
+ *
+ * Chrome is rendered as DOM buttons layered over the canvas, so its appearance
+ * lives in `src/play/styles/game.css`. Only this default remains here, because
+ * a control positioned in design space needs a height before CSS sees it.
  */
 export const CHROME_BUTTON = {
   height: 78,
-  labelSizePx: 16,
-  backgroundDepth: 30,
-  labelDepth: 31,
 } as const;
 
 export const CHROME_MENU = {
   headingSizePx: 15,
-  cardStrokeWidth: 5,
-  cardFill: "paperWhite",
-  cardStroke: "inkCharcoal",
-  cardSelectedFill: "managementGold",
-} as const satisfies {
-  readonly headingSizePx: number;
-  readonly cardStrokeWidth: number;
-  readonly cardFill: ColourRole;
-  readonly cardStroke: ColourRole;
-  readonly cardSelectedFill: ColourRole;
-};
+} as const;
 
 export const CHROME_PANEL = {
   background: "duvetCream",

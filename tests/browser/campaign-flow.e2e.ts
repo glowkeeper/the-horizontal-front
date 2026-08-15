@@ -2,7 +2,6 @@ import { expect, test, type Page } from "@playwright/test";
 
 import { canvasTargets, clickCanvas } from "./helpers/canvasControls";
 
-const campaignStatus = /Campaigns\. Selected: The Monday Uprising\./;
 const briefingStatus = /The Monday Uprising\. MONDAY\. DAWN\./;
 const resistanceStatus = /Hold the line\. Tap when a note crosses its gate\./;
 const resultStatus = /Press R or tap Try Again to retry/;
@@ -14,6 +13,16 @@ function gameStatus(page: Page) {
   return page.locator("#game-status");
 }
 
+// Interface chrome is real DOM, so screens are identified by their controls
+// rather than by a live-region message.
+function campaignCard(page: Page) {
+  return page.getByRole("button", { name: /The Monday Uprising/i });
+}
+
+function beginEpisodeButton(page: Page) {
+  return page.getByRole("button", { name: /Play\.\s*The Alarm/i });
+}
+
 async function waitForSceneInput(page: Page): Promise<void> {
   await page.evaluate(() => new Promise<void>((resolve) => {
     requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
@@ -22,7 +31,7 @@ async function waitForSceneInput(page: Page): Promise<void> {
 
 async function openEpisodeWithKeyboard(page: Page): Promise<void> {
   await page.goto("/play/");
-  await expect(gameStatus(page)).toHaveText(campaignStatus);
+  await expect(campaignCard(page)).toBeVisible();
   await page.keyboard.press("Enter");
   await expect(gameStatus(page)).toHaveText(briefingStatus);
   await waitForSceneInput(page);
@@ -42,7 +51,7 @@ test("opens the real game from the public site and accepts keyboard controls", a
   await page.goto("/");
   await page.getByRole("link", { name: "Hold the line" }).click();
   await expect(page).toHaveURL(/\/play\/$/);
-  await expect(gameStatus(page)).toHaveText(campaignStatus);
+  await expect(campaignCard(page)).toBeVisible();
 
   await page.keyboard.press("Enter");
   await expect(gameStatus(page)).toHaveText(briefingStatus);
@@ -57,12 +66,12 @@ test("opens the real game from the public site and accepts keyboard controls", a
 
 test("navigates and operates the resistance controls with a pointer", async ({ page }) => {
   await page.goto("/play/");
-  await expect(gameStatus(page)).toHaveText(campaignStatus);
+  await expect(campaignCard(page)).toBeVisible();
 
-  await clickCanvas(page, canvasTargets.campaignCard);
+  await campaignCard(page).click();
   await expect(gameStatus(page)).toHaveText(briefingStatus);
   await waitForSceneInput(page);
-  await clickCanvas(page, canvasTargets.briefing);
+  await beginEpisodeButton(page).click();
   await expect(gameStatus(page)).toHaveText(resistanceStatus);
 
   await clickCanvas(page, canvasTargets.leftResistanceControl);
@@ -87,5 +96,5 @@ test("accepts an outcome into the campaign debrief", async ({ page }) => {
   await expect(gameStatus(page)).toHaveText(debriefingStatus);
 
   await page.keyboard.press("Escape");
-  await expect(gameStatus(page)).toHaveText(campaignStatus);
+  await expect(campaignCard(page)).toBeVisible();
 });

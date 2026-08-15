@@ -41,11 +41,15 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
     "@playwright/mcp": "0.0.78",
     "@playwright/test": "1.62.0-alpha-1783623505000",
     "marked": "^16.4.2",
     "typescript": "^7.0.2",
     "vite": "^8.2.1",
     "vitest": "^4.1.10"
+  },
+  "overrides": {
+    "playwright-core": "1.62.0-alpha-1783623505000"
   }
 }

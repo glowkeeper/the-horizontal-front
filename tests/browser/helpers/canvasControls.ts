@@ -5,9 +5,9 @@ type CanvasTarget = {
   readonly y: number;
 };
 
+// Only in-world controls are addressed by canvas coordinates. Interface chrome
+// is real DOM and is addressed by role and name.
 export const canvasTargets = {
-  campaignCard: { x: 0.5, y: 0.48 },
-  briefing: { x: 0.5, y: 0.5 },
   leftResistanceControl: { x: 0.22, y: 0.82 },
   rightResistanceControl: { x: 0.78, y: 0.82 },
 } as const satisfies Record<string, CanvasTarget>;

@@ -14,31 +14,15 @@
   --space-xl: 2rem;
   --space-2xl: 3rem;
   --space-3xl: 4rem;
-
-  /*
-   * Shared button contract.
-   *
-   * The single source of truth for button styling on both surfaces. The public
-   * site consumes these directly in CSS; the game canvas reads the same custom
-   * properties at runtime through src/play/theme/theme.ts, exactly as it
-   * already resolves colour roles. Change a value here and the landing page
-   * and the game move together.
-   *
-   * Lengths are px rather than rem so a canvas design pixel and a CSS pixel
-   * mean the same thing. The canvas is scaled to fit its container, so the
-   * match is exact only at the 1280-wide design size and proportional
-   * elsewhere.
-   */
-  --button-border-width: 2px;
-  --button-shadow-offset: 4px;
-  --button-hover-shadow-offset: 6px;
-  --button-hover-lift: 2px;
-  --button-active-shadow-offset: 1px;
-  --button-active-press: 3px;
-  --button-border: var(--colour-ink-charcoal);
-  --button-shadow: var(--colour-ink-charcoal);
-  --button-primary-fill: var(--colour-resistance-red);
-  --button-primary-label: var(--colour-paper-white);
-  --button-secondary-fill: var(--colour-paper-white);
-  --button-secondary-label: var(--colour-ink-charcoal);
 }
+
+/*
+ * This file holds only genuinely shared presentation values: the semantic
+ * colour roles, typography and spacing that carry the project's identity
+ * across the public site and the game. Those must not drift between surfaces.
+ *
+ * Component styling is deliberately not here. The site and the game are
+ * different things and are expected to diverge, so each owns its own button
+ * contract — `--button-*` in src/site/styles/site.css and in
+ * src/play/styles/game.css — with both referencing the colour roles above.
+ */

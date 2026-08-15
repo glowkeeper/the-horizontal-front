@@ -28,9 +28,6 @@ export class CampaignBriefingScene extends Phaser.Scene {
   public create(): void {
     this.transitioning = false;
     const { briefing, episodes, title } = this.campaign;
-    const beginLabel = formatCopy(game.interface.beginEpisode, {
-      episode: episodes[0].title.toUpperCase(),
-    });
     let panelLayout: ReturnType<typeof createIllustratedSemanticPanel> | null = null;
     if (briefing.illustration) {
       const asset = resolveIllustrationAsset(briefing.illustration, this.campaign.id);
@@ -64,12 +61,17 @@ export class CampaignBriefingScene extends Phaser.Scene {
         panelLayout.anchors.primaryAction.x,
         panelLayout.anchors.primaryAction.y,
         panelLayout.actions.width,
-        beginLabel,
+        game.interface.beginEpisode,
         begin,
         panelLayout.actions.height,
+        "primary",
+        episodes[0].title,
       );
     } else {
-      createButton(this, GAME_CENTRE_X, 615, 420, beginLabel, begin);
+      createButton(
+        this, GAME_CENTRE_X, 615, 420, game.interface.beginEpisode, begin,
+        undefined, "primary", episodes[0].title,
+      );
     }
     this.input.keyboard?.on("keydown", (event: KeyboardEvent) => {
       if (getMenuAction(event) === "select") begin();

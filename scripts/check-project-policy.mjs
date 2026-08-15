@@ -71,6 +71,37 @@ async function findPersonReferences(directory) {
   return findings;
 }
 
+/**
+ * The game's canvas cannot use a stylesheet, so its theme adapter reads the
+ * game's own CSS custom properties at runtime. A token the adapter reads but
+ * the stylesheet no longer defines would fail only when a player loaded the
+ * game, so the mismatch is rejected here instead.
+ *
+ * The public site owns a separate button contract in its own stylesheet. The
+ * two surfaces are expected to diverge in value; this only checks that the
+ * game defines everything the game reads.
+ */
+async function findMissingGameThemeTokens() {
+  const adapter = await readFile(
+    join(projectRoot, "src/play/theme/theme.ts"),
+    "utf8",
+  );
+  const stylesheet = await readFile(
+    join(projectRoot, "src/play/styles/game.css"),
+    "utf8",
+  );
+  const required = [...new Set(
+    [...adapter.matchAll(/"(--[a-z0-9-]+)"/g)].map((match) => match[1]),
+  )];
+  return required.filter((token) => !new RegExp(`${token}\\s*:`).test(stylesheet)
+    && !new RegExp(`${token}\\s*:`).test(sharedThemeTokens));
+}
+
+const sharedThemeTokens = await readFile(
+  join(projectRoot, "src/shared/theme/tokens.css"),
+  "utf8",
+);
+
 async function findEmbeddedPlayerCopy(directory) {
   // This is a deliberately small regression tripwire for direct literals at
   // presentation call sites, not a semantic proof. Schemas, TypeScript and
@@ -249,6 +280,11 @@ const personReferences = [
 requirePolicy(
   embeddedPlayerCopy.length === 0,
   `Player-visible Phaser copy must come from validated content, not string literals: ${embeddedPlayerCopy.join(", ")}`,
+);
+const missingGameThemeTokens = await findMissingGameThemeTokens();
+requirePolicy(
+  missingGameThemeTokens.length === 0,
+  `The game canvas reads these theme tokens at runtime, but neither src/play/styles/game.css nor the shared tokens define them: ${missingGameThemeTokens.join(", ")}`,
 );
 requirePolicy(
   personReferences.length === 0,
