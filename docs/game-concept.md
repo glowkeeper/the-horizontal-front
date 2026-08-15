@@ -336,6 +336,18 @@ Every successful action needs satisfying feedback: mattress movement, duvet snap
 
 The default audio direction is original procedural synthesis rather than sampled effects. Duvet pulls, rhythm ticks, notification chirps, warning alarms, victory and failure stings, and fluorescent office hum can be generated mathematically and tuned with the gameplay. This provides especially clear provenance and may remain suitable for production if the resulting sound design is strong enough.
 
+The rhythmic bed is played on the apparatus of the workplace being satirised
+rather than on conventional instruments. Rubber stamps, typewriter carriage
+returns, pneumatic tube thumps, punch clocks, ringing desk phones and the
+fluorescent hum are the percussion section; the machinery that enforces the
+working day supplies the beat the player is asked to resist. This is a
+political choice before it is an aesthetic one — the soundtrack is not
+accompaniment to the imposition, it *is* the imposition — and it is also the
+practical one, because such sounds are exactly what mathematical synthesis
+produces convincingly, while orchestral or performed music is what it produces
+worst. Each episode draws its instrumentation from its own setting, so a
+different workplace sounds different without inventing new engine capability.
+
 Management does not need intelligible recorded dialogue. The figure can rumble, bluster and punctuate scenes through an original, unintelligible synthesised voice while speech bubbles carry the actual words. This makes Management sound like noisy institutional power without cloning or impersonating a real person. It also keeps politically important dialogue readable.
 
 Mobile vibration should be optional. Sound, colour, and motion cues should never be the sole way critical information is communicated.

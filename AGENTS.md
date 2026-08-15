@@ -173,6 +173,7 @@ The maintainer owns output as between the maintainer and the generation service 
 Procedural synthesis is the default direction for prototype audio and may remain the production direction when the results are good enough.
 
 - Generate sound effects mathematically in project-owned code rather than relying on samples where practical.
+- Build the rhythmic and musical bed from the apparatus of the setting being satirised — stamps, typewriters, pneumatic tubes, punch clocks, telephones, machine hum — rather than from conventional instruments. The machinery enforcing the working day supplies the beat the player resists, so the score is part of the argument rather than decoration over it. Each episode takes its instrumentation from its own setting. Conventional melodic instrumentation is a deliberate exception requiring justification, not the default.
 - Initial targets include duvet pulls, rhythm ticks, notification chirps, warning alarms, victory and failure stings, and fluorescent office hum.
 - Keep synthesis parameters explicit and reproducible so sounds can be tuned alongside gameplay.
 - Do not incorporate unlicensed samples, recordings, melodies or other third-party audio into procedural output.
