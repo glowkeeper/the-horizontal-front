@@ -292,6 +292,32 @@ export function compileConfrontationConfig(
     });
   }
   guideEvents.sort((left, right) => left.atMs - right.atMs);
+
+  // An interruption interrupts a phase; it must not end it. The player is given
+  // a warning, a protected interaction and a count-in that promises a return to
+  // resistance, so there has to be resistance left to return to. Without this,
+  // an interruption can silently consume every remaining cue in its phase and
+  // leave the player watching an empty stage until the next phase begins.
+  for (const attack of interruptions) {
+    const phase = resistance.phases.find((candidate) =>
+      attack.startsAtMs >= candidate.startsAtMs
+      && attack.startsAtMs < candidate.endsAtMs);
+    if (!phase) continue;
+    const remaining = cues.filter((cue) =>
+      cue.atMs >= attack.returnsAtMs && cue.atMs < phase.endsAtMs);
+    if (remaining.length === 0) {
+      throw new Error(`${scope.episodeId} interruption ${attack.id} leaves no playable cue in phase ${phase.id}; shorten it or lengthen the phase`);
+    }
+  }
+
+  // A phase with no scored cue is silent: it can be neither played nor failed
+  // against, so it is authored content the player can never meet.
+  for (const [index, phase] of resistance.phases.entries()) {
+    if (!cues.some((cue) => cue.phaseIndex === index)) {
+      throw new Error(`${scope.episodeId} phase ${phase.id} has no playable cue`);
+    }
+  }
+
   return { resistance: { ...resistance, cues, guideEvents }, interruptions };
 }
 
@@ -326,12 +352,13 @@ function subtractInterruptionWindows(
     segments = segments.flatMap((segment) => {
       if (segment.endsAtMs <= attack.startsAtMs
         || segment.startsAtMs >= attack.returnsAtMs) return [segment];
+      // Only the portion before the interruption survives. An authored pause
+      // whose remainder falls after the protected return has already been
+      // served by the return count-in, and keeping the stub would flash REST
+      // at the player for a fraction of a beat immediately after READY.
       return [
         segment.startsAtMs < attack.startsAtMs
           ? { startsAtMs: segment.startsAtMs, endsAtMs: attack.startsAtMs }
-          : null,
-        segment.endsAtMs > attack.returnsAtMs
-          ? { startsAtMs: attack.returnsAtMs, endsAtMs: segment.endsAtMs }
           : null,
       ].filter((candidate): candidate is { startsAtMs: number; endsAtMs: number } =>
         candidate !== null && candidate.endsAtMs > candidate.startsAtMs);

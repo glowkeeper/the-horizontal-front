@@ -43,13 +43,19 @@ describe("catalogued resistance composition", () => {
 
   it("compiles The Alarm into four contiguous phases and a finite cue score", () => {
     const config = game.entryEpisode.confrontation.resistance;
-    expect(config.durationMs + config.resolutionDurationMs).toBe(30_000);
+    // Episode length is authored, with no engine minimum or maximum, so assert
+    // the compiler contract — duration is exactly the sum of its phases — and
+    // that a resolution period exists, rather than any particular length.
+    expect(config.durationMs).toBe(
+      config.phases.reduce((total, phase) => total + (phase.endsAtMs - phase.startsAtMs), 0),
+    );
+    expect(config.resolutionDurationMs).toBeGreaterThan(0);
     expect(config.phases.map(({ id, startsAtMs, endsAtMs }) => ({ id, startsAtMs, endsAtMs })))
       .toEqual([
         { id: "orientation", startsAtMs: 0, endsAtMs: 4_000 },
-        { id: "establishment", startsAtMs: 4_000, endsAtMs: 14_000 },
-        { id: "pressure", startsAtMs: 14_000, endsAtMs: 22_000 },
-        { id: "crisis", startsAtMs: 22_000, endsAtMs: 27_000 },
+        { id: "establishment", startsAtMs: 4_000, endsAtMs: 17_000 },
+        { id: "pressure", startsAtMs: 17_000, endsAtMs: 28_000 },
+        { id: "crisis", startsAtMs: 28_000, endsAtMs: 33_000 },
       ]);
     expect(config.guideEvents.some(({ action }) => action === "rest")).toBe(true);
     const countIns = config.guideEvents.filter(({ action }) => action === "count-in");
@@ -58,8 +64,15 @@ describe("catalogued resistance composition", () => {
     expect(opening[0].endsAtMs).toBe(
       config.cues[0].atMs - config.cues[0].timingWindowMs,
     );
-    expect(config.guideEvents.some((event) =>
-      event.action === "rest" && event.phaseIndex === 1)).toBe(true);
+    // An interruption consumes the authored pause it lands on. What must never
+    // survive is a fragment of one left over after the protected return, which
+    // would flash REST at the player for a fraction of a beat right after READY.
+    for (const attack of game.entryEpisode.confrontation.interruptions) {
+      expect(config.guideEvents.filter((event) =>
+        event.action === "rest"
+        && event.atMs >= attack.startsAtMs
+        && event.atMs < attack.returnsAtMs)).toEqual([]);
+    }
     expect(config.guideEvents.some((event) =>
       event.action === "rest" && event.phaseIndex === 3)).toBe(false);
     const establishmentIndex = config.phases.findIndex(

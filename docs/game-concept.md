@@ -19,7 +19,7 @@ Possible opening copy:
 > **COMRADE, HOLD THE LINE.**  
 > Management has breached the bedroom.  
 > Your alarm has collaborated with the enemy.  
-> Stay horizontal for 30 seconds.
+> Stay horizontal until the shift breaks.
 
 ## Core loop
 
@@ -29,11 +29,13 @@ Possible opening copy:
 4. Corporate attacks periodically interrupt, complicate, or replace the current rhythm.
 5. Pressure escalates through the episode's authored dramatic phases.
 6. The final crisis becomes a frantic morning offensive without relying only on faster input.
-7. Survive for roughly 30 seconds to clear the level. Lose the duvet completely and the player is tipped out of bed.
+7. Survive the episode's authored duration to clear it. Lose the duvet completely and the player is tipped out of bed.
 
 The duvet and bed communicate danger directly: the duvet is progressively pulled down, the mattress tilts, the player becomes exposed, and cold work light invades the room. A small optional accessibility indicator may supplement this presentation, but a conventional Tilt Meter is not the primary interface.
 
-The authored pressure curve controls management's attack, not an unavoidable damage rate. Net safety loss is the unresisted fraction of that pressure: accurate performance must remain mechanically effective even when the authored rhythm is slow. The duration, pressure curve, resistance gains and recovery per input all require playtesting. Thirty seconds is the current starting point, not a final rule.
+The authored pressure curve controls management's attack, not an unavoidable damage rate. Net safety loss is the unresisted fraction of that pressure: accurate performance must remain mechanically effective even when the authored rhythm is slow. The duration, pressure curve, resistance gains and recovery per input all require playtesting.
+
+Episode length is authored per episode, not fixed by the engine. `The Alarm` runs about thirty-three seconds of play followed by a short resolution, and later episodes may run considerably longer where their composition earns it. What constrains length is not a target number but whether each dramatic phase can hold what is authored into it: a phase must fit its rhythm's repeating cycle, its lead-in, and any interruption, and must still leave playable resistance after that interruption returns. Content validation enforces those relationships, so a phase that has been over-filled fails the build rather than quietly dropping the composition's tail.
 
 ## Finite vocabulary, rich combinations
 

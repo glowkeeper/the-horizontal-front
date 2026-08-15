@@ -230,5 +230,19 @@ function reachSecondInterruption(): Confrontation {
     });
   }
   confrontation = advanceConfrontation(confrontation, first.returnsAtMs);
-  return advanceConfrontation(confrontation, config.interruptions[1].startsAtMs);
+  // Play the cues in between. These tests are about interruption handling, so
+  // the player must still be alive when the second interruption arrives.
+  const second = config.interruptions[1];
+  for (const cue of config.resistance.cues) {
+    if (cue.atMs < first.returnsAtMs || cue.atMs >= second.startsAtMs) continue;
+    confrontation = applyConfrontationInput(confrontation, {
+      kind: "resistance", side: cue.side, action: "press", atMs: cue.atMs,
+    });
+    if (cue.releaseAtMs !== null) {
+      confrontation = applyConfrontationInput(confrontation, {
+        kind: "resistance", side: cue.side, action: "release", atMs: cue.releaseAtMs,
+      });
+    }
+  }
+  return advanceConfrontation(confrontation, second.startsAtMs);
 }

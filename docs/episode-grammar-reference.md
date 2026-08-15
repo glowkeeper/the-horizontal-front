@@ -142,6 +142,25 @@ through a `shared` or same-episode reference. The illustration contains no
 story copy and is rendered by the shared illustrated narrative layout. No
 failure, trap-consequence or custom outcome discriminant exists.
 
+## Phase capacity
+
+A phase is a window of time, and everything authored into it competes for that
+window: the lead-in before its first cycle, the repeating rhythm cycle itself,
+and any interruption's warning, active play and return count-in.
+
+Compilation is deliberately unforgiving about the tail. A rhythm event beginning
+after the phase ends is dropped, and a hold whose release would fall past the end
+is dropped whole rather than truncated, so an over-filled phase loses the end of
+its composition. Two rules make that visible instead of silent: an interruption
+must leave at least one playable cue in its phase, and every phase must contain
+at least one scored cue.
+
+There is no minimum or maximum episode duration. A phase is long enough when it
+fits its cycle, its lead-in and its interruption and still returns the player to
+resistance; that is a relationship between authored values, not a target number.
+A slower tempo, a longer cycle or a longer interruption all demand a longer
+phase.
+
 ## What compilation means
 
 After an episode passes structural validation, the content compiler resolves its
@@ -173,6 +192,8 @@ alone:
 | Unknown trigger phase | `trigger.phase` names a phase in the selected curve. |
 | Invalid beat offset | `afterBeats` is smaller than the selected rhythm's `cycleBeats`. |
 | Interruption does not fit | Its warning, active play and return finish inside the phase. |
+| Interruption leaves no playable cue | After it returns, its phase must still contain resistance to return to. Shorten the interruption or lengthen the phase. |
+| Phase has no playable cue | Every phase must contain at least one scored cue, or it is content the player can never meet. |
 | Interruption starts during an event | Move it to a genuine musical boundary. |
 | Interruption windows overlap | Move one interruption beyond the other's protected return. |
 | Mechanic kind mismatch | Composition `kind` equals the selected mechanic's kind. |

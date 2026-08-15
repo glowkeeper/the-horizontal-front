@@ -7,68 +7,92 @@
       {
         "schemaVersion": 1,
         "id": "alarm-escalation",
-        "startingSafety": 0.85,
+        "startingSafety": 1,
         "resolutionDurationMs": 3000,
         "phases": [
           {
             "id": "orientation",
             "durationMs": 4000,
-            "rhythm": { "source": "shared", "id": "straight-alternation" },
+            "rhythm": {
+              "source": "shared",
+              "id": "straight-alternation"
+            },
             "beatIntervalMs": 900,
             "timingWindowMs": 350,
             "leadInBeats": 3,
-            "pressurePerSecond": 0.018,
+            "pressurePerSecond": 0.054,
             "recoveryPerAction": 0.045,
-            "safetyPenaltyPerMiss": 0.012,
+            "safetyPenaltyPerMiss": 0.014,
             "resistanceGainPerHit": 0.14,
-            "resistanceLossPerMiss": 0.10,
+            "resistanceLossPerMiss": 0.015,
             "resistanceRecoveryBonus": 0.4,
-            "presentationIntensity": { "from": 0, "to": 0.12 }
+            "presentationIntensity": {
+              "from": 0,
+              "to": 0.12
+            }
           },
           {
             "id": "establishment",
-            "durationMs": 10000,
-            "rhythm": { "source": "shared", "id": "sustained-grip" },
+            "durationMs": 13000,
+            "rhythm": {
+              "source": "shared",
+              "id": "sustained-grip"
+            },
             "beatIntervalMs": 820,
             "timingWindowMs": 320,
             "leadInBeats": 1,
-            "pressurePerSecond": 0.028,
+            "pressurePerSecond": 0.084,
             "recoveryPerAction": 0.048,
-            "safetyPenaltyPerMiss": 0.025,
+            "safetyPenaltyPerMiss": 0.03,
             "resistanceGainPerHit": 0.12,
-            "resistanceLossPerMiss": 0.13,
+            "resistanceLossPerMiss": 0.02,
             "resistanceRecoveryBonus": 0.45,
-            "presentationIntensity": { "from": 0.12, "to": 0.32 }
+            "presentationIntensity": {
+              "from": 0.12,
+              "to": 0.32
+            }
           },
           {
             "id": "pressure",
-            "durationMs": 8000,
-            "rhythm": { "source": "shared", "id": "three-and-rest" },
+            "durationMs": 11000,
+            "rhythm": {
+              "source": "shared",
+              "id": "three-and-rest"
+            },
             "beatIntervalMs": 700,
             "timingWindowMs": 280,
             "leadInBeats": 1,
-            "pressurePerSecond": 0.028,
+            "pressurePerSecond": 0.084,
             "recoveryPerAction": 0.048,
-            "safetyPenaltyPerMiss": 0.027,
+            "safetyPenaltyPerMiss": 0.032,
             "resistanceGainPerHit": 0.11,
-            "resistanceLossPerMiss": 0.16,
+            "resistanceLossPerMiss": 0.024,
             "resistanceRecoveryBonus": 0.5,
-            "presentationIntensity": { "from": 0.32, "to": 0.68 }
+            "presentationIntensity": {
+              "from": 0.32,
+              "to": 0.68
+            }
           },
           {
             "id": "crisis",
             "durationMs": 5000,
-            "rhythm": { "source": "shared", "id": "straight-alternation" },
+            "rhythm": {
+              "source": "shared",
+              "id": "straight-alternation"
+            },
             "beatIntervalMs": 650,
             "timingWindowMs": 250,
             "leadInBeats": 1,
-            "pressurePerSecond": 0.25,
+            "pressurePerSecond": 0.32,
             "recoveryPerAction": 0.09,
-            "safetyPenaltyPerMiss": 0.075,
+            "safetyPenaltyPerMiss": 0.09,
             "resistanceGainPerHit": 0.18,
-            "resistanceLossPerMiss": 0.20,
+            "resistanceLossPerMiss": 0.03,
             "resistanceRecoveryBonus": 0.55,
-            "presentationIntensity": { "from": 0.68, "to": 1 }
+            "presentationIntensity": {
+              "from": 0.68,
+              "to": 1
+            }
           }
         ]
       }
@@ -76,50 +100,95 @@
   },
   "confrontation": {
     "resistance": {
-      "dramaticCurve": { "source": "episode", "id": "alarm-escalation" }
+      "dramaticCurve": {
+        "source": "episode",
+        "id": "alarm-escalation"
+      }
     },
     "interruptions": [
       {
         "id": "quick-call-from-management",
         "kind": "sequence",
-        "mechanic": { "source": "shared", "id": "quick-call" },
-        "trigger": { "phase": "establishment", "afterCycles": 0, "afterBeats": 4 },
+        "mechanic": {
+          "source": "shared",
+          "id": "quick-call"
+        },
+        "trigger": {
+          "phase": "establishment",
+          "afterCycles": 0,
+          "afterBeats": 4
+        },
         "warningBeats": 1,
         "activeBeats": 3,
-        "returnCountInBeats": 3,
-        "consequences": { "successSafety": 0.03, "failureSafety": -0.04 },
+        "returnCountInBeats": 2,
+        "consequences": {
+          "successSafety": 0.03,
+          "failureSafety": -0.04
+        },
         "presentation": {
-          "skin": { "source": "shared", "id": "management-notification" }
+          "skin": {
+            "source": "shared",
+            "id": "management-notification"
+          }
         },
         "choices": [
-          { "id": "dentist", "label": "1  DENTIST", "key": "Digit1" },
-          { "id": "broken-wifi", "label": "2  BROKEN WI-FI", "key": "Digit2" },
-          { "id": "family-emergency", "label": "3  FAMILY EMERGENCY", "key": "Digit3" }
+          {
+            "id": "dentist",
+            "label": "1  DENTIST",
+            "key": "Digit1"
+          },
+          {
+            "id": "broken-wifi",
+            "label": "2  BROKEN WI-FI",
+            "key": "Digit2"
+          },
+          {
+            "id": "family-emergency",
+            "label": "3  FAMILY EMERGENCY",
+            "key": "Digit3"
+          }
         ],
-        "steps": ["broken-wifi", "dentist", "family-emergency"],
+        "steps": [
+          "broken-wifi",
+          "dentist",
+          "family-emergency"
+        ],
         "copy": {
           "warning": "INCOMING: QUICK CALL",
           "headline": "JUST A QUICK CALL",
           "instruction": "COMPLETE 3 EXCUSES IN ORDER",
           "status": "Just a Quick Call. Complete three highlighted excuses in order.",
           "success": "CALL DEFLECTED",
-          "failure": "WRONG EXCUSE — CALL CONNECTED",
-          "expired": "TOO LATE — CALL CONNECTED",
-          "cancelled": "CALL INTERRUPTED — NO PENALTY",
+          "failure": "WRONG EXCUSE \u2014 CALL CONNECTED",
+          "expired": "TOO LATE \u2014 CALL CONNECTED",
+          "cancelled": "CALL INTERRUPTED \u2014 NO PENALTY",
           "returning": "BACK TO THE LINE"
         }
       },
       {
         "id": "urgent-email-from-management",
         "kind": "hold",
-        "mechanic": { "source": "shared", "id": "urgent-email" },
-        "trigger": { "phase": "pressure", "afterCycles": 0, "afterBeats": 3 },
+        "mechanic": {
+          "source": "shared",
+          "id": "urgent-email"
+        },
+        "trigger": {
+          "phase": "pressure",
+          "afterCycles": 0,
+          "afterBeats": 3
+        },
         "warningBeats": 1,
         "activeBeats": 4,
         "returnCountInBeats": 3,
-        "consequences": { "successSafety": 0.03, "failureSafety": -0.04 },
+        "consequences": {
+          "successSafety": 0.03,
+          "failureSafety": -0.04
+        },
         "presentation": {
-          "skin": { "source": "shared", "id": "management-notification" }
+          "skin": {
+            "source": "shared",
+            "id": "management-notification"
+          }
         },
         "copy": {
           "warning": "INCOMING: URGENT EMAIL",
@@ -127,16 +196,22 @@
           "instruction": "MARK IT UNREAD BEFORE IT OPENS",
           "status": "Urgent Email. Press and hold the control, or hold Space, then release when instructed.",
           "success": "SUCCESSFULLY UNREAD",
-          "failure": "RELEASED EARLY — EMAIL OPENED",
+          "failure": "RELEASED EARLY \u2014 EMAIL OPENED",
           "expired": "EMAIL OPENED BY MANAGEMENT",
-          "cancelled": "INPUT INTERRUPTED — NO PENALTY",
+          "cancelled": "INPUT INTERRUPTED \u2014 NO PENALTY",
           "returning": "BACK TO THE LINE"
         }
       }
     ],
     "presentation": {
-      "layout": { "source": "shared", "id": "episode-confrontation" },
-      "skin": { "source": "episode", "id": "the-alarm-bedroom" }
+      "layout": {
+        "source": "shared",
+        "id": "episode-confrontation"
+      },
+      "skin": {
+        "source": "episode",
+        "id": "the-alarm-bedroom"
+      }
     },
     "copy": {
       "headline": "HOLD THE LINE",

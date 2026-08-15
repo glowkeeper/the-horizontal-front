@@ -104,7 +104,10 @@ describe("game content loading", () => {
     const episode = loadTestEpisode(episodeContent);
     const resistance = createResistance(episode.confrontation.resistance);
     expect(resistance.config).toBe(episode.confrontation.resistance);
-    expect(resistance.state.duvetSafety).toBe(0.85);
+    // Assert the authored starting safety rather than a literal, so retuning
+    // the episode does not break a test about configuration plumbing.
+    expect(resistance.state.duvetSafety)
+      .toBe(episode.confrontation.resistance.startingSafety);
   });
 
   it("rejects unknown episode fields and overlapping rhythm windows", () => {
