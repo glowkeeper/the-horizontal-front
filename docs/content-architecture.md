@@ -261,8 +261,8 @@ Each asset-catalogue entry is ordinary authored data. For example:
 
 ```json
 {
-  "id": "pillow-prototype",
-  "file": "episodes/the-alarm/pillow-prototype.png",
+  "id": "bedroom-base",
+  "file": "episodes/the-alarm/environment/bedroom-base.png",
   "origin": "ai-generated",
   "status": "prototype-placeholder",
   "creator": "Creator or source",

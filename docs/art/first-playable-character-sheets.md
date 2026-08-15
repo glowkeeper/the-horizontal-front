@@ -9,6 +9,8 @@ specification](the-alarm-playable-scene-production-spec.md). They are preserved
 for maintainer review and are not production-approved, catalogued runtime
 assets or a substitute for deliberately separated transparent parts.
 
+The separated character parts described here are retained as development material in [first-playable layered parts](first-playable-layered-parts/README.md) and are not catalogued runtime assets; only the whole-figure Management rest and lifting poses ship.
+
 ## Protagonist
 
 ![First protagonist production sheet](production/the-alarm-protagonist-production-sheet-v1.png)

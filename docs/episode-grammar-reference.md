@@ -156,6 +156,18 @@ motion and the rhythm palette; skin data owns its parts, copy and typography.
 The selected skin must name the selected layout. Interruption skins must
 support their mechanic kind and obey the same ownership rules.
 
+`confrontation.opposingActor` authors two independent kinds of movement. Its
+`states` are discrete: each names a `minimumIntensity` and swaps artwork when
+the dramatic curve crosses it. Its `strain` is continuous: the actor oscillates
+and leans further into its apparatus as intensity rises, so a finite set of
+drawings still reads as sustained effort rather than a few abrupt changes of
+pose. A skin authors `restFrequencyHz` and `strainFrequencyHz`, a
+`restAmplitude` and `strainAmplitude` point each, and a `lean` point reached at
+full intensity; the engine interpolates between rest and strain by intensity.
+`reducedMotion.amplitudeScale` multiplies only the oscillation, so a reader who
+prefers reduced motion still sees the lean — a static pose offset — without
+anything shaking.
+
 `confrontation.copy` supplies `headline` and accessible `instructionsStatus`.
 `results` contains exactly `victory` and `forcedVerticalisation`; each supplies
 non-empty `headline` and `feedback` and may select a catalogued illustration

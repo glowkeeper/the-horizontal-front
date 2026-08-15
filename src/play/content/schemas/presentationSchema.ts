@@ -483,6 +483,19 @@ export const resistanceSkinSchema = z.object({
           asset: ownedContentReferenceSchema,
         }).strict()).min(1),
       }).strict()).min(1),
+      // Continuous effort between the discrete pose states: the actor oscillates
+      // and leans further into its apparatus as dramatic intensity rises, so a
+      // finite set of drawings still reads as sustained exertion.
+      strain: z.object({
+        restFrequencyHz: z.number().nonnegative().max(20),
+        strainFrequencyHz: z.number().nonnegative().max(20),
+        restAmplitude: pointSchema,
+        strainAmplitude: pointSchema,
+        lean: pointSchema,
+      }).strict(),
+      reducedMotion: z.object({
+        amplitudeScale: unitIntervalSchema,
+      }).strict(),
     }).strict(),
   }).strict(),
 }).strict().superRefine((skin, context) => {

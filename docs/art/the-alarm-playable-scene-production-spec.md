@@ -8,8 +8,14 @@ first-draft political-cartoon direction into separable artwork, semantic states
 and reusable composition data. It is not perceptual acceptance of the finished
 assets.
 
-The first-draft protagonist, Management, bed, duvet-state and environment
-artwork is now catalogued and selected by the episode skin. Its runtime
+The environment artwork and the whole-figure Management poses are catalogued and
+selected by the episode skin. The separated protagonist, bed, pillow and
+duvet-state parts specified below are **not** catalogued: integrated review
+replaced independently rotating parts with complete bed tableaux, and those
+parts now live as development material in
+[first-playable layered parts](first-playable-layered-parts/README.md). This
+document remains the specification for that separable direction, not a record of
+what ships. Its runtime
 composition remains a prototype pending perceptual review and refinement. No
 item below permits episode-specific TypeScript. Assets belong to the episode,
 are selected by its skin and respond to generic dramatic intensity and outcome

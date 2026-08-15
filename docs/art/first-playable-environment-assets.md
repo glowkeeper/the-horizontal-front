@@ -7,6 +7,8 @@ Alarm**, in **The Monday Uprising**. They do not prescribe the direction of
 later episodes or campaigns: contributors may propose different enactments
 through the project's normal community process.
 
+The separated bed, pillow and duvet-state parts described here are retained as development material in [first-playable layered parts](first-playable-layered-parts/README.md) and are not catalogued runtime assets; the bedroom base, office incursion and whole bed tableaux ship in their place.
+
 All assets below are first-draft, AI-assisted production hypotheses. They are
 catalogued as `prototype-placeholder` until their composition, cut-out edges,
 human refinement and perceptual quality have been explicitly accepted. The

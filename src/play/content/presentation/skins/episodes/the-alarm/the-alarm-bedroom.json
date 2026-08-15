@@ -26,12 +26,12 @@
         { "minimumDanger": 0.9, "asset": { "source": "episode", "id": "the-alarm-resistance-states-final-pressure" } }
       ],
       "transition": {
-        "crossfadeDurationMs": 280,
+        "crossfadeDurationMs": 750,
         "rotationResponseMs": 240,
         "ease": "Sine.Out",
-        "joltX": -3,
-        "joltY": 3,
-        "shakeAmplitude": 2,
+        "joltX": 0,
+        "joltY": 0,
+        "shakeAmplitude": 0,
         "shakeDurationMs": 120
       },
       "reducedMotion": { "crossfadeDurationMs": 80 }
@@ -68,7 +68,15 @@
         { "partId": "figure", "asset": { "source": "episode", "id": "management-lifting-pose" } }
       ]
     }
-    ]
+    ],
+    "strain": {
+      "restFrequencyHz": 0.5,
+      "strainFrequencyHz": 5.4,
+      "restAmplitude": { "x": 0, "y": 1.5 },
+      "strainAmplitude": { "x": 2.5, "y": 6 },
+      "lean": { "x": -14, "y": 7 }
+    },
+    "reducedMotion": { "amplitudeScale": 0 }
     }
   }
 }

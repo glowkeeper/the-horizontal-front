@@ -4,6 +4,11 @@ import type { Episode } from "../../content/loadEpisode";
 import { loadPresentation } from "../../content/loadPresentation";
 import type { ShapePart } from "../../content/schemas/presentationSchema";
 import { createTextStyles, getThemeColour } from "../../theme/theme";
+import {
+  advanceStrainPhase,
+  getActorStrainOffset,
+  resolveActorStrain,
+} from "../presentation/actorStrain";
 import { getResistancePresentation } from "../presentation/resistancePresentation";
 import {
   getResistanceAngleDegrees,
@@ -12,6 +17,10 @@ import {
   smoothResistanceAngleDegrees,
 } from "../presentation/resistanceTransition";
 import type { ResistanceLayout } from "./resistanceLayout";
+
+// A backgrounded tab reports one enormous frame on return. Clamping the delta
+// keeps time-stepped motion continuous instead of leaping a whole second.
+const MAXIMUM_FRAME_DELTA_MS = 100;
 
 export function createEpisodeConfrontationLayout(
   scene: Phaser.Scene,
@@ -104,6 +113,12 @@ export function createEpisodeConfrontationLayout(
     anchors.opposingActor.x,
     anchors.opposingActor.y,
   );
+  const actorStrain = resolveActorStrain(
+    skin.confrontation.opposingActor.strain,
+    skin.confrontation.opposingActor.reducedMotion,
+    reducedMotion,
+  );
+  let actorStrainPhase = 0;
   const opposingActorParts = skin.confrontation.opposingActor.parts.map((part) =>
     createShape(scene, part));
   opposingActor.add(opposingActorParts);
@@ -152,7 +167,7 @@ export function createEpisodeConfrontationLayout(
         smoothResistanceAngleDegrees(
           currentAngle,
           targetAngle,
-          Math.min(scene.game.loop.delta, 100),
+          Math.min(scene.game.loop.delta, MAXIMUM_FRAME_DELTA_MS),
           resistanceMotion.rotationResponseMs,
         ),
       ));
@@ -168,6 +183,21 @@ export function createEpisodeConfrontationLayout(
             clamp01(dramaticIntensity),
           ));
       });
+      actorStrainPhase = advanceStrainPhase(
+        actorStrainPhase,
+        dramaticIntensity,
+        Math.min(scene.game.loop.delta, MAXIMUM_FRAME_DELTA_MS),
+        actorStrain,
+      );
+      const strainOffset = getActorStrainOffset(
+        actorStrainPhase,
+        dramaticIntensity,
+        actorStrain,
+      );
+      opposingActor.setPosition(
+        anchors.opposingActor.x + strainOffset.x,
+        anchors.opposingActor.y + strainOffset.y,
+      );
       const actorState = [...skin.confrontation.opposingActor.states]
         .reverse()
         .find(({ minimumIntensity }) => dramaticIntensity >= minimumIntensity);
