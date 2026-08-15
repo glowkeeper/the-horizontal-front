@@ -103,8 +103,9 @@ describe("presentation content", () => {
     expect(presentation.skin.confrontation.resistance).toMatchObject({
       width: 850,
       height: 850,
-      dangerAngleDegrees: -34.1,
     });
+    // How far the engine rotates is tuning — it depends on how much of the lift
+    // the artwork itself carries. That it rotates the head upwards is not.
     expect(presentation.skin.confrontation.resistance.dangerAngleDegrees)
       .toBeLessThan(0);
     expect(presentation.skin.confrontation.resistance.reducedMotion).toEqual({

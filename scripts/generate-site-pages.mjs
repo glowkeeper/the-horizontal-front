@@ -108,8 +108,10 @@ function pageTemplate({ title, description, content, documentPage = false }) {
     <header class="site-header">
       <a class="site-name" href="/">The Horizontal Front</a>
       <nav aria-label="Primary navigation">
+        <a href="/">Home</a>
         <a href="/play/">Play</a>
         <a href="/commons/">The Commons</a>
+        <a href="/sound/">Sound</a>
         ${repositoryLink}
       </nav>
     </header>

@@ -248,6 +248,15 @@ const resistanceVisualSchema = z.object({
   states: z.array(z.object({
     minimumDanger: unitIntervalSchema,
     asset: ownedContentReferenceSchema,
+    /**
+     * How far this artwork is already drawn into the lift, relative to the
+     * resting state.
+     *
+     * Telling the engine what each drawing already depicts lets it hold one
+     * continuous angle and compensate as the texture swaps, so a set of discrete
+     * drawings reads as a single rotation rather than a series of steps.
+     */
+    drawnAngleDegrees: z.number().min(-90).max(90),
   }).strict()).min(1),
   transition: z.object({
     crossfadeDurationMs: z.number().int().positive().max(1_000),

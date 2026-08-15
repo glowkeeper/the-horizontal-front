@@ -54,6 +54,10 @@
         flex: 1 1 260px;
         accent-color: var(--colour-resistance-red);
       }
+      .grounding {
+        font-size: 0.95rem;
+        opacity: 0.8;
+      }
       .sound-transport output {
         min-width: 4ch;
         font-variant-numeric: tabular-nums;
@@ -65,6 +69,7 @@
     <header class="site-header">
       <a class="site-name" href="/">The Horizontal Front</a>
       <nav aria-label="Primary navigation">
+        <a href="/">Home</a>
         <a href="/play/">Play</a>
         <a href="/commons/">The Commons</a>
         <a href="/sound/" aria-current="page">Sound</a>
@@ -76,6 +81,7 @@
         <p class="eyebrow">Bureaucracy as percussion.</p>
         <h1 id="page-title">The Sound Library</h1>
         <p class="brief">Every sound in the game, free to listen to and free to reuse.</p>
+        <p class="grounding" id="grounding"></p>
         <p class="lede">There are no audio files here. Each sound is built from a few lines of numbers the moment you press the button — a rubber stamp is two layers of maths, a phone is three. Nothing was sampled, nothing was recorded, and nothing needs clearing. The whole library is a few kilobytes of JSON.</p>
       </section>
 
@@ -98,7 +104,7 @@
 
       <section aria-labelledby="score-title">
         <h2 id="score-title">The whole score</h2>
-        <p>Hear the compiled rhythm of <em>The Alarm</em>: the count-in, the pulse underneath, and the sided demands that accent it — left and right differ in pitch as well as position, so the two can be told apart on any speaker.</p>
+        <p>Hear the compiled rhythm of <em id="score-episode"></em>: the count-in, the pulse underneath, and the sided demands that accent it — left and right differ in pitch as well as position, so the two can be told apart on any speaker.</p>
         <div class="sound-transport">
           <button id="play-score" class="primary-action" type="button">Play the score</button>
           <button id="stop-all" class="secondary-action" type="button">Stop</button>

@@ -135,68 +135,80 @@
       "file": "episodes/the-alarm/resistance-states/rest.png",
       "origin": "ai-generated",
       "status": "prototype-placeholder",
-      "creator": "OpenAI image generation tool, directed by the project maintainer and Codex",
-      "generatedAt": "2026-08-14",
-      "generationTool": "OpenAI built-in image generation (gpt-image-2), local chroma-key removal, equal crop, registration and deterministic plane normalization",
-      "prompt": "Create an isolated four-state bed-tableau sheet for The Alarm with the foot and short footboard at left, tall headboard and single pillow at right, and frame, mattress, pillow, duvet and heroic gender-ambiguous protagonist sharing one perspective plane; rest is calm and sweat-free; no Management, room, office, text, logos, signatures or watermarks; flat green removable background.",
+      "creator": "OpenArt AI image generation, directed by the project maintainer",
+      "generatedAt": "2026-08-15",
+      "generationTool": "OpenArt AI, 4096x4096 four-quadrant sheet on a flat chroma field, local chroma-key removal and registration",
+      "prompt": "Regenerate the four resistance states of The Alarm as one consistent bed drawn four times, progressively levered up from the head while the foot stays on the floor; this quadrant is the rest state, flat on the floor, the duvet held and the occupant watchful. Keep the frame, posts, mattress and proportions identical across all four; vary only the angle, the duvet and the occupant. Isolated on flat chroma with no room, text, logo or watermark.",
       "edits": [
-        "Removed the chroma field from the accepted v5 sheet with a soft matte and despill.",
-        "Cropped the rest quadrant without resizing.",
-        "Registered the unchanged crop around the shared foot-and-rail pivot, counter-rotated its authored bed plane to horizontal, and preserved it on a 900 by 900 transparent canvas so Phaser owns continuous bed rotation."
+        "Keyed the chroma field locally with a soft matte and a despill that pulls green back to what the surrounding red and blue justify.",
+        "Split the 4096x4096 sheet into four 2048x2048 quadrants.",
+        "Normalised on the timber frame rather than the whole silhouette, because the duvet and occupant legitimately change shape between states while the frame does not.",
+        "Area-averaged down onto a 900 by 900 canvas, every source pixel contributing, so a roughly threefold reduction supersamples rather than aliases.",
+        "Registered the foot-end post base to a single canvas point shared by all four states, so the bed pivots on the foot it stands on instead of drifting between drawings.",
+        "Left the drawn angle intact. The artwork carries the lift and the engine keeps only a small continuous creep, so no state was resampled by rotation."
       ],
       "licence": "CC-BY-SA-4.0",
-      "replacementStatus": "Maintainer-accepted first-draft resistance-state direction; normalized runtime motion, integrated framing and human refinement still require review before production approval."
+      "replacementStatus": "Second-generation resistance states with corrected and measured geometry: timber frame length varies 0.2 percent across the four and the foot pivot is identical in all of them. Awaiting maintainer perceptual acceptance before production approval."
     },
     {
       "id": "the-alarm-resistance-states-early-pressure",
       "file": "episodes/the-alarm/resistance-states/early-pressure.png",
       "origin": "ai-generated",
       "status": "prototype-placeholder",
-      "creator": "OpenAI image generation tool, directed by the project maintainer and Codex",
-      "generatedAt": "2026-08-14",
-      "generationTool": "OpenAI built-in image generation (gpt-image-2), local chroma-key removal, equal crop, registration and deterministic plane normalization",
-      "prompt": "Create an isolated four-state bed-tableau sheet for The Alarm with the foot and short footboard at left, tall headboard and single pillow at right, and frame, mattress, pillow, duvet and heroic gender-ambiguous protagonist sharing one perspective plane; rest is calm and sweat-free; no Management, room, office, text, logos, signatures or watermarks; flat green removable background.",
+      "creator": "OpenArt AI image generation, directed by the project maintainer",
+      "generatedAt": "2026-08-15",
+      "generationTool": "OpenArt AI, 4096x4096 four-quadrant sheet on a flat chroma field, local chroma-key removal and registration",
+      "prompt": "Regenerate the four resistance states of The Alarm as one consistent bed drawn four times, progressively levered up from the head while the foot stays on the floor; this quadrant is the early-lift state, the head raised and the grip tightening. Keep the frame, posts, mattress and proportions identical across all four; vary only the angle, the duvet and the occupant. Isolated on flat chroma with no room, text, logo or watermark.",
       "edits": [
-        "Removed the chroma field from the accepted v5 sheet with a soft matte and despill.",
-        "Cropped the early-lift quadrant without resizing.",
-        "Registered the unchanged crop around the shared foot-and-rail pivot, counter-rotated its authored bed plane to horizontal, and preserved it on a 900 by 900 transparent canvas so Phaser owns continuous bed rotation."
+        "Keyed the chroma field locally with a soft matte and a despill that pulls green back to what the surrounding red and blue justify.",
+        "Split the 4096x4096 sheet into four 2048x2048 quadrants.",
+        "Normalised on the timber frame rather than the whole silhouette, because the duvet and occupant legitimately change shape between states while the frame does not.",
+        "Area-averaged down onto a 900 by 900 canvas, every source pixel contributing, so a roughly threefold reduction supersamples rather than aliases.",
+        "Registered the foot-end post base to a single canvas point shared by all four states, so the bed pivots on the foot it stands on instead of drifting between drawings.",
+        "Left the drawn angle intact. The artwork carries the lift and the engine keeps only a small continuous creep, so no state was resampled by rotation."
       ],
       "licence": "CC-BY-SA-4.0",
-      "replacementStatus": "Maintainer-accepted first-draft resistance-state direction; normalized runtime motion, integrated framing and human refinement still require review before production approval."
+      "replacementStatus": "Second-generation resistance states with corrected and measured geometry: timber frame length varies 0.2 percent across the four and the foot pivot is identical in all of them. Awaiting maintainer perceptual acceptance before production approval."
     },
     {
       "id": "the-alarm-resistance-states-high-pressure",
       "file": "episodes/the-alarm/resistance-states/high-pressure.png",
       "origin": "ai-generated",
       "status": "prototype-placeholder",
-      "creator": "OpenAI image generation tool, directed by the project maintainer and Codex",
-      "generatedAt": "2026-08-14",
-      "generationTool": "OpenAI built-in image generation (gpt-image-2), local chroma-key removal, equal crop, registration and deterministic plane normalization",
-      "prompt": "Create an isolated four-state bed-tableau sheet for The Alarm with the foot and short footboard at left, tall headboard and single pillow at right, and frame, mattress, pillow, duvet and heroic gender-ambiguous protagonist sharing one perspective plane; rest is calm and sweat-free; no Management, room, office, text, logos, signatures or watermarks; flat green removable background.",
+      "creator": "OpenArt AI image generation, directed by the project maintainer",
+      "generatedAt": "2026-08-15",
+      "generationTool": "OpenArt AI, 4096x4096 four-quadrant sheet on a flat chroma field, local chroma-key removal and registration",
+      "prompt": "Regenerate the four resistance states of The Alarm as one consistent bed drawn four times, progressively levered up from the head while the foot stays on the floor; this quadrant is the high-danger state, steeply raised, the duvet bunched and the occupant straining. Keep the frame, posts, mattress and proportions identical across all four; vary only the angle, the duvet and the occupant. Isolated on flat chroma with no room, text, logo or watermark.",
       "edits": [
-        "Removed the chroma field from the accepted v5 sheet with a soft matte and despill.",
-        "Cropped the high-danger quadrant without resizing.",
-        "Registered the unchanged crop around the shared foot-and-rail pivot, counter-rotated its authored bed plane to horizontal, and preserved it on a 900 by 900 transparent canvas so Phaser owns continuous bed rotation."
+        "Keyed the chroma field locally with a soft matte and a despill that pulls green back to what the surrounding red and blue justify.",
+        "Split the 4096x4096 sheet into four 2048x2048 quadrants.",
+        "Normalised on the timber frame rather than the whole silhouette, because the duvet and occupant legitimately change shape between states while the frame does not.",
+        "Area-averaged down onto a 900 by 900 canvas, every source pixel contributing, so a roughly threefold reduction supersamples rather than aliases.",
+        "Registered the foot-end post base to a single canvas point shared by all four states, so the bed pivots on the foot it stands on instead of drifting between drawings.",
+        "Left the drawn angle intact. The artwork carries the lift and the engine keeps only a small continuous creep, so no state was resampled by rotation."
       ],
       "licence": "CC-BY-SA-4.0",
-      "replacementStatus": "Maintainer-accepted first-draft resistance-state direction; normalized runtime motion, integrated framing and human refinement still require review before production approval."
+      "replacementStatus": "Second-generation resistance states with corrected and measured geometry: timber frame length varies 0.2 percent across the four and the foot pivot is identical in all of them. Awaiting maintainer perceptual acceptance before production approval."
     },
     {
       "id": "the-alarm-resistance-states-final-pressure",
       "file": "episodes/the-alarm/resistance-states/final-pressure.png",
       "origin": "ai-generated",
       "status": "prototype-placeholder",
-      "creator": "OpenAI image generation tool, directed by the project maintainer and Codex",
-      "generatedAt": "2026-08-14",
-      "generationTool": "OpenAI built-in image generation (gpt-image-2), local chroma-key removal, equal crop, registration and deterministic plane normalization",
-      "prompt": "Create an isolated four-state bed-tableau sheet for The Alarm with the foot and short footboard at left, tall headboard and single pillow at right, and frame, mattress, pillow, duvet and heroic gender-ambiguous protagonist sharing one perspective plane; rest is calm and sweat-free; no Management, room, office, text, logos, signatures or watermarks; flat green removable background.",
+      "creator": "OpenArt AI image generation, directed by the project maintainer",
+      "generatedAt": "2026-08-15",
+      "generationTool": "OpenArt AI, 4096x4096 four-quadrant sheet on a flat chroma field, local chroma-key removal and registration",
+      "prompt": "Regenerate the four resistance states of The Alarm as one consistent bed drawn four times, progressively levered up from the head while the foot stays on the floor; this quadrant is the near-verticalisation state, close to vertical, teeth bared and sweat showing. Keep the frame, posts, mattress and proportions identical across all four; vary only the angle, the duvet and the occupant. Isolated on flat chroma with no room, text, logo or watermark.",
       "edits": [
-        "Removed the chroma field from the accepted v5 sheet with a soft matte and despill.",
-        "Cropped the near-verticalisation quadrant without resizing.",
-        "Registered the unchanged crop around the shared foot-and-rail pivot, counter-rotated its authored bed plane to horizontal, and preserved it on a 900 by 900 transparent canvas so Phaser owns continuous bed rotation."
+        "Keyed the chroma field locally with a soft matte and a despill that pulls green back to what the surrounding red and blue justify.",
+        "Split the 4096x4096 sheet into four 2048x2048 quadrants.",
+        "Normalised on the timber frame rather than the whole silhouette, because the duvet and occupant legitimately change shape between states while the frame does not.",
+        "Area-averaged down onto a 900 by 900 canvas, every source pixel contributing, so a roughly threefold reduction supersamples rather than aliases.",
+        "Registered the foot-end post base to a single canvas point shared by all four states, so the bed pivots on the foot it stands on instead of drifting between drawings.",
+        "Left the drawn angle intact. The artwork carries the lift and the engine keeps only a small continuous creep, so no state was resampled by rotation."
       ],
       "licence": "CC-BY-SA-4.0",
-      "replacementStatus": "Maintainer-accepted first-draft resistance-state direction; normalized runtime motion, integrated framing and human refinement still require review before production approval."
+      "replacementStatus": "Second-generation resistance states with corrected and measured geometry: timber frame length varies 0.2 percent across the four and the foot pivot is identical in all of them. Awaiting maintainer perceptual acceptance before production approval."
     }
   ]
 }

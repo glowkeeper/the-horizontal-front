@@ -13,6 +13,7 @@ import type { AudioCueRole } from "../play/content/schemas/audioSchema";
  * make. Nothing is downloaded: every sound is built from the numbers in
  * `src/play/content/audio/cues/` at the moment you press the button.
  */
+const campaign = game.campaigns[0];
 const episode = game.entryEpisode;
 const soundscape = episode.audio;
 const resistance = episode.confrontation.resistance;
@@ -142,6 +143,17 @@ document.querySelector("#play-score")?.addEventListener("click", () => {
 });
 
 document.querySelector("#stop-all")?.addEventListener("click", stopScore);
+
+// The library is not abstract: it is the palette one real episode is scored
+// with, and naming which keeps the page honest about what is being auditioned.
+const grounding = document.querySelector("#grounding");
+if (grounding) {
+  grounding.textContent = `Grounded in ${episode.title}, the opening episode of `
+    + `${campaign.title} — the soundscape below is the one that episode plays.`;
+}
+
+const scoreEpisode = document.querySelector("#score-episode");
+if (scoreEpisode) scoreEpisode.textContent = episode.title;
 
 const summary = document.querySelector("#library-summary");
 if (summary) {

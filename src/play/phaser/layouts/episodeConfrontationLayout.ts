@@ -54,6 +54,11 @@ export function createEpisodeConfrontationLayout(
   resistanceContainer.add(resistanceImages);
   let activeResistanceSlot = 0;
   let activeResistanceState = 0;
+  const slotDrawnAngle = [
+    resistanceVisual.states[0].drawnAngleDegrees,
+    resistanceVisual.states[0].drawnAngleDegrees,
+  ];
+  let smoothedLiftDegrees = 0;
   const reducedMotion = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)")
     .matches ?? false;
   const resistanceMotion = resolveResistanceTransition(
@@ -74,6 +79,7 @@ export function createEpisodeConfrontationLayout(
     scene.tweens.killTweensOf(incoming);
     scene.tweens.killTweensOf(resistanceContainer);
     resistanceContainer.setPosition(resistanceVisual.x, resistanceVisual.y);
+    slotDrawnAngle[incomingSlot] = resistanceVisual.states[targetState].drawnAngleDegrees;
     incoming
       .setTexture(resistanceVisual.states[targetState].asset.id)
       .setDisplaySize(resistanceVisual.width, resistanceVisual.height)
@@ -164,16 +170,19 @@ export function createEpisodeConfrontationLayout(
         physicalDanger,
         resistanceVisual.dangerAngleDegrees,
       );
-      const currentAngle = Phaser.Math.RadToDeg(resistanceContainer.rotation);
-      resistanceContainer.setRotation(Phaser.Math.DegToRad(
-        smoothResistanceAngleDegrees(
-          currentAngle,
-          targetAngle,
-          Math.min(scene.game.loop.delta, MAXIMUM_FRAME_DELTA_MS),
-          resistanceMotion.rotationResponseMs,
-        ),
-      ));
+      smoothedLiftDegrees = smoothResistanceAngleDegrees(
+        smoothedLiftDegrees,
+        targetAngle,
+        Math.min(scene.game.loop.delta, MAXIMUM_FRAME_DELTA_MS),
+        resistanceMotion.rotationResponseMs,
+      );
       transitionToResistance(selectResistanceStateIndex(physicalDanger, resistanceVisual.states));
+      // Rotate each slot by the part of the lift its own drawing is missing, so
+      // the subject holds one continuous angle while the artwork beneath it
+      // changes. A state swap becomes a change of drawing rather than a jump.
+      resistanceImages.forEach((image, slot) => {
+        image.setRotation(Phaser.Math.DegToRad(smoothedLiftDegrees - slotDrawnAngle[slot]));
+      });
       workLight.setAlpha(presentation.workLightAlpha);
 
       skin.confrontation.environment.intensityParts.forEach((layer, index) => {

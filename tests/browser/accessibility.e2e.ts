@@ -63,6 +63,32 @@ test("the public landing page has no accessibility violations", async ({ page })
   await expectNoViolations(page, "landing page");
 });
 
+test("every page offers the same way home", async ({ page }) => {
+  // The wordmark links home, but it is styled as a wordmark rather than a link,
+  // so it cannot be the only route back. Each page carries an explicit one.
+  for (const path of [
+    "/", "/commons/", "/sound/",
+    "/charter/", "/governance/", "/identity/", "/contribute/", "/licences/",
+  ]) {
+    await page.goto(path);
+    const primary = page.getByRole("navigation", { name: "Primary navigation" });
+    await expect(
+      primary.getByRole("link", { name: "Home" }),
+      `${path} must offer a way back to the homepage`,
+    ).toBeVisible();
+    await expect(
+      primary.getByRole("link", { name: "Sound" }),
+      `${path} must reach the sound library`,
+    ).toBeVisible();
+  }
+
+  await page.goto("/charter/");
+  await page.getByRole("navigation", { name: "Primary navigation" })
+    .getByRole("link", { name: "Home" }).click();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.getByRole("heading", { name: "The Horizontal Front" })).toBeVisible();
+});
+
 test("the sound library is reachable, operable and free of violations", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("navigation", { name: "Primary navigation" })
@@ -81,6 +107,11 @@ test("the sound library is reachable, operable and free of violations", async ({
 
   const intensity = page.getByRole("slider", { name: /dramatic intensity/i });
   await expect(intensity).toBeVisible();
+
+  // The library is the palette of one real episode, and says so from content
+  // rather than from copy typed into the page.
+  await expect(page.locator("#grounding")).toHaveText(/The Alarm.*The Monday Uprising/);
+  await expect(page.locator("#score-episode")).toHaveText("The Alarm");
 });
 
 test("every game screen exposes its chrome to assistive technology", async ({ page }) => {

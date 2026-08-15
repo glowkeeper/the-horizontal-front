@@ -12,21 +12,21 @@
       "pressureCaption": { "sizePx": 14, "colour": "managementGold" }
     },
     "resistance": {
-      "x": 400,
-      "y": 480,
+      "x": 381.1,
+      "y": 549.2,
       "width": 850,
       "height": 850,
-      "originX": 0.217778,
-      "originY": 0.734444,
-      "dangerAngleDegrees": -34.1,
+      "originX": 0.195556,
+      "originY": 0.851111,
+      "dangerAngleDegrees": -34,
       "states": [
-        { "minimumDanger": 0, "asset": { "source": "episode", "id": "the-alarm-resistance-states-rest" } },
-        { "minimumDanger": 0.28, "asset": { "source": "episode", "id": "the-alarm-resistance-states-early-pressure" } },
-        { "minimumDanger": 0.58, "asset": { "source": "episode", "id": "the-alarm-resistance-states-high-pressure" } },
-        { "minimumDanger": 0.9, "asset": { "source": "episode", "id": "the-alarm-resistance-states-final-pressure" } }
+        { "minimumDanger": 0, "asset": { "source": "episode", "id": "the-alarm-resistance-states-rest" }, "drawnAngleDegrees": 0 },
+        { "minimumDanger": 0.28, "asset": { "source": "episode", "id": "the-alarm-resistance-states-early-pressure" }, "drawnAngleDegrees": -15.7 },
+        { "minimumDanger": 0.58, "asset": { "source": "episode", "id": "the-alarm-resistance-states-high-pressure" }, "drawnAngleDegrees": -19.9 },
+        { "minimumDanger": 0.9, "asset": { "source": "episode", "id": "the-alarm-resistance-states-final-pressure" }, "drawnAngleDegrees": -28.2 }
       ],
       "transition": {
-        "crossfadeDurationMs": 750,
+        "crossfadeDurationMs": 150,
         "rotationResponseMs": 240,
         "ease": "Sine.Out",
         "joltX": 0,
