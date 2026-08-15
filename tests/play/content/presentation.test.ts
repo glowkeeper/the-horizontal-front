@@ -122,7 +122,9 @@ describe("presentation content", () => {
       assets.map(({ partId, asset }) => [partId, asset.id]),
     ])).toEqual([
       [0, [["figure", "management-rest-pose"]]],
-      [0.22, [["figure", "management-lifting-pose"]]],
+      [0.22, [["figure", "management-early-pressure-pose"]]],
+      [0.5, [["figure", "management-high-pressure-pose"]]],
+      [0.78, [["figure", "management-lifting-pose"]]],
     ]);
     expect([...presentation.interruptionSkins.entries()].map(([id, value]) => [
       id, value.id,

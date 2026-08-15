@@ -65,6 +65,18 @@
     {
       "minimumIntensity": 0.22,
       "assets": [
+        { "partId": "figure", "asset": { "source": "episode", "id": "management-early-pressure-pose" } }
+      ]
+    },
+    {
+      "minimumIntensity": 0.5,
+      "assets": [
+        { "partId": "figure", "asset": { "source": "episode", "id": "management-high-pressure-pose" } }
+      ]
+    },
+    {
+      "minimumIntensity": 0.78,
+      "assets": [
         { "partId": "figure", "asset": { "source": "episode", "id": "management-lifting-pose" } }
       ]
     }

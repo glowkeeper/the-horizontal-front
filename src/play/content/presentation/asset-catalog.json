@@ -114,6 +114,42 @@
       "replacementStatus": "First-draft no-exertion Management state awaiting integrated maintainer perceptual acceptance and human refinement before production approval."
     },
     {
+      "id": "management-early-pressure-pose",
+      "file": "episodes/the-alarm/characters/management/management-early-pressure-pose.png",
+      "origin": "ai-generated",
+      "status": "prototype-placeholder",
+      "creator": "OpenArt AI image generation, directed by the project maintainer and Claude",
+      "generatedAt": "2026-08-15",
+      "generationTool": "OpenArt AI MCP connector, GPT Image 2 image-to-image at 1344x1680 on a flat chroma field, local chroma-key removal and registration",
+      "prompt": "Using the two supplied references as the absolute authority for identity, costume, apparatus, camera, scale and rendering, create one coherent complete Management pose for the earliest stage of effort, between the resting pose (reference 1) and the straining lifting pose (reference 2). He has committed to the work but it has barely begun: the paperwork is released and hangs from its clips, both hands have closed around the brass lever, and the lever has moved only slightly from its idle upright angle. The stance is still largely upright, weight just beginning to shift onto the rear foot. Expression is brittle professional confidence hardening into concentration - brows down, mouth set, jaw firm; no shouting, no bared clenched teeth, and no sweat at all. Preserve exactly the pinstripe three-piece suit with brass-buckled utility pouches, the pocket watch, the printed receipt strips, the wire-rimmed glasses, the slicked dark hair, and the riveted brass-and-iron console with the paper roll spilling from its left face. Keep the console at identical position, scale and ground contact as both references; keep the figure facing left at the same framing and height. Same editorial cartoon line, ink texture and warm lamp-lit palette. Isolated on flat #00ff00, no detached parts, no room, bed, furniture, text, logo, signature or watermark, and no resemblance to any real person.",
+      "edits": [
+        "Supplied the accepted rest and lifting poses as the two image-to-image references so identity, costume and apparatus carry across the state sequence.",
+        "Keyed the chroma field locally with a soft matte sampled from the rendered background and a green despill.",
+        "Registered the fixed apparatus by translating the drawing 17 pixels left and 31 pixels up so its console plinth matches the rest pose within one pixel.",
+        "Resampled from 1344x1680 to 680x850, twice the authored part size, because the canvas backing store is fixed at the design resolution. The full-resolution master is preserved outside the shipped tree."
+      ],
+      "licence": "CC-BY-SA-4.0",
+      "replacementStatus": "First-draft early-effort Management state awaiting integrated maintainer perceptual acceptance and human refinement before production approval."
+    },
+    {
+      "id": "management-high-pressure-pose",
+      "file": "episodes/the-alarm/characters/management/management-high-pressure-pose.png",
+      "origin": "ai-generated",
+      "status": "prototype-placeholder",
+      "creator": "OpenArt AI image generation, directed by the project maintainer and Claude",
+      "generatedAt": "2026-08-15",
+      "generationTool": "OpenArt AI MCP connector, GPT Image 2 image-to-image at 1344x1680 on a flat chroma field, local chroma-key removal and registration",
+      "prompt": "Using the three supplied references as the absolute authority for identity, costume, apparatus, camera, scale and rendering, create one coherent complete Management pose for sustained hard effort. It is the third of four states: reference 1 is rest, reference 3 is the earliest stage of effort, reference 2 is the final full-tilt strain. This new pose must sit clearly beyond reference 3 and just as clearly short of reference 2. Both hands haul the brass lever roughly halfway down from upright - noticeably further than reference 3, but not yet reference 2's deep angle. The torso leans back into the pull, the front leg is braced and the rear foot planted, and the released paperwork swings outward with the movement. Expression is strained determination: brows hard down, face flushed, teeth only just showing in a tight grimace rather than reference 2's wide bared snarl, with a few clearly readable sweat beads at the temple and brow but none of reference 2's flying droplet spray. Copy the riveted brass-and-iron console, its plinth, its pipework and the paper roll spilling from its left face exactly as they appear in reference 1, at identical position, scale and ground contact; the machine is fixed furniture and must not grow, shrink or change detail between states. Reproduce the lever pivot housing exactly as reference 1 draws it. Preserve exactly the pinstripe three-piece suit with brass-buckled utility pouches, the checked waistcoat, the dotted tie, the pocket watch, the printed receipt strips, the wire-rimmed glasses and the slicked dark hair. Keep the figure facing left at the same framing, height and ground line as all three references. Same editorial cartoon line, ink texture and warm lamp-lit palette. Isolated on flat #00ff00, no detached parts, no room, bed, furniture, text, logo, signature or watermark, and no resemblance to any real person.",
+      "edits": [
+        "Supplied the accepted rest and lifting poses and the accepted early-pressure state as three image-to-image references, so the pose is bounded on both sides and cannot collapse into either neighbouring state.",
+        "Keyed the chroma field locally with a soft matte sampled from the rendered background and a green despill.",
+        "Registered the fixed apparatus by translating the drawing 37 pixels left and 46 pixels up so its console plinth matches the rest pose within one pixel.",
+        "Resampled from 1344x1680 to 680x850, twice the authored part size, because the canvas backing store is fixed at the design resolution. The full-resolution master is preserved outside the shipped tree."
+      ],
+      "licence": "CC-BY-SA-4.0",
+      "replacementStatus": "First-draft sustained-effort Management state awaiting integrated maintainer perceptual acceptance and human refinement before production approval."
+    },
+    {
       "id": "management-lifting-pose",
       "file": "episodes/the-alarm/characters/management/management-lifting-pose.png",
       "origin": "ai-generated",

@@ -185,6 +185,74 @@ and enforces normal asset ownership. The generic renderer selects the highest
 eligible state. It contains no knowledge of this campaign, this episode,
 levers or sweat.
 
+## Management four-state effort progression
+
+Two states proved too few. The episode skin switched from composure to full
+strain at 0.22 dramatic intensity, so Management reached maximum exertion very
+early and had nowhere further to go for the rest of the confrontation. Two
+intermediate states were authored on 15 August 2026 to spread that escalation:
+
+- `management-early-pressure-pose` releases the paperwork, closes both hands on
+  the lever and moves it only slightly from upright, with the stance still
+  largely upright and, per the shared rest invariant, no sweat at all; and
+- `management-high-pressure-pose` hauls the lever roughly halfway down, leans
+  the torso back into the pull with the front leg braced, and shows a tight
+  grimace with a few readable sweat beads but none of the lifting pose's flying
+  droplet spray.
+
+Read across all four, the escalation is carried on four independent channels:
+lever angle, torso lean, sweat (none, none, beads, spray) and expression. The
+sweat channel preserves the resistance-state sheet's rule that perspiration
+appears only after lift and effort begin.
+
+### Generation record
+
+- Generated: 15 August 2026
+- Tool: OpenArt, GPT Image 2 image-to-image, 1344 by 1680 on a flat chroma field
+- References: the accepted rest and lifting poses as the identity, costume,
+  apparatus and framing authority. The high-pressure pose additionally received
+  the accepted early-pressure render as a third reference, bounding it on both
+  sides so it could not collapse into either neighbouring state.
+- Edits: chroma removal with a soft matte sampled from the rendered background
+  and a green despill; translation to register the console; resample to 680 by
+  850. Complete prompts and per-asset edits are in the asset catalogue.
+
+These are the first Management assets generated on OpenArt rather than the
+built-in OpenAI tool. The catalogue records that distinction in each entry's
+`creator` and `generationTool` fields.
+
+### Registration
+
+The riveted console is fixed furniture and must not move between states.
+Measurement confirmed it is drawn at a consistent size throughout — plinth
+widths of 158, 154, 152 and 153 pixels — so registration is a translation
+problem only. Both new states were translated until their console plinth
+matched the rest pose within one pixel.
+
+The accepted `management-lifting-pose` was left unmodified, and its console
+therefore still sits about 13 pixels right and 36 pixels below the other three.
+That is a pre-existing inconsistency in accepted artwork rather than one the
+new states introduced, and correcting it is a maintainer decision because it
+means editing an already-accepted asset.
+
+### Naming
+
+`management-high-pressure-pose` is the third state, matching the
+`high-pressure` resistance state. The lifting pose's catalogued prompt calls
+itself a "high-danger pose", which is now misleading, but that field records
+the text actually sent to the generator on 14 August and is preserved unchanged
+as provenance rather than rewritten to match later naming.
+
+### Threshold change
+
+The episode skin now selects the four poses at dramatic intensities of 0, 0.22,
+0.5 and 0.78. The first threshold is unchanged, so the moment Management first
+commits to the work is exactly as authored before. The lifting pose is the
+behavioural change: it previously appeared at 0.22 and now waits until 0.78,
+reserving full tilt for genuine peak danger. Thresholds remain content, not
+episode-specific TypeScript, and the generic renderer still selects the highest
+eligible state with no knowledge of levers, sweat or this episode.
+
 ## Protagonist perspective and downhill cloth
 
 Browser review then showed that rotating the resting protagonist as a rigid
