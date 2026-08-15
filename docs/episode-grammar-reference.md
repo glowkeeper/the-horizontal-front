@@ -112,6 +112,27 @@ A `hold` has no episode-owned choices. Its selected mechanic supplies the press
 window and required hold duration in beats. Those windows must fit inside the
 composition's `activeBeats`.
 
+### Outcomes and consequences
+
+An interruption is judged separately from the rhythm and resolved once. While it
+is active no rhythm cue is scored and passive pressure is suspended, so the
+player can neither miss a note nor bleed safety while dealing with it. The
+interruption itself is not free, though: succeeding applies `successSafety` and
+failing applies `failureSafety`. Both are authored per interruption, and they
+need not be symmetrical — in `The Alarm` a failure costs more than a success
+pays, so ignoring an interruption is a worse bargain than attempting one.
+
+A sequence fails on a wrong choice or on running out of time. A hold fails on
+releasing early, on pressing after its press window has closed, or on never
+pressing at all. Doing nothing is a failure, not a way to opt out.
+
+Cancellation is a third outcome and is deliberately neutral: nothing is applied.
+It covers the interaction being taken away by the browser or hardware — a lost
+pointer capture, a window blur, a hidden tab — which is not the player's
+failure and must not be charged as one. It is distinct from a deliberate early
+release, which is. An input arriving when no interruption is in progress is
+ignored rather than resolving anything.
+
 ## Presentation, copy and results
 
 `confrontation.presentation` selects:
@@ -150,10 +171,14 @@ and any interruption's warning, active play and return count-in.
 
 Compilation is deliberately unforgiving about the tail. A rhythm event beginning
 after the phase ends is dropped, and a hold whose release would fall past the end
-is dropped whole rather than truncated, so an over-filled phase loses the end of
-its composition. Two rules make that visible instead of silent: an interruption
-must leave at least one playable cue in its phase, and every phase must contain
-at least one scored cue.
+is dropped whole rather than truncated, because a hold the player could start but
+never legitimately release would be unplayable.
+
+Three rules make that visible instead of silent. An interruption must leave at
+least one playable cue in its phase. Every phase must contain at least one scored
+cue. And a rhythm cycle that begins inside a phase must yield at least one cue —
+a phase ending part-way through a cycle is ordinary, but one with visible room
+for a whole cycle that produces nothing has been mis-timed.
 
 There is no minimum or maximum episode duration. A phase is long enough when it
 fits its cycle, its lead-in and its interruption and still returns the player to
@@ -194,6 +219,7 @@ alone:
 | Interruption does not fit | Its warning, active play and return finish inside the phase. |
 | Interruption leaves no playable cue | After it returns, its phase must still contain resistance to return to. Shorten the interruption or lengthen the phase. |
 | Phase has no playable cue | Every phase must contain at least one scored cue, or it is content the player can never meet. |
+| Phase has room for a cycle that yields nothing | A rhythm cycle beginning inside the phase produced no cue because its events fall past the end. Adjust the phase duration, tempo or lead-in. |
 | Interruption starts during an event | Move it to a genuine musical boundary. |
 | Interruption windows overlap | Move one interruption beyond the other's protected return. |
 | Mechanic kind mismatch | Composition `kind` equals the selected mechanic's kind. |

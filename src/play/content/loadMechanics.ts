@@ -444,7 +444,17 @@ function compilePhaseCues(
       phaseIndex,
     });
   }
+  // A cycle that begins inside the phase but contributes no scored cue is a
+  // phantom: the author wrote it into the rhythm and can see room for it, but
+  // every event falls past the end and is dropped — holds whole, because a hold
+  // the player could start and never legitimately release would be unplayable.
+  // Rather than silently losing the tail of a composition, say so.
+  const assertCycleIsPlayable = (cycleStartMs: number, before: number): void => {
+    if (target.length > before) return;
+    throw new Error(`phase ${phase.id} has room for a rhythm cycle at ${Math.round(cycleStartMs - phaseStartMs)}ms that yields no playable cue; adjust its duration, tempo or lead-in`);
+  };
   for (let cycleStartMs = firstCycleMs; cycleStartMs < phaseEndMs; cycleStartMs += cycleMs) {
+    const cuesBeforeCycle = target.length;
     for (const event of rhythm.events) {
       const atMs = cycleStartMs + event.atBeat * phase.beatIntervalMs;
       if (atMs >= phaseEndMs) continue;
@@ -482,6 +492,7 @@ function compilePhaseCues(
         phaseIndex,
       });
     }
+    assertCycleIsPlayable(cycleStartMs, cuesBeforeCycle);
   }
 }
 
