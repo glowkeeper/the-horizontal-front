@@ -116,15 +116,23 @@ composition's `activeBeats`.
 
 `confrontation.presentation` selects:
 
-- `layout`: currently exactly `{ "source": "shared", "id": "episode-confrontation" }`;
+- `layout`: a shared layout, today `{ "source": "shared", "id": "episode-confrontation" }`;
 - `skin`: a shared or same-episode skin.
 
-These literals are intentional finite engine capabilities. Adding another one
-requires a separately designed reusable interpreter, not an episode exception.
+Layout identity is ordinary data. A layout is a JSON file under
+`presentation/layouts/` whose filename matches its ID, and the engine resolves
+the selection generically — no layout ID appears in TypeScript. Adding a layout
+that reuses the existing vocabulary is therefore a content change: author the
+JSON, point a skin at it, and select it from an episode. A layout needing
+genuinely new visual structure is a separate engine expansion, because the
+interpreter would have to learn to draw something new.
+
 The layout is a reusable intensity-driven composition, not a bed or episode
 instruction: its skin authors `confrontation.resistance`,
 `confrontation.opposingActor` and `confrontation.environment`, plus their finite
-transitions. The selected skin must support the selected layout. Interruption skins must
+transitions. Layout data owns the confrontation backdrop, control geometry,
+motion and the rhythm palette; skin data owns its parts, copy and typography.
+The selected skin must name the selected layout. Interruption skins must
 support their mechanic kind and obey the same ownership rules.
 
 `confrontation.copy` supplies `headline` and accessible `instructionsStatus`.

@@ -6,7 +6,7 @@ import type { Campaign } from "../../content/loadGame";
 import { getMenuAction, moveSelection } from "../../input/menuInput";
 import { createTextStyles, getThemeColour } from "../../theme/theme";
 import { getCampaignCardPlacements } from "../campaignMenuLayout";
-import { GAME_CENTRE_X } from "../design";
+import { CHROME_MENU, CHROME_PANEL, GAME_CENTRE_X } from "../design";
 import { announce, toColour } from "../sceneChrome";
 
 export class CampaignsScene extends Phaser.Scene {
@@ -22,7 +22,7 @@ export class CampaignsScene extends Phaser.Scene {
     this.selectedIndex = 0;
     this.cards = [];
     this.transitioning = false;
-    this.cameras.main.setBackgroundColor(getThemeColour("duvetCream"));
+    this.cameras.main.setBackgroundColor(getThemeColour(CHROME_PANEL.background));
     this.add.text(GAME_CENTRE_X, 80, game.title.toUpperCase(), createTextStyles().notice)
       .setOrigin(0.5);
     this.add.text(GAME_CENTRE_X, 155, game.interface.campaignsHeading, createTextStyles().title)
@@ -40,7 +40,7 @@ export class CampaignsScene extends Phaser.Scene {
     });
     this.add.text(GAME_CENTRE_X, 665, game.interface.campaignsInstructions, {
       ...createTextStyles().notice,
-      fontSize: "15px",
+      fontSize: `${CHROME_MENU.headingSizePx}px`,
     }).setOrigin(0.5);
 
     this.input.keyboard?.on("keydown", (event: KeyboardEvent) => {
@@ -67,7 +67,7 @@ export class CampaignsScene extends Phaser.Scene {
   ): Phaser.GameObjects.Container {
     const { height, titleOffset, summaryOffset, titleFontSize, summaryFontSize } = placement;
     const background = this.add.rectangle(0, 0, 900, height)
-      .setStrokeStyle(5, toColour("inkCharcoal"));
+      .setStrokeStyle(CHROME_MENU.cardStrokeWidth, toColour(CHROME_MENU.cardStroke));
     const title = this.add.text(0, titleOffset, campaign.title.toUpperCase(), {
       ...createTextStyles().notice,
       fontSize: `${titleFontSize}px`,
@@ -89,8 +89,8 @@ export class CampaignsScene extends Phaser.Scene {
       const background = card.list[0] as Phaser.GameObjects.Rectangle;
       background.setFillStyle(
         index === this.selectedIndex
-          ? toColour("managementGold")
-          : toColour("paperWhite"),
+          ? toColour(CHROME_MENU.cardSelectedFill)
+          : toColour(CHROME_MENU.cardFill),
       );
     });
     const campaign = game.campaigns[this.selectedIndex];

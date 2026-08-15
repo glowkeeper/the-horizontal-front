@@ -7,8 +7,12 @@
       "opposingActorLabel": "MANAGEMENT",
       "pressureCaption": "LIFTING THE HEAD\nOF THE BED"
     },
+    "typography": {
+      "opposingActorLabel": { "offsetY": 45, "sizePx": 16, "wrapWidth": 125, "colour": "paperWhite" },
+      "pressureCaption": { "sizePx": 14, "colour": "managementGold" }
+    },
     "resistance": {
-      "x": 220,
+      "x": 400,
       "y": 480,
       "width": 850,
       "height": 850,

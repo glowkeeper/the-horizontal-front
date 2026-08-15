@@ -12,6 +12,7 @@
     "campaignsInstructions": "ARROWS: CHOOSE     ENTER: BEGIN",
     "campaignsStatus": "Campaigns. Selected: {title}. {headline} Use arrow keys to choose and Enter to begin.",
     "briefingInstructions": "PRESS ENTER OR TAP TO HOLD THE LINE",
+    "beginEpisode": "PLAY {episode}",
     "briefingStatus": "{title}. {headline} {body} Press Enter or tap to begin.",
     "retryEpisode": "TRY AGAIN",
     "acceptOutcome": "ACCEPT OUTCOME",

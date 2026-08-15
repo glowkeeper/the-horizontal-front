@@ -359,9 +359,28 @@ code contributes only computed values through a finite named-placeholder
 formatter. A policy tripwire rejects direct player-visible string literals
 passed to Phaser text, button and announcement APIs; it is intentionally backed
 by schema validation, type checking and review rather than treated as a complete
-semantic proof. Interface chrome uses shared design-space constants and small
-code-owned responsive layout functions; authored world composition remains in
-validated presentation data.
+semantic proof.
+
+Presentation genericity is enforced the same way, and is a project invariant
+rather than a convention. No module under `src/play/phaser/` may contain an
+authored presentation value: not a size, depth, opacity or stroke width written
+inline, and not a semantic colour role selected by a code literal. Layout data
+owns the confrontation backdrop, control geometry, motion and the rhythm
+palette; skin data owns its parts, copy and typography; panel layout data owns
+the illustrated briefing and debriefing surfaces. The adapter resolves those
+authored roles and chooses none of them.
+
+Interface chrome — buttons, menus and the canvas ground — remains code-owned,
+because it is engine furniture that no episode restyles. It is confined to
+named constants in `src/play/phaser/design.ts`, the policy check's single
+exemption, so the rule stays absolute everywhere else and chrome values remain
+inspectable in one module rather than scattered as inline literals.
+
+Content identity is likewise absent from code. No episode, campaign, rhythm,
+curve, mechanic, skin, layout or asset ID appears as a TypeScript literal;
+selections resolve generically from validated data by filename-matching ID.
+Adding a layout that reuses the existing vocabulary is therefore a content
+change, while genuinely new visual structure remains an engine expansion.
 
 The play page's static identity is also data-owned. Vite injects title, description, exit label, initial live-region status and application label from `game.json` while transforming the HTML entry. The production static-build check verifies the emitted page contains those values and no unresolved placeholders, so tab titles and navigation remain meaningful before the Phaser bundle executes.
 

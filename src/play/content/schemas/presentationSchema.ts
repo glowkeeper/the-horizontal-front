@@ -189,7 +189,7 @@ const rectangleSchema = z.object({
 
 export const illustratedPanelLayoutSchema = z.object({
   schemaVersion: z.literal(1),
-  id: z.literal("illustration-left"),
+  id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
   designSize: z.object({
     width: z.number().int().positive(),
     height: z.number().int().positive(),
@@ -201,8 +201,18 @@ export const illustratedPanelLayoutSchema = z.object({
     semanticStrokeWidth: positiveSizeSchema,
     semanticFillAlpha: unitIntervalSchema,
   }).strict(),
+  palette: z.object({
+    background: colourRoleSchema,
+    illustrationFill: colourRoleSchema,
+    illustrationStroke: colourRoleSchema,
+    semanticFill: colourRoleSchema,
+    semanticStroke: colourRoleSchema,
+    detail: colourRoleSchema,
+    instruction: colourRoleSchema,
+  }).strict(),
   actions: z.object({
     width: positiveSizeSchema,
+    height: positiveSizeSchema,
   }).strict(),
   typography: z.object({
     kickerSizePx: positiveSizeSchema,
@@ -255,14 +265,21 @@ const resistanceVisualSchema = z.object({
 
 export const resistanceLayoutSchema = z.object({
   schemaVersion: z.literal(1),
-  id: z.literal("episode-confrontation"),
+  id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
   designSize: z.object({
     width: z.number().int().positive(),
     height: z.number().int().positive(),
   }).strict(),
   backdrop: z.object({
-    floor: rectangleSchema,
-    workLight: rectangleSchema,
+    background: colourRoleSchema,
+    floor: rectangleSchema.extend({
+      fill: colourRoleSchema,
+      stroke: colourRoleSchema,
+      strokeWidth: z.number().nonnegative(),
+    }).strict(),
+    workLight: rectangleSchema.extend({
+      fill: colourRoleSchema,
+    }).strict(),
   }).strict(),
   statusPanel: z.object({
     frame: rectangleSchema,
@@ -317,6 +334,59 @@ export const resistanceLayoutSchema = z.object({
       controlSizePx: positiveSizeSchema,
       feedbackSizePx: positiveSizeSchema,
       cueSizePx: positiveSizeSchema,
+    }).strict(),
+    palette: z.object({
+      gate: z.object({
+        fill: colourRoleSchema,
+        stroke: colourRoleSchema,
+        activeStroke: colourRoleSchema,
+        now: colourRoleSchema,
+        holding: colourRoleSchema,
+        upcoming: colourRoleSchema,
+        beatLine: colourRoleSchema,
+      }).strict(),
+      note: z.object({
+        fill: colourRoleSchema,
+        stroke: colourRoleSchema,
+        holdBar: colourRoleSchema,
+        heldBar: colourRoleSchema,
+      }).strict(),
+      emitter: z.object({
+        fill: colourRoleSchema,
+        stroke: colourRoleSchema,
+      }).strict(),
+      pauseBand: z.object({
+        fill: colourRoleSchema,
+        stroke: colourRoleSchema,
+      }).strict(),
+      label: z.object({
+        rest: colourRoleSchema,
+        now: colourRoleSchema,
+      }).strict(),
+      status: z.object({
+        timeRemaining: colourRoleSchema,
+      }).strict(),
+      feedback: z.object({
+        hit: colourRoleSchema,
+        miss: colourRoleSchema,
+      }).strict(),
+      successfulNote: z.object({
+        fill: colourRoleSchema,
+        stroke: colourRoleSchema,
+      }).strict(),
+      expiredNote: z.object({
+        fill: colourRoleSchema,
+        stroke: colourRoleSchema,
+        cross: colourRoleSchema,
+      }).strict(),
+      brokenHold: z.object({
+        fill: colourRoleSchema,
+        stroke: colourRoleSchema,
+      }).strict(),
+      result: z.object({
+        victory: colourRoleSchema,
+        forcedVerticalisation: colourRoleSchema,
+      }).strict(),
     }).strict(),
     layers: z.object({
       result: z.number(), successfulNote: z.number(), missedNote: z.number(),
@@ -374,11 +444,23 @@ export const resistanceLayoutSchema = z.object({
 export const resistanceSkinSchema = z.object({
   schemaVersion: z.literal(1),
   id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
-  layout: z.literal("episode-confrontation"),
+  layout: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
   confrontation: z.object({
     copy: z.object({
       opposingActorLabel: z.string().trim().min(1).max(80),
       pressureCaption: z.string().trim().min(1).max(120),
+    }).strict(),
+    typography: z.object({
+      opposingActorLabel: z.object({
+        offsetY: z.number(),
+        sizePx: positiveSizeSchema,
+        wrapWidth: positiveSizeSchema,
+        colour: colourRoleSchema,
+      }).strict(),
+      pressureCaption: z.object({
+        sizePx: positiveSizeSchema,
+        colour: colourRoleSchema,
+      }).strict(),
     }).strict(),
     resistance: resistanceVisualSchema,
     environment: z.object({
@@ -444,6 +526,7 @@ export const resistanceSkinSchema = z.object({
   }
 });
 
+export type ColourRole = z.infer<typeof colourRoleSchema>;
 export type ResistanceLayoutContent = z.infer<typeof resistanceLayoutSchema>;
 export type ResistanceSkin = z.infer<typeof resistanceSkinSchema>;
 export type ShapePart = z.infer<typeof shapePartSchema>;

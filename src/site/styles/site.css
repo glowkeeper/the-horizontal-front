@@ -214,32 +214,57 @@ h3 {
   margin-top: var(--space-xl);
 }
 
-.primary-action {
+/* Both variants share one shape, one motion and one border; only the fill and
+   label colour differ. Every value comes from the shared button contract in
+   src/shared/theme/tokens.css, which the game canvas reads too. */
+.primary-action,
+.secondary-action {
   display: inline-block;
   padding: 0.8rem 1.1rem;
-  border: 2px solid var(--colour-ink-charcoal);
-  color: var(--colour-paper-white);
-  background: var(--colour-resistance-red);
-  box-shadow: 0.25rem 0.25rem 0 var(--colour-ink-charcoal);
+  border: var(--button-border-width) solid var(--button-border);
+  box-shadow: var(--button-shadow-offset) var(--button-shadow-offset) 0 var(--button-shadow);
   font-weight: 800;
   text-decoration: none;
   transition: transform 120ms ease, box-shadow 120ms ease;
 }
 
-.primary-action:hover {
-  color: var(--colour-paper-white);
-  box-shadow: 0.35rem 0.35rem 0 var(--colour-ink-charcoal);
+.primary-action {
+  color: var(--button-primary-label);
+  background: var(--button-primary-fill);
+}
+
+.secondary-action {
+  color: var(--button-secondary-label);
+  background: var(--button-secondary-fill);
+}
+
+.primary-action:hover,
+.secondary-action:hover {
+  box-shadow: var(--button-hover-shadow-offset) var(--button-hover-shadow-offset) 0 var(--button-shadow);
   text-decoration: none;
-  transform: translate(-0.1rem, -0.1rem);
+  transform: translate(
+    calc(-1 * var(--button-hover-lift)),
+    calc(-1 * var(--button-hover-lift))
+  );
 }
 
-.primary-action:focus-visible {
-  outline-color: var(--colour-ink-charcoal);
+.primary-action:hover {
+  color: var(--button-primary-label);
 }
 
-.primary-action:active {
-  box-shadow: 0.08rem 0.08rem 0 var(--colour-ink-charcoal);
-  transform: translate(0.17rem, 0.17rem);
+.secondary-action:hover {
+  color: var(--button-secondary-label);
+}
+
+.primary-action:focus-visible,
+.secondary-action:focus-visible {
+  outline-color: var(--button-border);
+}
+
+.primary-action:active,
+.secondary-action:active {
+  box-shadow: var(--button-active-shadow-offset) var(--button-active-shadow-offset) 0 var(--button-shadow);
+  transform: translate(var(--button-active-press), var(--button-active-press));
 }
 
 .commitment-grid,
@@ -388,12 +413,15 @@ h3 {
     scroll-behavior: auto;
   }
 
-  .primary-action {
+  .primary-action,
+  .secondary-action {
     transition: none;
   }
 
   .primary-action:hover,
-  .primary-action:active {
+  .primary-action:active,
+  .secondary-action:hover,
+  .secondary-action:active {
     transform: none;
   }
 }

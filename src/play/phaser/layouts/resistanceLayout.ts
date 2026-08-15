@@ -17,9 +17,5 @@ export function createResistanceLayout(
   scene: Phaser.Scene,
   episode: Episode,
 ): ResistanceLayout {
-  const presentation = episode.confrontation.presentation;
-  switch (presentation.layout.id) {
-    case "episode-confrontation":
-      return createEpisodeConfrontationLayout(scene, episode);
-  }
+  return createEpisodeConfrontationLayout(scene, episode);
 }

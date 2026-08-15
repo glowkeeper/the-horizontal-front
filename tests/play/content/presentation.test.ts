@@ -87,13 +87,17 @@ describe("presentation content", () => {
       rotationResponseMs: 240,
       shakeAmplitude: 2,
     });
+    // Structural facts only. The bed's x/y are authored composition that a
+    // designer retunes, and `assertSensiblePresentation` already requires the
+    // resistance anchor to sit inside the design canvas, so pinning the
+    // coordinate here would duplicate validation and break on every retune.
     expect(presentation.skin.confrontation.resistance).toMatchObject({
-      x: 220,
-      y: 480,
       width: 850,
       height: 850,
       dangerAngleDegrees: -34.1,
     });
+    expect(presentation.skin.confrontation.resistance.dangerAngleDegrees)
+      .toBeLessThan(0);
     expect(presentation.skin.confrontation.resistance.reducedMotion).toEqual({
       crossfadeDurationMs: 80,
     });

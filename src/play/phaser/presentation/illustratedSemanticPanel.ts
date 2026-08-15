@@ -1,13 +1,8 @@
 import Phaser from "phaser";
 
-import layoutContent from "../../content/presentation/layouts/illustration-left.json";
-import { illustratedPanelLayoutSchema } from "../../content/schemas/presentationSchema";
-import { assertSensibleIllustratedPanel } from "../../content/validateIllustratedPanel";
+import { illustratedPanelLayout as layout } from "../../content/loadPresentation";
 import { createTextStyles, getThemeColour } from "../../theme/theme";
 import { toColour } from "../sceneChrome";
-
-const layout = illustratedPanelLayoutSchema.parse(layoutContent);
-assertSensibleIllustratedPanel(layout);
 
 type IllustratedSemanticPanelContent = {
   readonly assetId: string;
@@ -22,7 +17,8 @@ export function createIllustratedSemanticPanel(
   scene: Phaser.Scene,
   content: IllustratedSemanticPanelContent,
 ) {
-  scene.cameras.main.setBackgroundColor(getThemeColour("duvetCream"));
+  const palette = layout.palette;
+  scene.cameras.main.setBackgroundColor(getThemeColour(palette.background));
   const illustration = layout.illustration;
   const semantic = layout.semanticContent;
 
@@ -31,9 +27,9 @@ export function createIllustratedSemanticPanel(
     illustration.y,
     illustration.width,
     illustration.height,
-    toColour("paperWhite"),
+    toColour(palette.illustrationFill),
   ).setOrigin(illustration.originX, illustration.originY)
-    .setStrokeStyle(layout.appearance.illustrationStrokeWidth, toColour("inkCharcoal"));
+    .setStrokeStyle(layout.appearance.illustrationStrokeWidth, toColour(palette.illustrationStroke));
   const image = scene.add.image(
     illustration.x + illustration.width / 2,
     illustration.y + illustration.height / 2,
@@ -62,10 +58,10 @@ export function createIllustratedSemanticPanel(
     semantic.y,
     semantic.width,
     semantic.height,
-    toColour("paperWhite"),
+    toColour(palette.semanticFill),
     layout.appearance.semanticFillAlpha,
   ).setOrigin(semantic.originX, semantic.originY)
-    .setStrokeStyle(layout.appearance.semanticStrokeWidth, toColour("resistanceRed"));
+    .setStrokeStyle(layout.appearance.semanticStrokeWidth, toColour(palette.semanticStroke));
 
   if (content.kicker) {
     scene.add.text(layout.anchors.kicker.x, layout.anchors.kicker.y, content.kicker, {
@@ -89,7 +85,7 @@ export function createIllustratedSemanticPanel(
   if (content.detail) {
     scene.add.text(layout.anchors.detail.x, layout.anchors.detail.y, content.detail, {
       ...createTextStyles().notice,
-      color: getThemeColour("resistanceRed"),
+      color: getThemeColour(palette.detail),
       align: "center",
       wordWrap: { width: semantic.width - layout.typography.horizontalInset },
     }).setOrigin(0.5);
@@ -101,7 +97,7 @@ export function createIllustratedSemanticPanel(
       content.instruction,
       {
         ...createTextStyles().notice,
-        color: getThemeColour("resistanceRed"),
+        color: getThemeColour(palette.instruction),
         fontSize: layout.typography.instructionSizePx,
         align: "center",
         wordWrap: { width: semantic.width - layout.typography.horizontalInset },

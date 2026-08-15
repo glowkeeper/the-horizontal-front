@@ -1,5 +1,12 @@
 # Expanded design direction
 
+> **Editorial note.** This archived discussion originally called the recurring
+> boss "the Orange Fella", a superseded name whose colour coding evoked a
+> particular real person. The project now names the antagonist **Management**:
+> a role within a corporate-capitalist hierarchy rather than any individual.
+> The name has been substituted below; the design reasoning is unchanged. See
+> [Game concept](../game-concept.md) for the current character direction.
+
 Yes—this sharpens the concept considerably. The game should resist importing capitalist reward structures while using them as the object of ridicule.
 
 ## Danger through the duvet
@@ -81,7 +88,7 @@ These could be presented like grand achievement rewards without becoming currenc
 
 Cosmetic bedding could exist, but even that risks pulling the game toward grinding and acquisition. I would begin with no progression economy at all.
 
-## Repeated confrontations with the Orange Fella
+## Repeated confrontations with Management
 
 One recurring boss is stronger than a sequence of disposable managers. He becomes the player’s nemesis and the embodiment of capital: impossible to permanently defeat, endlessly rebranding the same demands.
 
@@ -137,7 +144,7 @@ I agree. The mechanic is strong enough for a small arcade game, but the cartoon 
 
 I’d structure it as short illustrated sequences around the action:
 
-1. **Pre-level cartoon:** the Orange Fella announces the latest policy.
+1. **Pre-level cartoon:** Management announces the latest policy.
 2. **Thirty-second confrontation:** gameplay.
 3. **Post-level punchline:** victory or failure cartoon.
 4. **Occasional longer scene:** introduces a new absurdity or attack.
@@ -178,4 +185,4 @@ Then:
 
 That sadness matters. If failure is only slapstick, the political point becomes weightless. It should briefly remind the player that the absurdity has consequences—lost time, lost autonomy and an exhausted human being—before inviting them to resist again.
 
-The emerging identity feels very coherent: **a rhythm-based arcade struggle wrapped in an episodic animated political cartoon, with no conventional economy and no permanent victory—only more time reclaimed from the Orange Fella.**
+The emerging identity feels very coherent: **a rhythm-based arcade struggle wrapped in an episodic animated political cartoon, with no conventional economy and no permanent victory—only more time reclaimed from Management.**

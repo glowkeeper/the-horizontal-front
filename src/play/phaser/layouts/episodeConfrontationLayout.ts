@@ -2,10 +2,7 @@ import Phaser from "phaser";
 
 import type { Episode } from "../../content/loadEpisode";
 import { loadPresentation } from "../../content/loadPresentation";
-import type {
-  ResistanceLayoutContent,
-  ShapePart,
-} from "../../content/schemas/presentationSchema";
+import type { ShapePart } from "../../content/schemas/presentationSchema";
 import { createTextStyles, getThemeColour } from "../../theme/theme";
 import { getResistancePresentation } from "../presentation/resistancePresentation";
 import {
@@ -24,16 +21,16 @@ export function createEpisodeConfrontationLayout(
   const { backdrop, anchors, motion } = layout;
   const resistanceVisual = skin.confrontation.resistance;
 
-  scene.cameras.main.setBackgroundColor(colour("duvetCream"));
+  scene.cameras.main.setBackgroundColor(colour(backdrop.background));
   skin.confrontation.environment.baseParts.forEach((part) => createShape(scene, part));
   if (!skin.confrontation.environment.replacesLayoutBackdrop) {
-    createRectangle(scene, backdrop.floor, colour("paperWhite"))
-      .setStrokeStyle(5, colour("inkCharcoal"));
+    createRectangle(scene, backdrop.floor, colour(backdrop.floor.fill))
+      .setStrokeStyle(backdrop.floor.strokeWidth, colour(backdrop.floor.stroke));
   }
   const workLight = createRectangle(
     scene,
     backdrop.workLight,
-    colour("workLightBlue"),
+    colour(backdrop.workLight.fill),
   ).setAlpha(motion.rest.workLightAlpha);
   const intensityParts = skin.confrontation.environment.intensityParts.map(({ part }) =>
     createShape(scene, part));
@@ -110,12 +107,19 @@ export function createEpisodeConfrontationLayout(
   const opposingActorParts = skin.confrontation.opposingActor.parts.map((part) =>
     createShape(scene, part));
   opposingActor.add(opposingActorParts);
+  const typography = skin.confrontation.typography;
   opposingActor.add(
-    scene.add.text(0, 45, skin.confrontation.copy.opposingActorLabel, {
-      ...createTextStyles().notice,
-      fontSize: "16px",
-      wordWrap: { width: 125 },
-    }).setOrigin(0.5),
+    scene.add.text(
+      0,
+      typography.opposingActorLabel.offsetY,
+      skin.confrontation.copy.opposingActorLabel,
+      {
+        ...createTextStyles().notice,
+        color: getThemeColour(typography.opposingActorLabel.colour),
+        fontSize: `${typography.opposingActorLabel.sizePx}px`,
+        wordWrap: { width: typography.opposingActorLabel.wrapWidth },
+      },
+    ).setOrigin(0.5),
   );
   scene.add.text(
     anchors.pressureCaption.x,
@@ -123,8 +127,8 @@ export function createEpisodeConfrontationLayout(
     skin.confrontation.copy.pressureCaption,
     {
       ...createTextStyles().notice,
-      color: getThemeColour("managementGold"),
-      fontSize: "14px",
+      color: getThemeColour(typography.pressureCaption.colour),
+      fontSize: `${typography.pressureCaption.sizePx}px`,
     },
   ).setOrigin(0.5);
 
@@ -236,9 +240,18 @@ function createShape(scene: Phaser.Scene, part: ShapePart) {
   return object;
 }
 
+type DesignRectangle = {
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+  readonly originX?: number;
+  readonly originY?: number;
+};
+
 function createRectangle(
   scene: Phaser.Scene,
-  rectangle: ResistanceLayoutContent["backdrop"]["floor"],
+  rectangle: DesignRectangle,
   fill: number,
 ) {
   return scene.add.rectangle(

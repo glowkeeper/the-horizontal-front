@@ -17,6 +17,60 @@ function requirePolicy(condition, message) {
   }
 }
 
+/**
+ * Character-agnosticism invariant.
+ *
+ * The recurring antagonist is Management: a role within a corporate-capitalist
+ * hierarchy, not a depiction or coded stand-in for any particular politician or
+ * other real person. This check fails the build if a superseded person-coded
+ * name reappears in project text.
+ *
+ * Multi-word phrases are matched deliberately. A bare word such as "orange" is
+ * unusable as a rule: the art-direction and concept sheets legitimately instruct
+ * "no politician or celebrity likeness, no orange skin", and a naive word match
+ * would reject the very instructions that enforce this policy.
+ *
+ * Two paths are exempt. `docs/history/` is explicitly marked as superseded
+ * rather than current specification, and its editorial note preserves the
+ * retired name so the reason for the change is not erased from the record.
+ * This file is exempt because the rule cannot state which phrases are banned
+ * without containing them.
+ */
+const PERSON_REFERENCE_PHRASES = [
+  "orange fella",
+  "orange-fella",
+  "trumpesque",
+  "trumpian",
+];
+const PERSON_REFERENCE_EXEMPT_PREFIXES = [
+  "docs/history/",
+  "scripts/check-project-policy.mjs",
+];
+const PERSON_REFERENCE_EXTENSIONS = new Set([
+  ".md", ".json", ".ts", ".mjs", ".js", ".html", ".css",
+]);
+
+async function findPersonReferences(directory) {
+  const findings = [];
+  for (const file of await listFiles(directory)) {
+    const relativePath = relative(projectRoot, file).split("\\").join("/");
+    if (!PERSON_REFERENCE_EXTENSIONS.has(extname(file))) continue;
+    if (PERSON_REFERENCE_EXEMPT_PREFIXES.some(
+      (prefix) => relativePath.startsWith(prefix),
+    )) continue;
+    const lines = (await readFile(file, "utf8")).split("\n");
+    for (const [index, line] of lines.entries()) {
+      const lowered = line.toLowerCase();
+      for (const phrase of PERSON_REFERENCE_PHRASES) {
+        if (lowered.includes(phrase)) {
+          findings.push(`${relativePath}:${index + 1} ("${phrase}")`);
+        }
+      }
+    }
+  }
+  return findings;
+}
+
 async function findEmbeddedPlayerCopy(directory) {
   // This is a deliberately small regression tripwire for direct literals at
   // presentation call sites, not a semantic proof. Schemas, TypeScript and
@@ -42,6 +96,24 @@ async function findEmbeddedPlayerCopy(directory) {
   return findings;
 }
 
+/**
+ * Presentation genericity invariant.
+ *
+ * Every Phaser module must resolve its appearance from validated content or
+ * from the named interface-chrome constants in `src/play/phaser/design.ts`.
+ * Two things are therefore rejected anywhere else under `src/play/phaser/`:
+ *
+ * - authored numbers written inline (sizes, depths, opacity, stroke widths);
+ * - authored semantic theme roles chosen by a code literal, which decides
+ *   appearance in the adapter instead of in layout, skin or chrome data.
+ *
+ * `design.ts` is the single exemption because interface chrome — buttons,
+ * menus and the canvas ground — is engine furniture rather than authored world
+ * composition. Naming those values in one inspectable module keeps the rule
+ * absolute everywhere else.
+ */
+const PRESENTATION_VALUE_EXEMPT_FILES = new Set(["src/play/phaser/design.ts"]);
+
 async function findHardCodedPresentationValues(directory) {
   const findings = [];
   const files = directory.endsWith(".ts")
@@ -52,13 +124,16 @@ async function findHardCodedPresentationValues(directory) {
     /\.setDepth\(\s*-?\d/g,
     /\.setAlpha\(\s*0?\.\d/g,
     /\.setStrokeStyle\(\s*\d/g,
+    /(?:getThemeColour|toColour|colour)\(\s*["'`][a-zA-Z]/g,
   ];
   for (const file of files) {
+    const relativePath = relative(projectRoot, file).split("\\").join("/");
+    if (PRESENTATION_VALUE_EXEMPT_FILES.has(relativePath)) continue;
     const source = await readFile(file, "utf8");
     for (const pattern of authoredValuePatterns) {
       for (const match of source.matchAll(pattern)) {
         const line = source.slice(0, match.index).split("\n").length;
-        findings.push(`${relative(projectRoot, file)}:${line}`);
+        findings.push(`${relativePath}:${line}`);
       }
     }
   }
@@ -152,13 +227,23 @@ const discoveredInterruptionFiles = (await listFiles(join(mechanicRoot, "interru
 const embeddedPlayerCopy = await findEmbeddedPlayerCopy(
   join(projectRoot, "src/play"),
 );
-const hardCodedPresentationValues = [
-  ...await findHardCodedPresentationValues(
-    join(projectRoot, "src/play/phaser/presentation"),
-  ),
-  ...await findHardCodedPresentationValues(
-    join(projectRoot, "src/play/phaser/scenes/ResistanceScene.ts"),
-  ),
+const hardCodedPresentationValues = await findHardCodedPresentationValues(
+  join(projectRoot, "src/play/phaser"),
+);
+const personReferences = [
+  ...await findPersonReferences(join(projectRoot, "src")),
+  ...await findPersonReferences(join(projectRoot, "docs")),
+  ...await findPersonReferences(join(projectRoot, "scripts")),
+  ...(await Promise.all(
+    ["AGENTS.md", "README.md", "CONTRIBUTING.md", "PROJECT_CHARTER.md",
+      "GOVERNANCE.md", "IDENTITY.md", "LICENSE.md", "CLAUDE.md"]
+      .map(async (file) => {
+        const lines = (await readFile(join(projectRoot, file), "utf8")).split("\n");
+        return lines.flatMap((line, index) => PERSON_REFERENCE_PHRASES
+          .filter((phrase) => line.toLowerCase().includes(phrase))
+          .map((phrase) => `${file}:${index + 1} ("${phrase}")`));
+      }),
+  )).flat(),
 ];
 
 requirePolicy(
@@ -166,8 +251,12 @@ requirePolicy(
   `Player-visible Phaser copy must come from validated content, not string literals: ${embeddedPlayerCopy.join(", ")}`,
 );
 requirePolicy(
+  personReferences.length === 0,
+  `The recurring antagonist is Management, a role within a corporate-capitalist hierarchy rather than any particular real person. Remove the superseded person-coded name: ${personReferences.join(", ")}`,
+);
+requirePolicy(
   hardCodedPresentationValues.length === 0,
-  `Resistance Phaser presentation must resolve authored visual values from validated layout, skin or theme data: ${hardCodedPresentationValues.join(", ")}`,
+  `Phaser modules must resolve every authored size, depth, opacity, stroke and semantic colour role from validated layout, skin or panel data, or from the named interface-chrome constants in src/play/phaser/design.ts: ${hardCodedPresentationValues.join(", ")}`,
 );
 
 requirePolicy(

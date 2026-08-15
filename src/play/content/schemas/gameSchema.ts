@@ -66,6 +66,7 @@ const interfaceCopySchema = z.object({
   campaignsInstructions: shortCopy,
   campaignsStatus: copyTemplate("title", "headline"),
   briefingInstructions: shortCopy,
+  beginEpisode: copyTemplate("episode"),
   briefingStatus: copyTemplate("title", "headline", "body"),
   retryEpisode: shortCopy,
   acceptOutcome: shortCopy,

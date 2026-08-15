@@ -3,8 +3,9 @@
   "id": "episode-confrontation",
   "designSize": { "width": 1280, "height": 720 },
   "backdrop": {
-    "floor": { "x": 640, "y": 590, "width": 1280, "height": 260 },
-    "workLight": { "x": 1280, "y": 360, "width": 1280, "height": 720, "originX": 1, "originY": 0.5 }
+    "background": "duvetCream",
+    "floor": { "x": 640, "y": 590, "width": 1280, "height": 260, "fill": "paperWhite", "stroke": "inkCharcoal", "strokeWidth": 5 },
+    "workLight": { "x": 1280, "y": 360, "width": 1280, "height": 720, "originX": 1, "originY": 0.5, "fill": "workLightBlue" }
   },
   "statusPanel": {
     "frame": { "x": 640, "y": 66, "width": 350, "height": 108 },
@@ -55,6 +56,19 @@
   },
   "rhythmPresentation": {
     "typography": { "titleSizePx": 25, "controlSizePx": 15, "feedbackSizePx": 19, "cueSizePx": 18 },
+    "palette": {
+      "gate": { "fill": "paperWhite", "stroke": "resistanceRed", "activeStroke": "inkCharcoal", "now": "resistanceRed", "holding": "workLightBlue", "upcoming": "managementGold", "beatLine": "inkCharcoal" },
+      "note": { "fill": "managementGold", "stroke": "inkCharcoal", "holdBar": "managementGold", "heldBar": "workLightBlue" },
+      "emitter": { "fill": "paperWhite", "stroke": "inkCharcoal" },
+      "pauseBand": { "fill": "paperWhite", "stroke": "inkCharcoal" },
+      "label": { "rest": "inkCharcoal", "now": "resistanceRed" },
+      "status": { "timeRemaining": "inkCharcoal" },
+      "feedback": { "hit": "workLightBlue", "miss": "resistanceRed" },
+      "successfulNote": { "fill": "paperWhite", "stroke": "workLightBlue" },
+      "expiredNote": { "fill": "resistanceRed", "stroke": "inkCharcoal", "cross": "paperWhite" },
+      "brokenHold": { "fill": "resistanceRed", "stroke": "inkCharcoal" },
+      "result": { "victory": "resistanceRed", "forcedVerticalisation": "workLightBlue" }
+    },
     "layers": { "result": 20, "successfulNote": 10, "missedNote": 12 },
     "strokes": { "guide": 2, "successfulNote": 4, "missedNote": 2 },
     "opacity": { "inactiveGate": 0.28, "inactiveLabel": 0.55, "holdBarMultiplier": 0.7 },

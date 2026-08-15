@@ -6,7 +6,7 @@ import { CampaignBriefingScene } from "./scenes/CampaignBriefingScene";
 import { CampaignDebriefingScene } from "./scenes/CampaignDebriefingScene";
 import { CampaignsScene } from "./scenes/CampaignsScene";
 import { ResistanceScene } from "./scenes/ResistanceScene";
-import { GAME_HEIGHT, GAME_WIDTH } from "./design";
+import { CHROME_BACKGROUND, GAME_HEIGHT, GAME_WIDTH } from "./design";
 
 export function createGame(container: HTMLElement): Phaser.Game {
   const config: Phaser.Types.Core.GameConfig = {
@@ -17,7 +17,7 @@ export function createGame(container: HTMLElement): Phaser.Game {
     width: GAME_WIDTH,
     height: GAME_HEIGHT,
 
-    backgroundColor: getThemeColour("duvetCream"),
+    backgroundColor: getThemeColour(CHROME_BACKGROUND),
 
     scale: {
       mode: Phaser.Scale.FIT,

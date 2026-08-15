@@ -162,10 +162,24 @@ describe("minimum validated episode grammar", () => {
     expect(() => loadPresentation(missingSkin)).toThrow(/Missing shared presentation skin/);
   });
 
-  it("enforces the current finite presentation capabilities", () => {
-    expect(() => load(episodeWith(
+  it("resolves the selected layout from data rather than a code literal", () => {
+    // A well-formed but unknown layout ID is structurally valid and is rejected
+    // when presentation resolves it, so adding a layout that reuses the existing
+    // vocabulary is content work rather than a TypeScript change.
+    const unknownLayout = load(episodeWith(
       ["confrontation", "presentation", "layout", "id"], "office-left",
-    ))).toThrow(/episode-confrontation/);
+    ));
+    expect(() => loadPresentation(unknownLayout))
+      .toThrow(/Missing presentation layout: office-left/);
+
+    // Malformed identities and episode-owned layouts still fail structurally:
+    // layouts are a deliberately shared-only content family.
+    expect(() => load(episodeWith(
+      ["confrontation", "presentation", "layout", "id"], "Office Left",
+    ))).toThrow();
+    expect(() => load(episodeWith(
+      ["confrontation", "presentation", "layout", "source"], "episode",
+    ))).toThrow();
   });
 
   it("rejects invalid interruption placement and duration", () => {

@@ -29,4 +29,28 @@ export function assertSensibleIllustratedPanel(
   if (anchors.primaryAction.y >= anchors.secondaryAction.y) {
     throw new Error("primary action must precede secondary action");
   }
+
+  // An anchor point inside the panel is not enough: the drawn control must also
+  // fit, with enough clearance that it does not sit on the panel border.
+  const minimumInset = 16;
+  const panelBottom = semanticContent.y + semanticContent.height;
+  const panelRight = semanticContent.x + semanticContent.width;
+  for (const name of ["primaryAction", "secondaryAction"] as const) {
+    const anchor = anchors[name];
+    const halfWidth = layout.actions.width / 2;
+    const halfHeight = layout.actions.height / 2;
+    if (
+      anchor.x - halfWidth < semanticContent.x + minimumInset
+      || anchor.x + halfWidth > panelRight - minimumInset
+      || anchor.y - halfHeight < semanticContent.y + minimumInset
+      || anchor.y + halfHeight > panelBottom - minimumInset
+    ) {
+      throw new Error(`${name} control must fit inside semantic content with clearance from its border`);
+    }
+  }
+  const actionGap = (anchors.secondaryAction.y - layout.actions.height / 2)
+    - (anchors.primaryAction.y + layout.actions.height / 2);
+  if (actionGap < 8) {
+    throw new Error("action controls must not touch or overlap each other");
+  }
 }

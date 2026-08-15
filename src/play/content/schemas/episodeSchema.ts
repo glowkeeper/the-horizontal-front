@@ -72,7 +72,7 @@ const presentationSchema = z
   .object({
     layout: z.object({
       source: z.literal("shared"),
-      id: z.literal("episode-confrontation"),
+      id: contentIdSchema,
     }).strict(),
     skin: ownedContentReferenceSchema,
   })

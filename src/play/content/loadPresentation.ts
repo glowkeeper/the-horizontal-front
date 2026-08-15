@@ -1,13 +1,16 @@
 import type { Episode } from "./loadEpisode";
 import {
+  illustratedPanelLayoutSchema,
   resistanceLayoutSchema,
   resistanceSkinSchema,
   interruptionSkinSchema,
+  type IllustratedPanelLayoutContent,
   type InterruptionSkin,
   type ResistanceLayoutContent,
   type ResistanceSkin,
 } from "./schemas/presentationSchema";
 import { assertSensiblePresentation } from "./validatePresentation";
+import { assertSensibleIllustratedPanel } from "./validateIllustratedPanel";
 import { presentationAssets } from "./presentationAssets";
 
 const layoutModules = import.meta.glob("./presentation/layouts/*.json", {
@@ -63,6 +66,20 @@ export function loadInterruptionSkinLibrary(
 }
 
 const interruptionSkinLibrary = loadInterruptionSkinLibrary();
+
+/**
+ * The illustrated panel is a single shared engine surface. It is parsed and
+ * semantically validated here, in the content layer, so `npm run validate:content`
+ * and the production build reject an unusable panel. Validating it inside the
+ * Phaser adapter alone would only fail once a browser rendered it.
+ */
+export const illustratedPanelLayout: IllustratedPanelLayoutContent = (() => {
+  const parsed = illustratedPanelLayoutSchema.parse(
+    layoutModules["./presentation/layouts/illustration-left.json"],
+  );
+  assertSensibleIllustratedPanel(parsed);
+  return parsed;
+})();
 
 export type LoadedPresentation = {
   readonly layout: ResistanceLayoutContent;

@@ -51,7 +51,11 @@ import {
   type InterruptionPresentation,
 } from "../presentation/interruptionPresentation";
 import { createIllustratedSemanticPanel } from "../presentation/illustratedSemanticPanel";
-import type { IllustratedPanelLayoutContent } from "../../content/schemas/presentationSchema";
+import type {
+  ColourRole,
+  IllustratedPanelLayoutContent,
+  ResistanceLayoutContent,
+} from "../../content/schemas/presentationSchema";
 
 const MAXIMUM_FRAME_DELTA_MS = 100;
 
@@ -59,6 +63,25 @@ type ResistanceSceneData = {
   readonly campaign: Campaign;
   readonly episode: unknown;
   readonly run: CampaignRun;
+};
+
+type ResolvedColourGroup<T> = { readonly [K in keyof T]: number };
+
+type AuthoredPalette =
+  ResistanceLayoutContent["rhythmPresentation"]["palette"];
+
+type ResolvedRhythmPalette = {
+  readonly gate: ResolvedColourGroup<AuthoredPalette["gate"]>;
+  readonly note: ResolvedColourGroup<AuthoredPalette["note"]>;
+  readonly emitter: ResolvedColourGroup<AuthoredPalette["emitter"]>;
+  readonly pauseBand: ResolvedColourGroup<AuthoredPalette["pauseBand"]>;
+  readonly successfulNote: ResolvedColourGroup<AuthoredPalette["successfulNote"]>;
+  readonly expiredNote: ResolvedColourGroup<AuthoredPalette["expiredNote"]>;
+  readonly brokenHold: ResolvedColourGroup<AuthoredPalette["brokenHold"]>;
+  readonly label: AuthoredPalette["label"];
+  readonly status: AuthoredPalette["status"];
+  readonly feedback: AuthoredPalette["feedback"];
+  readonly result: AuthoredPalette["result"];
 };
 
 type RhythmGuideVisual = {
@@ -96,6 +119,7 @@ export class ResistanceScene extends Phaser.Scene {
   private transitioning = false;
   private outcomeActionsAvailable = false;
   private illustratedOutcomeLayout: IllustratedPanelLayoutContent | null = null;
+  private resolvedPalette!: ResolvedRhythmPalette;
   private interruptionPresentation!: InterruptionPresentation;
   private announcedInterruptionState: string | null = null;
 
@@ -176,6 +200,8 @@ export class ResistanceScene extends Phaser.Scene {
       this,
       this.episode,
     );
+    this.resolvedPalette = this.resolvePalette();
+    const palette = this.resolvedPalette;
     const { anchors } = this.layout.content;
     const presentation = this.layout.content.rhythmPresentation;
     const statusPanel = this.layout.content.statusPanel;
@@ -210,7 +236,7 @@ export class ResistanceScene extends Phaser.Scene {
         { seconds: (this.episode.confrontation.resistance.durationMs / 1_000).toFixed(1) },
       ), {
         ...createTextStyles().status,
-        color: getThemeColour("inkCharcoal"),
+        color: getThemeColour(palette.status.timeRemaining),
       })
       .setOrigin(0.5);
 
@@ -223,7 +249,7 @@ export class ResistanceScene extends Phaser.Scene {
   }
 
   private createRhythmInterface(): void {
-    const colours = this.colours();
+    const palette = this.resolvedPalette;
     const { anchors, controls } = this.layout.content;
     const presentation = this.layout.content.rhythmPresentation;
     const maximumGateWidth = this.gateWidth(controls.maximumTimingWindowMs);
@@ -237,29 +263,29 @@ export class ResistanceScene extends Phaser.Scene {
       anchors.leftControl.y,
       maximumGateWidth,
       controls.gateHeight,
-      colours.paperWhite,
-    ).setStrokeStyle(controls.gateStrokeWidth, colours.resistanceRed);
+      palette.gate.fill,
+    ).setStrokeStyle(controls.gateStrokeWidth, palette.gate.stroke);
     this.rightCue = this.add.rectangle(
       anchors.rightControl.x,
       anchors.rightControl.y,
       maximumGateWidth,
       controls.gateHeight,
-      colours.paperWhite,
-    ).setStrokeStyle(controls.gateStrokeWidth, colours.resistanceRed);
+      palette.gate.fill,
+    ).setStrokeStyle(controls.gateStrokeWidth, palette.gate.stroke);
 
     this.leftBeatLine = this.add.rectangle(
       anchors.leftControl.x,
       anchors.leftControl.y,
       controls.gateBeatLineWidth,
       controls.gateHeight,
-      colours.inkCharcoal,
+      palette.gate.beatLine,
     );
     this.rightBeatLine = this.add.rectangle(
       anchors.rightControl.x,
       anchors.rightControl.y,
       controls.gateBeatLineWidth,
       controls.gateHeight,
-      colours.inkCharcoal,
+      palette.gate.beatLine,
     );
 
     this.leftCueLabel = this.add
@@ -279,26 +305,26 @@ export class ResistanceScene extends Phaser.Scene {
       { length: controls.visibleGuideEvents },
       () => ({
         holdBar: this.add.rectangle(
-          0, 0, maximumLaneWidth, controls.noteRadius, colours.managementGold,
+          0, 0, maximumLaneWidth, controls.noteRadius, palette.note.holdBar,
         )
           .setOrigin(0.5)
-          .setStrokeStyle(presentation.strokes.guide, colours.inkCharcoal)
+          .setStrokeStyle(presentation.strokes.guide, palette.note.stroke)
           .setVisible(false),
         heldBar: this.add.rectangle(
-          0, 0, maximumLaneWidth, controls.noteRadius, colours.workLightBlue,
+          0, 0, maximumLaneWidth, controls.noteRadius, palette.note.heldBar,
         )
           .setOrigin(0.5)
-          .setStrokeStyle(presentation.strokes.guide, colours.inkCharcoal)
+          .setStrokeStyle(presentation.strokes.guide, palette.note.stroke)
           .setVisible(false),
-        note: this.add.circle(0, 0, controls.noteRadius, colours.managementGold)
-          .setStrokeStyle(presentation.strokes.guide, colours.inkCharcoal)
+        note: this.add.circle(0, 0, controls.noteRadius, palette.note.fill)
+          .setStrokeStyle(presentation.strokes.guide, palette.note.stroke)
           .setVisible(false),
         tail: this.add.circle(
           0, 0,
           controls.noteRadius * presentation.guide.tailRadiusMultiplier,
-          colours.managementGold,
+          palette.note.fill,
         )
-          .setStrokeStyle(presentation.strokes.guide, colours.inkCharcoal)
+          .setStrokeStyle(presentation.strokes.guide, palette.note.stroke)
           .setVisible(false),
       }),
     );
@@ -308,17 +334,17 @@ export class ResistanceScene extends Phaser.Scene {
       anchors.leftControl.y,
       controls.emitterWidth,
       controls.emitterHeight,
-      colours.paperWhite,
-    ).setStrokeStyle(controls.gateStrokeWidth, colours.inkCharcoal);
+      palette.emitter.fill,
+    ).setStrokeStyle(controls.gateStrokeWidth, palette.emitter.stroke);
 
     this.pauseBand = this.add.rectangle(
       anchors.feedback.x,
       anchors.leftControl.y,
       controls.pauseBandWidth,
       controls.pauseBandHeight,
-      colours.paperWhite,
+      palette.pauseBand.fill,
     )
-      .setStrokeStyle(controls.gateStrokeWidth, colours.inkCharcoal)
+      .setStrokeStyle(controls.gateStrokeWidth, palette.pauseBand.stroke)
       .setVisible(false);
 
     this.feedback = this.add
@@ -486,6 +512,7 @@ export class ResistanceScene extends Phaser.Scene {
   }
 
   private renderResistance(): void {
+    const palette = this.resolvedPalette;
     const state = this.resistance.state;
     const cue = getNextRhythmCue(this.resistance);
     const guide = getRhythmGuide(
@@ -513,8 +540,8 @@ export class ResistanceScene extends Phaser.Scene {
       { seconds: (remainingMs / 1_000).toFixed(1) },
     ));
 
-    this.leftCue.setFillStyle(this.colours().paperWhite);
-    this.rightCue.setFillStyle(this.colours().paperWhite);
+    this.leftCue.setFillStyle(palette.gate.fill);
+    this.rightCue.setFillStyle(palette.gate.fill);
     const gateWidth = cue
       ? this.gateWidth(cue.timingWindowMs)
       : this.layout.content.controls.gateBeatLineWidth;
@@ -529,19 +556,19 @@ export class ResistanceScene extends Phaser.Scene {
     this.rightCue.setAlpha(presentation.opacity.inactiveGate);
     this.leftCueLabel
       .setAlpha(presentation.opacity.inactiveLabel)
-      .setColor(getThemeColour("inkCharcoal"))
+      .setColor(getThemeColour(palette.label.rest))
       .setText(game.mechanics.resistance.leftControl);
     this.rightCueLabel
       .setAlpha(presentation.opacity.inactiveLabel)
-      .setColor(getThemeColour("inkCharcoal"))
+      .setColor(getThemeColour(palette.label.rest))
       .setText(game.mechanics.resistance.rightControl);
     this.leftCue.setStrokeStyle(
       this.layout.content.controls.gateStrokeWidth,
-      this.colours().resistanceRed,
+      palette.gate.stroke,
     );
     this.rightCue.setStrokeStyle(
       this.layout.content.controls.gateStrokeWidth,
-      this.colours().resistanceRed,
+      palette.gate.stroke,
     );
     this.renderRhythmGuide(guide);
 
@@ -566,18 +593,18 @@ export class ResistanceScene extends Phaser.Scene {
         .setAlpha(1)
         .setFillStyle(
           isNow
-            ? this.colours().resistanceRed
+            ? palette.gate.now
             : holding
-              ? this.colours().workLightBlue
-              : this.colours().managementGold,
+              ? palette.gate.holding
+              : palette.gate.upcoming,
         )
         .setStrokeStyle(
           this.layout.content.controls.activeGateStrokeWidth,
-          this.colours().inkCharcoal,
+          palette.gate.activeStroke,
         );
       expectedLabel
         .setAlpha(1)
-        .setColor(getThemeColour(isNow ? "resistanceRed" : "inkCharcoal"))
+        .setColor(getThemeColour(isNow ? palette.label.now : palette.label.rest))
         .setText(isNow
           ? holding
             ? game.mechanics.resistance.cueReleaseNow
@@ -597,7 +624,7 @@ export class ResistanceScene extends Phaser.Scene {
         ) {
           this.feedback
             .setVisible(true)
-            .setColor(getThemeColour("inkCharcoal"))
+            .setColor(getThemeColour(palette.label.rest))
             .setText(formatCopy(cue.action === "hold"
               ? game.mechanics.resistance.hold
               : game.mechanics.resistance.tap, {
@@ -610,6 +637,7 @@ export class ResistanceScene extends Phaser.Scene {
   }
 
   private renderRhythmGuide(guide: readonly RhythmGuideItem[]): void {
+    const palette = this.resolvedPalette;
     const controls = this.layout.content.controls;
     const controlsPresentation = this.layout.content.rhythmPresentation;
     const { anchors } = this.layout.content;
@@ -644,7 +672,7 @@ export class ResistanceScene extends Phaser.Scene {
           this.layout.content.designSize.width,
         ), target.y)
         .setAlpha(alpha)
-        .setFillStyle(this.colours().managementGold)
+        .setFillStyle(palette.note.fill)
         .setVisible(
           notePosition.x >= 0
           && notePosition.x <= this.layout.content.designSize.width,
@@ -765,6 +793,7 @@ export class ResistanceScene extends Phaser.Scene {
   private renderJudgement(
     judgement: RhythmJudgement | null,
   ): void {
+    const palette = this.resolvedPalette;
     if (!judgement) {
       return;
     }
@@ -786,14 +815,14 @@ export class ResistanceScene extends Phaser.Scene {
     if (judgement.kind === "hit") {
       this.animateSuccessfulNote(judgement.expectedSide);
       this.feedback
-        .setColor(getThemeColour("workLightBlue"))
+        .setColor(getThemeColour(palette.feedback.hit))
         .setText(formatCopy(game.mechanics.resistance.hit, {
           side: judgement.expectedSide.toUpperCase(),
         }));
       return;
     }
 
-    this.feedback.setColor(getThemeColour("resistanceRed"));
+    this.feedback.setColor(getThemeColour(palette.feedback.miss));
 
     if (judgement.reason === "expired") {
       this.animateExpiredNote(judgement.step, judgement.expectedSide);
@@ -827,6 +856,7 @@ export class ResistanceScene extends Phaser.Scene {
   }
 
   private animateSuccessfulNote(side: ResistanceSide): void {
+    const palette = this.resolvedPalette;
     const presentation = this.layout.content.rhythmPresentation;
     const target = side === "left"
       ? this.layout.content.anchors.leftControl
@@ -836,8 +866,8 @@ export class ResistanceScene extends Phaser.Scene {
       target.y,
       this.layout.content.controls.noteRadius,
     )
-      .setFillStyle(this.colours().paperWhite, 0)
-      .setStrokeStyle(presentation.strokes.successfulNote, this.colours().workLightBlue)
+      .setFillStyle(palette.successfulNote.fill, 0)
+      .setStrokeStyle(presentation.strokes.successfulNote, palette.successfulNote.stroke)
       .setDepth(presentation.layers.successfulNote);
     this.tweens.add({
       targets: burst,
@@ -850,6 +880,7 @@ export class ResistanceScene extends Phaser.Scene {
   }
 
   private animateExpiredNote(step: number, side: ResistanceSide): void {
+    const palette = this.resolvedPalette;
     const cue = this.resistance.config.cues[step];
     if (!cue) return;
     const target = side === "left"
@@ -862,15 +893,15 @@ export class ResistanceScene extends Phaser.Scene {
     const startX = target.x + direction
       * cue.timingWindowMs
       * this.layout.content.controls.noteTravelPixelsPerMs;
-    const note = this.add.circle(0, 0, radius, this.colours().resistanceRed)
-      .setStrokeStyle(presentation.strokes.missedNote, this.colours().inkCharcoal);
+    const note = this.add.circle(0, 0, radius, palette.expiredNote.fill)
+      .setStrokeStyle(presentation.strokes.missedNote, palette.expiredNote.stroke);
     const crossOne = this.add.rectangle(
       0, 0, radius * expired.crossWidthMultiplier,
-      expired.crossThickness, this.colours().paperWhite,
+      expired.crossThickness, palette.expiredNote.cross,
     ).setAngle(expired.crossAngleDegrees);
     const crossTwo = this.add.rectangle(
       0, 0, radius * expired.crossWidthMultiplier,
-      expired.crossThickness, this.colours().paperWhite,
+      expired.crossThickness, palette.expiredNote.cross,
     ).setAngle(-expired.crossAngleDegrees);
     const escaped = this.add.container(startX, target.y, [note, crossOne, crossTwo])
       .setDepth(presentation.layers.missedNote);
@@ -885,6 +916,7 @@ export class ResistanceScene extends Phaser.Scene {
   }
 
   private animateBrokenHold(step: number, side: ResistanceSide): void {
+    const palette = this.resolvedPalette;
     const cue = this.resistance.config.cues[step];
     if (!cue || cue.action !== "hold") return;
     const target = side === "left"
@@ -902,16 +934,16 @@ export class ResistanceScene extends Phaser.Scene {
       -brokenStyle.fragmentYOffset,
       fragmentWidth,
       this.layout.content.controls.noteRadius,
-      this.colours().resistanceRed,
-    ).setStrokeStyle(presentation.strokes.missedNote, this.colours().inkCharcoal)
+      palette.brokenHold.fill,
+    ).setStrokeStyle(presentation.strokes.missedNote, palette.brokenHold.stroke)
       .setAngle(-brokenStyle.fragmentAngleDegrees);
     const rightFragment = this.add.rectangle(
       fragmentWidth * brokenStyle.fragmentOffsetMultiplier,
       brokenStyle.fragmentYOffset,
       fragmentWidth,
       this.layout.content.controls.noteRadius,
-      this.colours().resistanceRed,
-    ).setStrokeStyle(presentation.strokes.missedNote, this.colours().inkCharcoal)
+      palette.brokenHold.fill,
+    ).setStrokeStyle(presentation.strokes.missedNote, palette.brokenHold.stroke)
       .setAngle(brokenStyle.fragmentAngleDegrees);
     const broken = this.add.container(
       target.x,
@@ -932,6 +964,7 @@ export class ResistanceScene extends Phaser.Scene {
   }
 
   private finishConfrontation(): void {
+    const palette = this.resolvedPalette;
     this.finished = true;
     this.cueLabel.setVisible(false);
     this.pauseBand.setVisible(false);
@@ -942,16 +975,16 @@ export class ResistanceScene extends Phaser.Scene {
       holdBar.setVisible(false);
       heldBar.setVisible(false);
     });
-    this.leftCue.setFillStyle(this.colours().paperWhite);
-    this.rightCue.setFillStyle(this.colours().paperWhite);
+    this.leftCue.setFillStyle(palette.gate.fill);
+    this.rightCue.setFillStyle(palette.gate.fill);
     this.leftCue.setAlpha(1);
     this.rightCue.setAlpha(1);
     this.leftCueLabel
       .setAlpha(1)
-      .setColor(getThemeColour("inkCharcoal"));
+      .setColor(getThemeColour(palette.label.rest));
     this.rightCueLabel
       .setAlpha(1)
-      .setColor(getThemeColour("inkCharcoal"));
+      .setColor(getThemeColour(palette.label.rest));
     const victory = this.resistance.state.outcome === "victory";
     const resultContent = victory
       ? this.episode.results.victory
@@ -970,7 +1003,9 @@ export class ResistanceScene extends Phaser.Scene {
 
       this.result
         .setText(resultContent.headline)
-        .setColor(victory ? getThemeColour("resistanceRed") : getThemeColour("workLightBlue"))
+        .setColor(getThemeColour(
+        victory ? palette.result.victory : palette.result.forcedVerticalisation,
+      ))
         .setVisible(true);
       this.feedback.setText(resultContent.feedback).setVisible(true);
       if (victory) this.layout.animateVictory();
@@ -997,12 +1032,13 @@ export class ResistanceScene extends Phaser.Scene {
       x: restart.x + actions.horizontalOffset, y: restart.y,
     };
     const width = this.illustratedOutcomeLayout?.actions.width ?? actions.width;
+    const height = this.illustratedOutcomeLayout?.actions.height;
     createButton(this, retryPosition.x, retryPosition.y, width, game.interface.retryEpisode, () => {
       this.restartConfrontation();
-    });
+    }, height);
     createButton(this, acceptPosition.x, acceptPosition.y, width, game.interface.acceptOutcome, () => {
       this.acceptOutcomeAndContinue();
-    });
+    }, height, "secondary");
     this.outcomeActionsAvailable = true;
     announce(formatCopy(game.interface.resultStatus, { outcome, feedback }));
   }
@@ -1040,14 +1076,28 @@ export class ResistanceScene extends Phaser.Scene {
     });
   }
 
-  private colours() {
+  /**
+   * Resolves the authored rhythm palette into Phaser colour values. Every role
+   * is selected by validated layout data; this adapter chooses none of them.
+   */
+  private resolvePalette(): ResolvedRhythmPalette {
+    const authored = this.layout.content.rhythmPresentation.palette;
+    const resolve = <T extends Record<string, ColourRole>>(group: T) =>
+      Object.fromEntries(
+        Object.entries(group).map(([key, role]) => [key, this.colour(role)]),
+      ) as { readonly [K in keyof T]: number };
     return {
-      duvetCream: this.colour("duvetCream"),
-      inkCharcoal: this.colour("inkCharcoal"),
-      resistanceRed: this.colour("resistanceRed"),
-      workLightBlue: this.colour("workLightBlue"),
-      managementGold: this.colour("managementGold"),
-      paperWhite: this.colour("paperWhite"),
+      gate: resolve(authored.gate),
+      note: resolve(authored.note),
+      emitter: resolve(authored.emitter),
+      pauseBand: resolve(authored.pauseBand),
+      successfulNote: resolve(authored.successfulNote),
+      expiredNote: resolve(authored.expiredNote),
+      brokenHold: resolve(authored.brokenHold),
+      label: authored.label,
+      status: authored.status,
+      feedback: authored.feedback,
+      result: authored.result,
     };
   }
 

@@ -23,7 +23,16 @@
     "semanticStrokeWidth": 4,
     "semanticFillAlpha": 0.92
   },
-  "actions": { "width": 330 },
+  "palette": {
+    "background": "duvetCream",
+    "illustrationFill": "paperWhite",
+    "illustrationStroke": "inkCharcoal",
+    "semanticFill": "paperWhite",
+    "semanticStroke": "resistanceRed",
+    "detail": "resistanceRed",
+    "instruction": "resistanceRed"
+  },
+  "actions": { "width": 330, "height": 78 },
   "typography": {
     "kickerSizePx": 17,
     "headlineSizePx": 34,
@@ -38,7 +47,7 @@
     "body": { "x": 1044, "y": 312 },
     "detail": { "x": 1044, "y": 450 },
     "instruction": { "x": 1044, "y": 620 },
-    "primaryAction": { "x": 1044, "y": 550 },
-    "secondaryAction": { "x": 1044, "y": 642 }
+    "primaryAction": { "x": 1044, "y": 515 },
+    "secondaryAction": { "x": 1044, "y": 609 }
   }
 }
