@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "bed-frame-settle",
+  "layers": [
+    {
+      "kind": "tone",
+      "wave": "triangle",
+      "startFrequencyHz": 120,
+      "endFrequencyHz": 74,
+      "delayMs": 0,
+      "attackMs": 6,
+      "holdMs": 60,
+      "releaseMs": 240,
+      "gain": 0.18,
+      "pan": 0
+    },
+    {
+      "kind": "noise",
+      "filter": "lowpass",
+      "startCutoffHz": 700,
+      "endCutoffHz": 260,
+      "resonance": 4,
+      "delayMs": 0,
+      "attackMs": 4,
+      "holdMs": 50,
+      "releaseMs": 200,
+      "gain": 0.16,
+      "pan": 0
+    }
+  ]
+}

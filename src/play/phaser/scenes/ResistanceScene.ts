@@ -1,6 +1,16 @@
 import Phaser from "phaser";
 
+import {
+  collectDueCues,
+  createCueScheduler,
+  type CueSchedulerState,
+} from "../../audio/cueScheduler";
+import {
+  createSoundscapePlayer,
+  type SoundscapePlayer,
+} from "../../audio/soundscapePlayer";
 import type { Campaign } from "../../content/loadGame";
+import type { AudioCueRole } from "../../content/schemas/audioSchema";
 import { formatCopy } from "../../content/formatCopy";
 import { game } from "../../content/game";
 import { resolveIllustrationAsset } from "../../content/presentationAssets";
@@ -102,6 +112,15 @@ export class ResistanceScene extends Phaser.Scene {
   private finished = false;
   private lastReportedExpiredStep = -1;
   private lastAnnouncedNowStep = -1;
+  private audio!: SoundscapePlayer;
+  private cueScheduler: CueSchedulerState = createCueScheduler();
+  private countInScheduler: CueSchedulerState = createCueScheduler();
+  private beatScheduler: CueSchedulerState = createCueScheduler();
+  private scoredCueTimesMs: readonly number[] = [];
+  private scoredCueSides: readonly ResistanceSide[] = [];
+  private countInTimesMs: readonly number[] = [];
+  private unaccentedBeatTimesMs: readonly number[] = [];
+  private holdSounding = false;
 
   private leftCue!: Phaser.GameObjects.Rectangle;
   private rightCue!: Phaser.GameObjects.Rectangle;
@@ -154,6 +173,30 @@ export class ResistanceScene extends Phaser.Scene {
     this.lastAnnouncedNowStep = -1;
     this.announcedInterruptionState = null;
 
+    this.audio = createSoundscapePlayer(this.episode.audio);
+    this.cueScheduler = createCueScheduler();
+    this.countInScheduler = createCueScheduler();
+    this.beatScheduler = createCueScheduler();
+    this.holdSounding = false;
+    // The apparatus strikes on every scored cue: that beat is what the player
+    // is answering, so it comes from the compiled score rather than a metronome
+    // running alongside it.
+    const resistanceConfig = this.episode.confrontation.resistance;
+    this.scoredCueTimesMs = resistanceConfig.cues.map(({ atMs }) => atMs);
+    this.scoredCueSides = resistanceConfig.cues.map(({ side }) => side);
+    this.countInTimesMs = resistanceConfig.guideEvents
+      .filter((event) => event.action === "count-in")
+      .map(({ atMs }) => atMs);
+    // The apparatus keeps time underneath, but a beat that already carries a
+    // sided demand is not doubled: the demand is the accent on that beat.
+    const accented = new Set(this.scoredCueTimesMs);
+    this.unaccentedBeatTimesMs = resistanceConfig.beatTimesMs
+      .filter((atMs) => !accented.has(atMs));
+    // Browsers keep audio suspended until a gesture. Arriving here always
+    // followed one, but the resume is asynchronous, so ask on entry.
+    void this.audio.unlock();
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.audio.stop());
+
     this.createBedroom();
     this.createRhythmInterface();
     this.interruptionPresentation = createInterruptionPresentation(
@@ -188,6 +231,7 @@ export class ResistanceScene extends Phaser.Scene {
     );
     this.resistance = this.confrontation.resistance;
 
+    this.scheduleAudioCues();
     this.renderResistance();
 
     if (this.resistance.state.outcome !== "active") {
@@ -195,10 +239,64 @@ export class ResistanceScene extends Phaser.Scene {
     }
   }
 
+  /**
+   * Commit the next moments of the score to the audio device.
+   *
+   * The window is one frame of lookahead, which is all it takes to remove
+   * render-loop jitter from the rhythm: the device places each sound on its own
+   * clock instead of whenever a frame happens to land.
+   */
+  private scheduleAudioCues(): void {
+    const elapsedMs = this.resistance.state.elapsedMs;
+    const countIn = collectDueCues(
+      this.countInScheduler,
+      this.countInTimesMs,
+      elapsedMs,
+      MAXIMUM_FRAME_DELTA_MS,
+    );
+    this.countInScheduler = countIn.next;
+    for (const cue of countIn.due) this.audio.schedule("count-in", cue.inMs);
+
+    const scored = collectDueCues(
+      this.cueScheduler,
+      this.scoredCueTimesMs,
+      elapsedMs,
+      MAXIMUM_FRAME_DELTA_MS,
+    );
+    this.cueScheduler = scored.next;
+    for (const cue of scored.due) {
+      this.audio.schedule(
+        this.scoredCueSides[cue.index] === "left" ? "cue-due-left" : "cue-due-right",
+        cue.inMs,
+      );
+    }
+
+    const pulse = collectDueCues(
+      this.beatScheduler,
+      this.unaccentedBeatTimesMs,
+      elapsedMs,
+      MAXIMUM_FRAME_DELTA_MS,
+    );
+    this.beatScheduler = pulse.next;
+    for (const beat of pulse.due) this.audio.schedule("beat", beat.inMs);
+
+    this.audio.setIntensity(this.resistance.state.dramaticIntensity);
+
+    // A hold begins on the press, which produces no judgement of its own.
+    const holding = this.resistance.state.activeHold !== null;
+    if (holding && !this.holdSounding) this.audio.play("hold-start");
+    this.holdSounding = holding;
+  }
+
   private createBedroom(): void {
     this.layout = createResistanceLayout(
       this,
       this.episode,
+      // The bed itself, hauled up a notch or settling back. Judgement cues
+      // answer the player; this answers Management.
+      (direction) => this.audio.play(
+        direction > 0 ? "resistance-strain" : "resistance-ease",
+      ),
     );
     this.resolvedPalette = this.resolvePalette();
     const palette = this.resolvedPalette;
@@ -402,6 +500,7 @@ export class ResistanceScene extends Phaser.Scene {
     input: { kind: "sequence"; choiceId: string }
       | { kind: "hold"; action: "press" | "release" | "cancel" },
   ): void {
+    this.audio.play("interruption-input");
     this.confrontation = applyConfrontationInput(this.confrontation, {
       ...input,
       atMs: this.confrontationTimeMs,
@@ -434,6 +533,8 @@ export class ResistanceScene extends Phaser.Scene {
   private announceInterruptionState(id: string, copy: string): void {
     if (this.announcedInterruptionState === id) return;
     this.announcedInterruptionState = id;
+    const role = soundForInterruptionState(id);
+    if (role) this.audio.play(role);
     announce(copy);
   }
 
@@ -798,6 +899,8 @@ export class ResistanceScene extends Phaser.Scene {
       return;
     }
 
+    this.audio.play(soundForJudgement(judgement));
+
     const feedbackSide = judgement.actualSide ?? judgement.expectedSide;
     const control = feedbackSide === "left" ? this.leftCue : this.rightCue;
     control.setAlpha(1);
@@ -966,6 +1069,14 @@ export class ResistanceScene extends Phaser.Scene {
   private finishConfrontation(): void {
     const palette = this.resolvedPalette;
     this.finished = true;
+    this.audio.play(
+      this.resistance.state.outcome === "victory" ? "victory" : "forced-verticalisation",
+    );
+    // The confrontation is over but the scene lives on through the outcome and
+    // the debrief, so the room has to be told to go quiet. The sting is already
+    // scheduled and survives, sounding over the silence rather than under the
+    // hum that was pressing on the player a moment ago.
+    this.audio.stopAmbience();
     this.cueLabel.setVisible(false);
     this.pauseBand.setVisible(false);
     this.rhythmEmitter.setVisible(false);
@@ -1133,4 +1244,30 @@ function formatCueItem(item: RhythmGuideItem): string {
         side: item.side.toUpperCase(),
       });
   }
+}
+
+function soundForJudgement(judgement: RhythmJudgement): AudioCueRole {
+  if (judgement.kind === "hit") {
+    // A hold is judged when it is released, so a successful one sounds as the
+    // apparatus letting go rather than as another strike.
+    return judgement.action === "hold" ? "hold-release" : "tap-hit";
+  }
+  return judgement.reason === "released-early" ? "hold-broken" : "tap-miss";
+}
+
+/**
+ * Interruption stages are announced with composite identifiers, and the same
+ * identifiers decide what the moment sounds like. Cancellation stays silent
+ * because it is deliberately neutral: the interaction was taken away from the
+ * player rather than failed by them, and a failure sound would say otherwise.
+ */
+function soundForInterruptionState(id: string): AudioCueRole | null {
+  if (id.endsWith(":warning")) return "interruption-warning";
+  if (id.endsWith(":active")) return "management-bluster";
+  if (id.endsWith(":returning")) return "interruption-return";
+  if (id.endsWith(":resolved:success")) return "interruption-success";
+  if (id.endsWith(":resolved:failure") || id.endsWith(":resolved:expired")) {
+    return "interruption-failure";
+  }
+  return null;
 }

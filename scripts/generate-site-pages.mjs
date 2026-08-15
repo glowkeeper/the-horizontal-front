@@ -9,6 +9,7 @@ const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const sourceEntryPages = [
   { source: "src/site/pages/home.html", output: "index.html" },
   { source: "src/site/pages/commons.html", output: "commons/index.html" },
+  { source: "src/site/pages/sound.html", output: "sound/index.html" },
   { source: "src/play/index.html", output: "play/index.html" },
 ];
 

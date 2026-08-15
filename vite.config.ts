@@ -17,6 +17,10 @@ const shellCopy = new Map([
   ["{{GAME_PAGE_DESCRIPTION}}", game.interface.pageDescription],
   ["{{GAME_PAGE_TITLE}}", game.interface.pageTitle],
   ["{{GAME_EXIT_LABEL}}", game.interface.exitLabel],
+  ["{{GAME_MUTE_LABEL}}", game.interface.muteAudio],
+  ["{{GAME_UNMUTE_LABEL}}", game.interface.unmuteAudio],
+  ["{{GAME_AUDIO_MUTED_STATUS}}", game.interface.audioMutedStatus],
+  ["{{GAME_AUDIO_AUDIBLE_STATUS}}", game.interface.audioAudibleStatus],
   ["{{GAME_LOADING_STATUS}}", game.interface.loadingStatus],
   ["{{GAME_ARIA_LABEL}}", game.interface.gameAriaLabel],
 ]);
@@ -38,6 +42,7 @@ export default defineConfig({
         home: page("index.html"),
         play: page("play/index.html"),
         commons: page("commons/index.html"),
+        sound: page("sound/index.html"),
         charter: page("charter/index.html"),
         governance: page("governance/index.html"),
         identity: page("identity/index.html"),

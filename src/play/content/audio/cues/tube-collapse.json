@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "tube-collapse",
+  "layers": [
+    {
+      "kind": "tone",
+      "wave": "sawtooth",
+      "startFrequencyHz": 300,
+      "endFrequencyHz": 70,
+      "delayMs": 0,
+      "attackMs": 2,
+      "holdMs": 40,
+      "releaseMs": 240,
+      "gain": 0.28,
+      "pan": 0
+    },
+    {
+      "kind": "noise",
+      "filter": "lowpass",
+      "startCutoffHz": 1200,
+      "endCutoffHz": 200,
+      "resonance": 4,
+      "delayMs": 0,
+      "attackMs": 2,
+      "holdMs": 40,
+      "releaseMs": 220,
+      "gain": 0.26,
+      "pan": 0
+    }
+  ]
+}

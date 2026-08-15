@@ -1,5 +1,11 @@
 import type { ConfrontationConfig, ResistanceConfig } from "../engine/types";
 import {
+  compileSoundscape,
+  createEpisodeAudioScope,
+  type AudioLibrary,
+  type CompiledSoundscape,
+} from "./loadAudio";
+import {
   compileConfrontationConfig,
   createEpisodeMechanicScope,
   type MechanicLibrary,
@@ -7,15 +13,20 @@ import {
 import { episodeSchema, type EpisodeContent } from "./schemas/episodeSchema";
 import { parseContent } from "./parseContent";
 
-export interface Episode extends Omit<EpisodeContent, "confrontation"> {
+export interface Episode extends Omit<EpisodeContent, "confrontation" | "audio"> {
   readonly confrontation: Omit<EpisodeContent["confrontation"], "resistance" | "interruptions"> & {
     readonly resistance: ResistanceConfig;
     readonly interruptions: ConfrontationConfig["interruptions"];
     readonly dramaticCurve: EpisodeContent["confrontation"]["resistance"]["dramaticCurve"];
   };
+  readonly audio: CompiledSoundscape;
 }
 
-export function loadEpisode(content: unknown, mechanics: MechanicLibrary): Episode {
+export function loadEpisode(
+  content: unknown,
+  mechanics: MechanicLibrary,
+  audio: AudioLibrary,
+): Episode {
   const episode = parseContent("Episode content", episodeSchema, content);
   const dramaticCurve = episode.confrontation.resistance.dramaticCurve;
   const scope = createEpisodeMechanicScope(
@@ -28,6 +39,7 @@ export function loadEpisode(content: unknown, mechanics: MechanicLibrary): Episo
     episode.confrontation.interruptions,
     scope,
   );
+  const audioScope = createEpisodeAudioScope(episode.id, episode.audio.cues, audio);
   return {
     ...episode,
     confrontation: {
@@ -36,5 +48,10 @@ export function loadEpisode(content: unknown, mechanics: MechanicLibrary): Episo
       resistance: confrontation.resistance,
       interruptions: confrontation.interruptions,
     },
+    audio: compileSoundscape(
+      episode.audio.soundscape,
+      episode.audio.soundscapes,
+      audioScope,
+    ),
   };
 }

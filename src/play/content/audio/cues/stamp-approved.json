@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "id": "stamp-approved",
+  "layers": [
+    {
+      "kind": "noise",
+      "filter": "lowpass",
+      "startCutoffHz": 2200,
+      "endCutoffHz": 380,
+      "resonance": 1,
+      "delayMs": 0,
+      "attackMs": 0,
+      "holdMs": 6,
+      "releaseMs": 70,
+      "gain": 0.36,
+      "pan": 0
+    },
+    {
+      "kind": "tone",
+      "wave": "triangle",
+      "startFrequencyHz": 180,
+      "endFrequencyHz": 70,
+      "delayMs": 0,
+      "attackMs": 0,
+      "holdMs": 8,
+      "releaseMs": 100,
+      "gain": 0.3,
+      "pan": 0
+    },
+    {
+      "kind": "tone",
+      "wave": "sine",
+      "startFrequencyHz": 880,
+      "endFrequencyHz": 1320,
+      "delayMs": 60,
+      "attackMs": 6,
+      "holdMs": 50,
+      "releaseMs": 160,
+      "gain": 0.2,
+      "pan": 0
+    }
+  ]
+}

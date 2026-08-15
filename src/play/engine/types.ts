@@ -71,6 +71,15 @@ export type ResistanceConfig = {
   readonly phases: readonly ResistancePhase[];
   readonly cues: readonly ScoredRhythmCue[];
   readonly guideEvents: readonly RhythmGuideEvent[];
+  /**
+   * Every beat the episode contains, whether or not it asks for an action.
+   *
+   * Scored cues are sparse by design — rests are part of the composition — so
+   * the pulse the player is keeping cannot be recovered from `cues` alone. The
+   * compiler keeps the grid it already walked rather than making presentation
+   * rebuild it from phase tempos.
+   */
+  readonly beatTimesMs: readonly number[];
 };
 
 export type ResistanceOutcome = "active" | "victory" | "forced-verticalisation";

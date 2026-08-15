@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import episodeContent from "../../../src/play/content/episodes/the-alarm.json";
 import straightAlternationContent from "../../../src/play/content/mechanics/rhythms/straight-alternation.json";
-import { game, mechanics } from "../../../src/play/content/game";
+import { audio, game, mechanics } from "../../../src/play/content/game";
 import { loadEpisode } from "../../../src/play/content/loadEpisode";
 import {
   compileResistanceConfig,
@@ -106,7 +106,7 @@ describe("catalogued resistance composition", () => {
             : interruption,
         ),
       },
-    }, mechanics)).toThrow(/starts during a hold event/);
+    }, mechanics, audio)).toThrow(/starts during a hold event/);
   });
 
   it("keeps The Alarm's curve episode-owned while composing shared rhythms", () => {

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import campaignContent from "../../../src/play/content/campaigns/the-monday-uprising.json";
 import episodeContent from "../../../src/play/content/episodes/the-alarm.json";
-import { game, mechanics } from "../../../src/play/content/game";
+import { audio, game, mechanics } from "../../../src/play/content/game";
 import gameContent from "../../../src/play/content/game.json";
 import { loadEpisode } from "../../../src/play/content/loadEpisode";
 import { loadGame, type ContentModules } from "../../../src/play/content/loadGame";
@@ -18,8 +18,8 @@ const loadTestGame = (
   content: unknown,
   campaigns: ContentModules = campaignModules,
   episodes: ContentModules = episodeModules,
-) => loadGame(content, campaigns, episodes, mechanics);
-const loadTestEpisode = (content: unknown) => loadEpisode(content, mechanics);
+) => loadGame(content, campaigns, episodes, mechanics, audio);
+const loadTestEpisode = (content: unknown) => loadEpisode(content, mechanics, audio);
 
 describe("game content loading", () => {
   it("loads the ordered game, campaign and episode hierarchy", () => {

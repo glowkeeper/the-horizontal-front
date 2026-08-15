@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "machine-tick",
+  "layers": [
+    {
+      "kind": "noise",
+      "filter": "bandpass",
+      "startCutoffHz": 1900,
+      "endCutoffHz": 1500,
+      "resonance": 9,
+      "delayMs": 0,
+      "attackMs": 0,
+      "holdMs": 2,
+      "releaseMs": 24,
+      "gain": 0.12,
+      "pan": 0
+    },
+    {
+      "kind": "tone",
+      "wave": "square",
+      "startFrequencyHz": 620,
+      "endFrequencyHz": 560,
+      "delayMs": 0,
+      "attackMs": 0,
+      "holdMs": 2,
+      "releaseMs": 18,
+      "gain": 0.05,
+      "pan": 0
+    }
+  ]
+}

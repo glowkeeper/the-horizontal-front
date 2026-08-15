@@ -175,6 +175,116 @@ through a `shared` or same-episode reference. The illustration contains no
 story copy and is rendered by the shared illustrated narrative layout. No
 failure, trap-consequence or custom outcome discriminant exists.
 
+## Audio
+
+Every episode selects a soundscape:
+
+```text
+audio:
+  soundscape: shared or same-episode reference
+  cues: optional private cue definitions
+  soundscapes: optional private soundscapes
+```
+
+Sound is synthesised from authored numbers. There are no audio files, no
+samples and no recordings anywhere in the game, which is both an aesthetic
+choice and a provenance one — see [Art direction](art-direction.md) and the
+audio production rules in `AGENTS.md`.
+
+### Roles
+
+A soundscape maps every one of the twenty semantic roles to a cue:
+`count-in`, `beat`, `cue-due-left`, `cue-due-right`, `tap-hit`, `tap-miss`,
+`resistance-strain`, `resistance-ease`, `hold-start`, `hold-release`,
+`hold-broken`, `interruption-warning`, `interruption-input`,
+`interruption-success`, `interruption-failure`, `interruption-return`,
+`management-bluster`, `victory`, `forced-verticalisation` and
+`interface-action`.
+
+All twenty are required. A moment meant to pass quietly is authored as a quiet
+cue rather than left out, so silence is always a decision on record. Adding a
+role is an engine change; deciding what a role sounds like is content.
+
+Three roles carry the rhythm between them. `beat` sounds on every beat of the
+compiled grid, so the apparatus keeps time whether or not the beat asks for
+anything — without it the score falls silent through rests and the player loses
+the pulse. `cue-due-left` and `cue-due-right` accent the beats that do ask,
+replacing the plain tick, so a demand is heard as an accent on the pulse rather
+than a sound layered over it.
+
+The demand is sided because the player has to know which hand to answer with.
+Two roles rather than one panned cue keeps that decision in content: the sides
+should differ in pitch and timbre as well as stereo position, so the
+distinction survives a mono speaker or hearing in one ear. Stereo alone is
+never sufficient.
+
+`resistance-strain` and `resistance-ease` are the bed itself rather than the
+player: they sound when the resistance artwork advances or eases, so the frame
+is heard being hauled up a notch or settling back as ground is won. Judgement
+cues answer the player; these answer Management.
+
+Interruption cancellation is deliberately silent, because the interaction was
+taken away from the player rather than failed by them.
+
+### Cues and layers
+
+A cue has `schemaVersion`, `id` and one to eight `layers`. Each layer is a
+`tone` or a `noise`, and every layer authors `delayMs`, `attackMs`, `holdMs`,
+`releaseMs` and `gain`:
+
+| Field | Meaning |
+| --- | --- |
+| `delayMs` | Start offset within the cue, so one stamp can be a thump with its click just behind it. |
+| `attackMs`, `holdMs`, `releaseMs` | The envelope. Short attack and release read as an impact; longer ones as a hiss or a ring. |
+| `gain` | Layer level from 0 to 1, multiplied by the soundscape's `gain`. |
+| `pan` | Stereo position from -1 to 1. Reinforcement only; never the sole signal. |
+
+A `tone` adds `wave` (`sine`, `square`, `triangle` or `sawtooth`) with
+`startFrequencyHz` and `endFrequencyHz`; equal values hold a pitch, differing
+values sweep. A `noise` adds `filter` (`lowpass`, `highpass` or `bandpass`),
+`startCutoffHz`, `endCutoffHz` and `resonance`. Pitched machinery comes from
+tone; impacts, paper and hiss come from noise. Most convincing cues use both.
+
+Every parameter is bounded and validated. A cue whose layers are all silent, or
+all zero-length, is rejected rather than shipped as an inaudible mystery.
+
+### Ambience
+
+A soundscape also authors one continuously sounding bed:
+
+```text
+ambience:
+  restGain, strainGain   the bed's level at rest and at full intensity
+  responseMs             how quickly it follows a change
+  layers                 one to six sustained tone or noise layers
+```
+
+An ambience layer has no envelope, because it never ends on its own. It has two
+settings of itself instead — a tone gives `restFrequencyHz` and
+`strainFrequencyHz`, a noise gives `restCutoffHz` and `strainCutoffHz` — and
+the engine glides between them as dramatic intensity rises. That movement is
+what makes an episode feel like it is tightening: the office hum climbs in
+pitch, brightens and grows louder as Management gains ground.
+
+The bed only exists while the game is audible. Muted play builds no bed at all,
+and unmuting mid-episode brings it in on the next frame.
+
+### Ownership
+
+Audio follows the same two-level ownership as the rest of the grammar. Shared
+cues and soundscapes live under `audio/` with a catalogue whose entries match
+their filenames exactly. A shared soundscape may reference shared cues only, so
+it stays reusable; an episode soundscape may reference either. An episode cue
+cannot shadow a shared identifier, and no episode can reach another's private
+cues.
+
+### Muting
+
+Muted play is a first-class mode, not a degraded one. Muting changes nothing
+about rules, timing or scoring, and the game creates no audio at all while
+muted. Every essential timing and state signal is available on screen, so
+critical information is never carried by sound alone.
+
 ## Phase capacity
 
 A phase is a window of time, and everything authored into it competes for that

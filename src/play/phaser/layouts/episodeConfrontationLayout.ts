@@ -16,7 +16,7 @@ import {
   selectResistanceStateIndex,
   smoothResistanceAngleDegrees,
 } from "../presentation/resistanceTransition";
-import type { ResistanceLayout } from "./resistanceLayout";
+import type { ResistanceLayout, ResistanceStateListener } from "./resistanceLayout";
 
 // A backgrounded tab reports one enormous frame on return. Clamping the delta
 // keeps time-stepped motion continuous instead of leaping a whole second.
@@ -25,6 +25,7 @@ const MAXIMUM_FRAME_DELTA_MS = 100;
 export function createEpisodeConfrontationLayout(
   scene: Phaser.Scene,
   episode: Episode,
+  onResistanceStateChange?: ResistanceStateListener,
 ): ResistanceLayout {
   const { layout, skin, interruptionSkins } = loadPresentation(episode);
   const { backdrop, anchors, motion } = layout;
@@ -64,6 +65,7 @@ export function createEpisodeConfrontationLayout(
   function transitionToResistance(targetState: number): void {
     if (targetState === activeResistanceState) return;
     const direction = Math.sign(targetState - activeResistanceState);
+    onResistanceStateChange?.(direction > 0 ? 1 : -1);
     const outgoing = resistanceImages[activeResistanceSlot];
     const incomingSlot = 1 - activeResistanceSlot;
     const incoming = resistanceImages[incomingSlot];

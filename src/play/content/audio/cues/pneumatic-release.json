@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "pneumatic-release",
+  "layers": [
+    {
+      "kind": "noise",
+      "filter": "highpass",
+      "startCutoffHz": 3000,
+      "endCutoffHz": 600,
+      "resonance": 1,
+      "delayMs": 0,
+      "attackMs": 2,
+      "holdMs": 30,
+      "releaseMs": 120,
+      "gain": 0.28,
+      "pan": 0
+    },
+    {
+      "kind": "tone",
+      "wave": "triangle",
+      "startFrequencyHz": 400,
+      "endFrequencyHz": 180,
+      "delayMs": 0,
+      "attackMs": 2,
+      "holdMs": 20,
+      "releaseMs": 120,
+      "gain": 0.16,
+      "pan": 0
+    }
+  ]
+}

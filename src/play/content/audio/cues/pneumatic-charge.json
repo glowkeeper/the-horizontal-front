@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "pneumatic-charge",
+  "layers": [
+    {
+      "kind": "noise",
+      "filter": "highpass",
+      "startCutoffHz": 500,
+      "endCutoffHz": 3000,
+      "resonance": 1,
+      "delayMs": 0,
+      "attackMs": 20,
+      "holdMs": 60,
+      "releaseMs": 90,
+      "gain": 0.26,
+      "pan": 0
+    },
+    {
+      "kind": "tone",
+      "wave": "sine",
+      "startFrequencyHz": 220,
+      "endFrequencyHz": 420,
+      "delayMs": 0,
+      "attackMs": 15,
+      "holdMs": 60,
+      "releaseMs": 80,
+      "gain": 0.12,
+      "pan": 0
+    }
+  ]
+}

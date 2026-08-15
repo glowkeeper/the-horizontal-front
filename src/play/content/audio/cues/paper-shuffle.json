@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "paper-shuffle",
+  "layers": [
+    {
+      "kind": "noise",
+      "filter": "highpass",
+      "startCutoffHz": 2200,
+      "endCutoffHz": 3400,
+      "resonance": 1,
+      "delayMs": 0,
+      "attackMs": 3,
+      "holdMs": 14,
+      "releaseMs": 46,
+      "gain": 0.2,
+      "pan": 0
+    }
+  ]
+}

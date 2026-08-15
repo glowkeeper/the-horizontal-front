@@ -123,6 +123,7 @@ export function compileResistanceConfig(
   let startsAtMs = 0;
   const cues: ScoredRhythmCue[] = [];
   const guideEvents: RhythmGuideEvent[] = [];
+  const beatTimesMs: number[] = [];
   const phases = curve.phases.map((phase, phaseIndex) => {
     const rhythm = resolveOwnedDefinition(
       "rhythm",
@@ -139,6 +140,13 @@ export function compileResistanceConfig(
       cues,
       guideEvents,
     );
+    for (
+      let beatAtMs = startsAtMs;
+      beatAtMs < startsAtMs + phase.durationMs;
+      beatAtMs += phase.beatIntervalMs
+    ) {
+      beatTimesMs.push(beatAtMs);
+    }
     const compiled = {
       id: phase.id,
       startsAtMs,
@@ -164,6 +172,7 @@ export function compileResistanceConfig(
     phases,
     cues,
     guideEvents: alignedGuideEvents,
+    beatTimesMs,
   };
 }
 

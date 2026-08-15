@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "id": "office-apparatus",
+  "gain": 0.8,
+  "cues": {
+    "count-in": {
+      "source": "shared",
+      "id": "punch-clock-tick"
+    },
+    "beat": {
+      "source": "shared",
+      "id": "machine-tick"
+    },
+    "cue-due-left": {
+      "source": "shared",
+      "id": "stamp-left"
+    },
+    "cue-due-right": {
+      "source": "shared",
+      "id": "stamp-right"
+    },
+    "tap-hit": {
+      "source": "shared",
+      "id": "typewriter-strike"
+    },
+    "tap-miss": {
+      "source": "shared",
+      "id": "jammed-key"
+    },
+    "resistance-strain": {
+      "source": "shared",
+      "id": "bed-frame-strain"
+    },
+    "resistance-ease": {
+      "source": "shared",
+      "id": "bed-frame-settle"
+    },
+    "hold-start": {
+      "source": "shared",
+      "id": "pneumatic-charge"
+    },
+    "hold-release": {
+      "source": "shared",
+      "id": "pneumatic-release"
+    },
+    "hold-broken": {
+      "source": "shared",
+      "id": "tube-collapse"
+    },
+    "interruption-warning": {
+      "source": "shared",
+      "id": "desk-phone-ring"
+    },
+    "interruption-input": {
+      "source": "shared",
+      "id": "key-press"
+    },
+    "interruption-success": {
+      "source": "shared",
+      "id": "stamp-approved"
+    },
+    "interruption-failure": {
+      "source": "shared",
+      "id": "stamp-rejected"
+    },
+    "interruption-return": {
+      "source": "shared",
+      "id": "carriage-return"
+    },
+    "management-bluster": {
+      "source": "shared",
+      "id": "managerial-rumble"
+    },
+    "victory": {
+      "source": "shared",
+      "id": "clock-off"
+    },
+    "forced-verticalisation": {
+      "source": "shared",
+      "id": "alarm-klaxon"
+    },
+    "interface-action": {
+      "source": "shared",
+      "id": "paper-shuffle"
+    }
+  },
+  "ambience": {
+    "restGain": 0.035,
+    "strainGain": 0.19,
+    "responseMs": 900,
+    "layers": [
+      {
+        "kind": "tone",
+        "wave": "sine",
+        "restFrequencyHz": 42,
+        "strainFrequencyHz": 52,
+        "gain": 0.55,
+        "pan": 0
+      },
+      {
+        "kind": "tone",
+        "wave": "sawtooth",
+        "restFrequencyHz": 84,
+        "strainFrequencyHz": 104,
+        "gain": 0.08,
+        "pan": 0
+      },
+      {
+        "kind": "noise",
+        "filter": "bandpass",
+        "restCutoffHz": 600,
+        "strainCutoffHz": 1500,
+        "resonance": 3,
+        "gain": 0.24,
+        "pan": 0
+      }
+    ]
+  }
+}

@@ -155,6 +155,31 @@ html,
   outline-offset: 3px;
 }
 
+/* Mirrors the exit control at the opposite corner: both are page chrome that
+   stays reachable on every screen, rather than furniture of any one scene. */
+.game-audio-toggle {
+  position: fixed;
+  z-index: 1;
+  top: 0.75rem;
+  right: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid var(--colour-ink-charcoal);
+  color: var(--colour-ink-charcoal);
+  background: var(--colour-paper-white);
+  font: 600 0.875rem/1.2 var(--font-interface);
+  cursor: pointer;
+}
+
+.game-audio-toggle[aria-pressed="true"] {
+  color: var(--colour-paper-white);
+  background: var(--colour-ink-charcoal);
+}
+
+.game-audio-toggle:focus-visible {
+  outline: 3px solid var(--colour-resistance-red);
+  outline-offset: 3px;
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;

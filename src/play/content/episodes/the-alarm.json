@@ -2,6 +2,9 @@
   "schemaVersion": 1,
   "id": "the-alarm",
   "title": "The Alarm",
+  "audio": {
+    "soundscape": { "source": "shared", "id": "office-apparatus" }
+  },
   "definitions": {
     "dramaticCurves": [
       {

@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "bed-frame-strain",
+  "layers": [
+    {
+      "kind": "tone",
+      "wave": "sawtooth",
+      "startFrequencyHz": 88,
+      "endFrequencyHz": 132,
+      "delayMs": 0,
+      "attackMs": 18,
+      "holdMs": 90,
+      "releaseMs": 260,
+      "gain": 0.2,
+      "pan": 0
+    },
+    {
+      "kind": "noise",
+      "filter": "bandpass",
+      "startCutoffHz": 420,
+      "endCutoffHz": 900,
+      "resonance": 11,
+      "delayMs": 0,
+      "attackMs": 14,
+      "holdMs": 110,
+      "releaseMs": 240,
+      "gain": 0.22,
+      "pan": 0
+    }
+  ]
+}

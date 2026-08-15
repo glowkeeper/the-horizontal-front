@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "id": "managerial-rumble",
+  "layers": [
+    {
+      "kind": "tone",
+      "wave": "sawtooth",
+      "startFrequencyHz": 96,
+      "endFrequencyHz": 132,
+      "delayMs": 0,
+      "attackMs": 30,
+      "holdMs": 220,
+      "releaseMs": 180,
+      "gain": 0.3,
+      "pan": 0
+    },
+    {
+      "kind": "tone",
+      "wave": "square",
+      "startFrequencyHz": 68,
+      "endFrequencyHz": 84,
+      "delayMs": 40,
+      "attackMs": 30,
+      "holdMs": 200,
+      "releaseMs": 160,
+      "gain": 0.18,
+      "pan": 0
+    },
+    {
+      "kind": "noise",
+      "filter": "lowpass",
+      "startCutoffHz": 600,
+      "endCutoffHz": 260,
+      "resonance": 5,
+      "delayMs": 0,
+      "attackMs": 25,
+      "holdMs": 230,
+      "releaseMs": 170,
+      "gain": 0.16,
+      "pan": 0
+    }
+  ]
+}

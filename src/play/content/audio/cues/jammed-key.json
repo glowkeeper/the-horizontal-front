@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "jammed-key",
+  "layers": [
+    {
+      "kind": "noise",
+      "filter": "lowpass",
+      "startCutoffHz": 900,
+      "endCutoffHz": 260,
+      "resonance": 3,
+      "delayMs": 0,
+      "attackMs": 1,
+      "holdMs": 20,
+      "releaseMs": 130,
+      "gain": 0.36,
+      "pan": 0
+    },
+    {
+      "kind": "tone",
+      "wave": "sawtooth",
+      "startFrequencyHz": 150,
+      "endFrequencyHz": 96,
+      "delayMs": 0,
+      "attackMs": 1,
+      "holdMs": 24,
+      "releaseMs": 150,
+      "gain": 0.26,
+      "pan": 0
+    }
+  ]
+}

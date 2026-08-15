@@ -63,6 +63,26 @@ test("the public landing page has no accessibility violations", async ({ page })
   await expectNoViolations(page, "landing page");
 });
 
+test("the sound library is reachable, operable and free of violations", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("navigation", { name: "Primary navigation" })
+    .getByRole("link", { name: "Sound" }).click();
+  await expect(page).toHaveURL(/\/sound\/$/);
+  await expectNoViolations(page, "sound library");
+
+  // Every cue in the shared library is offered as a real control.
+  const cues = page.locator("#cue-list button");
+  expect(await cues.count()).toBeGreaterThan(0);
+
+  const ambience = page.getByRole("button", { name: /the hum/i });
+  await expect(ambience).toHaveAttribute("aria-pressed", "false");
+  await ambience.click();
+  await expect(ambience).toHaveAttribute("aria-pressed", "true");
+
+  const intensity = page.getByRole("slider", { name: /dramatic intensity/i });
+  await expect(intensity).toBeVisible();
+});
+
 test("every game screen exposes its chrome to assistive technology", async ({ page }) => {
   await page.goto("/play/");
 
@@ -70,6 +90,7 @@ test("every game screen exposes its chrome to assistive technology", async ({ pa
   await expectNoViolations(page, "campaigns");
   expect(await reachableControls(page)).toEqual([
     "link: Return to the Front",
+    "button: Mute sound",
     "button: THE MONDAY UPRISING. MONDAY. DAWN.",
   ]);
 
@@ -78,6 +99,7 @@ test("every game screen exposes its chrome to assistive technology", async ({ pa
   await expectNoViolations(page, "campaign briefing");
   expect(await reachableControls(page)).toEqual([
     "link: Return to the Front",
+    "button: Mute sound",
     "button: PLAY. The Alarm",
   ]);
 
@@ -87,7 +109,7 @@ test("every game screen exposes its chrome to assistive technology", async ({ pa
   expect(
     await reachableControls(page),
     "the confrontation must not expose chrome while the player is resisting",
-  ).toEqual(["link: Return to the Front"]);
+  ).toEqual(["link: Return to the Front", "button: Mute sound"]);
 
   await page.waitForTimeout(openingCountInSettlingMs);
   for (let attempt = 0; attempt < unsuccessfulInputCount; attempt += 1) {
@@ -97,6 +119,7 @@ test("every game screen exposes its chrome to assistive technology", async ({ pa
   await expectNoViolations(page, "episode outcome");
   expect(await reachableControls(page)).toEqual([
     "link: Return to the Front",
+    "button: Mute sound",
     "button: TRY AGAIN",
     "button: ACCEPT OUTCOME",
   ]);

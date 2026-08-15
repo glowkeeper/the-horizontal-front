@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import episodeContent from "../../../src/play/content/episodes/the-alarm.json";
-import { game, mechanics } from "../../../src/play/content/game";
+import { audio, game, mechanics } from "../../../src/play/content/game";
 import { loadEpisode } from "../../../src/play/content/loadEpisode";
 import { loadPresentation } from "../../../src/play/content/loadPresentation";
 import { sharedDramaticCurveSchema } from "../../../src/play/content/schemas/mechanicsSchema";
@@ -49,7 +49,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function load(content: unknown = episodeContent) {
-  return loadEpisode(content, mechanics);
+  return loadEpisode(content, mechanics, audio);
 }
 
 describe("minimum validated episode grammar", () => {
@@ -75,7 +75,7 @@ describe("minimum validated episode grammar", () => {
     );
     const definitionsFree = episodeWithoutFrom(minimal, ["definitions"]);
     const content = episodeWithoutFrom(definitionsFree, ["confrontation", "interruptions"]);
-    expect(loadEpisode(content, sharedMechanics).confrontation.interruptions).toEqual([]);
+    expect(loadEpisode(content, sharedMechanics, audio).confrontation.interruptions).toEqual([]);
     expect(() => load(withoutDefinitions)).toThrow(/unknown episode dramatic curve/);
     expect(load(withoutInterruptions).confrontation.interruptions).toEqual([]);
   });

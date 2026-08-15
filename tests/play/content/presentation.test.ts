@@ -27,7 +27,7 @@ import {
 } from "../../../src/play/content/schemas/presentationSchema";
 import { assertSensiblePresentation } from "../../../src/play/content/validatePresentation";
 import { assertSensibleIllustratedPanel } from "../../../src/play/content/validateIllustratedPanel";
-import { game, mechanics } from "../../../src/play/content/game";
+import { audio, game, mechanics } from "../../../src/play/content/game";
 
 const layout = resistanceLayoutSchema.parse(layoutContent);
 const skin = resistanceSkinSchema.parse(skinContent);
@@ -156,7 +156,7 @@ describe("presentation content", () => {
           skin: { source: "shared", id: "the-alarm-bedroom" },
         },
       },
-    }, mechanics);
+    }, mechanics, audio);
     expect(() => loadPresentation(wrongSource))
       .toThrow(/Missing shared presentation skin/);
   });
@@ -175,7 +175,7 @@ describe("presentation content", () => {
           } : interruption,
         ),
       },
-    }, mechanics);
+    }, mechanics, audio);
     expect(() => loadPresentation(wrongSource))
       .toThrow(/Missing episode interruption skin/);
   });
@@ -247,7 +247,7 @@ describe("presentation content", () => {
           ),
         }],
       },
-    }, mechanics);
+    }, mechanics, audio);
     expect(() => loadPresentation(tooWide)).toThrow(/cannot display.*timing tolerance/);
   });
 
@@ -260,7 +260,7 @@ describe("presentation content", () => {
           (interruption) => ({ ...interruption, returnCountInBeats: 1 }),
         ),
       },
-    }, mechanics);
+    }, mechanics, audio);
     expect(() => assertVisibleInterruptionReturns(insufficientReturn, layout))
       .toThrow(/complete approach/);
   });

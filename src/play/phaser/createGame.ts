@@ -29,6 +29,14 @@ export function createGame(container: HTMLElement): Phaser.Game {
       roundPixels: false,
     },
 
+    // The game synthesises its own score through a single shared audio device,
+    // and never loads or plays a sound through Phaser. Leaving Phaser's sound
+    // manager enabled would open a second audio context for nothing, against a
+    // limit browsers actually enforce.
+    audio: {
+      noAudio: true,
+    },
+
     scene: [
       BootScene,
       CampaignsScene,

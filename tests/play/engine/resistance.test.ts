@@ -40,6 +40,7 @@ const config: ResistanceConfig = {
     { action: "tap", side: "right", atMs: 1_000, timingWindowMs: 100, endsAtMs: 1_100, phaseIndex: 0 },
     { action: "hold", side: "left", atMs: 2_500, timingWindowMs: 100, releaseAtMs: 3_000, endsAtMs: 3_100, phaseIndex: 1 },
   ],
+  beatTimesMs: [],
 };
 
 describe("resistance engine", () => {
@@ -63,6 +64,7 @@ describe("resistance engine", () => {
       ...config,
       cues: [],
       guideEvents: [],
+      beatTimesMs: [],
     };
     const initial = createResistance(exposed);
     const protectedResistance: Resistance = {
@@ -225,6 +227,7 @@ describe("resistance engine", () => {
       startingSafety: 0.1,
       cues: [],
       guideEvents: [],
+      beatTimesMs: [],
     };
     const result = advanceResistance(createResistance(dangerous), 2_000);
     expect(result.state.outcome).toBe("forced-verticalisation");

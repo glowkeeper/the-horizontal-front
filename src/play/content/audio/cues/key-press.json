@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "key-press",
+  "layers": [
+    {
+      "kind": "noise",
+      "filter": "bandpass",
+      "startCutoffHz": 3000,
+      "endCutoffHz": 2200,
+      "resonance": 7,
+      "delayMs": 0,
+      "attackMs": 0,
+      "holdMs": 3,
+      "releaseMs": 28,
+      "gain": 0.26,
+      "pan": 0
+    },
+    {
+      "kind": "tone",
+      "wave": "square",
+      "startFrequencyHz": 900,
+      "endFrequencyHz": 760,
+      "delayMs": 0,
+      "attackMs": 0,
+      "holdMs": 3,
+      "releaseMs": 26,
+      "gain": 0.1,
+      "pan": 0
+    }
+  ]
+}

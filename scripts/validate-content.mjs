@@ -14,7 +14,7 @@ try {
   );
   for (const episode of game.episodes) loadPresentation(episode);
   console.log(
-    `Validated ${game.campaigns.length} campaign(s) and ${game.episodes.length} episode(s), including mechanics and presentation.`,
+    `Validated ${game.campaigns.length} campaign(s) and ${game.episodes.length} episode(s), including mechanics, presentation and audio.`,
   );
 } catch (error) {
   if (error instanceof z.ZodError) {

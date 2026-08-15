@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { audioCueSchema, audioSoundscapeSchema } from "./audioSchema";
 import { contentIdSchema } from "./gameSchema";
 import {
   episodeMechanicDefinitionsSchema,
@@ -97,6 +98,16 @@ export const episodeSchema = z
     id: contentIdSchema,
     title: z.string().trim().min(1),
     definitions: episodeMechanicDefinitionsSchema.optional(),
+    // Audio spans the whole episode, outcomes included, so it sits beside the
+    // confrontation rather than inside it. Private cues and soundscapes follow
+    // the same two-level ownership as every other episode-owned definition.
+    audio: z
+      .object({
+        soundscape: ownedContentReferenceSchema,
+        cues: z.array(audioCueSchema).default([]),
+        soundscapes: z.array(audioSoundscapeSchema).default([]),
+      })
+      .strict(),
     confrontation: z
       .object({
         resistance: resistanceCompositionSchema,
