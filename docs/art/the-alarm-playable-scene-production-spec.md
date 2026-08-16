@@ -142,6 +142,38 @@ Intensity must not encode the final outcome. Victory and forced
 verticalisation remain explicit engine outcomes with their own authored
 narrative illustrations.
 
+### Current implementation against this table
+
+The layered incursion above was produced as a single composite `office-incursion`
+cut-out rather than the separate wedge, cable, paperwork-density and console
+layers it describes. Until 16 August 2026 that one layer carried the whole
+progression through its alpha, ramping `0` to `0.9` — which meant solid brass
+apparatus was rendered semi-transparent for the entire episode, and the bedroom
+showed through the pipework. The maintainer saw this in play and it was changed:
+the layer now holds one constant near-opaque alpha and arrives by sliding, so
+encroachment is a physical advance rather than a fade. It rests with a narrow
+leading edge already on screen, matching this table's "small cold edge and idle
+apparatus" at low intensity, and travels left as intensity rises.
+
+The alpha is held at `0.94` rather than `1`, equal at rest and at danger so it
+never reads as a fade. That is a deliberate hair of translucency, accepted by the
+maintainer by eye: enough for the room to persist faintly behind the apparatus,
+honouring this specification's requirement that the office never completely
+replaces the bedroom, while far too little to make solid brass look see-through.
+
+The multi-layer design is not lost work and needs no engine expansion:
+`environment.intensityParts` is already a list, and each entry authors its own
+alphas and offsets. Producing the densities as separate assets would let them
+enter at different intensities, which is what this table actually describes.
+That remains outstanding artwork rather than outstanding code.
+
+One tension to watch by eye: an opaque layer at full advance covers considerably
+more of the room than a 0.9 ghost did, and this specification requires that the
+office never *completely* replaces the bedroom and that a warm pool survives
+around the bed. If the crisis phase reads as a scene change rather than an
+invaded bedroom, the fix is the arrival offset or the artwork's extent, not a
+return to transparency.
+
 ## Motion grammar and pivots
 
 - protagonist breathing: restrained torso and duvet movement, never sleepiness;

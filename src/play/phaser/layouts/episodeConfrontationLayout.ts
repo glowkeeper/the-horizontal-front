@@ -12,6 +12,7 @@ import {
 import { getResistancePresentation } from "../presentation/resistancePresentation";
 import {
   getResistanceAngleDegrees,
+  holdPeakStateIndex,
   resolveResistanceTransition,
   selectResistanceStateIndex,
   smoothResistanceAngleDegrees,
@@ -127,9 +128,33 @@ export function createEpisodeConfrontationLayout(
     reducedMotion,
   );
   let actorStrainPhase = 0;
+  // The authored parts already carry the first state's drawings, so the peak
+  // starts there and only ever climbs. A retry rebuilds this layout, which
+  // resets the ratchet for the new attempt.
+  let activeActorState = 0;
   const opposingActorParts = skin.confrontation.opposingActor.parts.map((part) =>
     createShape(scene, part));
-  opposingActor.add(opposingActorParts);
+  // One transparent twin per image part. A pose change hands the twin the
+  // drawing being left behind and dissolves it out as the original fades in, so
+  // the actor changes drawing rather than snapping between them. Parts with no
+  // texture to swap get no twin.
+  const opposingActorFadeParts = skin.confrontation.opposingActor.parts.map((part) => {
+    if (part.shape !== "image") return null;
+    const twin = createShape(scene, part);
+    return twin instanceof Phaser.GameObjects.Image ? twin.setAlpha(0) : null;
+  });
+  // Each twin sits directly above its own part rather than above the whole
+  // figure, so an actor drawn from several overlapping parts still composites in
+  // the authored order while a dissolve is running.
+  opposingActorParts.forEach((part, index) => {
+    opposingActor.add(part);
+    const twin = opposingActorFadeParts[index];
+    if (twin) opposingActor.add(twin);
+  });
+  const actorTransition = skin.confrontation.opposingActor.transition;
+  const actorCrossfadeMs = reducedMotion
+    ? skin.confrontation.opposingActor.reducedMotion.crossfadeDurationMs
+    : actorTransition.crossfadeDurationMs;
   const typography = skin.confrontation.typography;
   opposingActor.add(
     scene.add.text(
@@ -209,18 +234,54 @@ export function createEpisodeConfrontationLayout(
         anchors.opposingActor.x + strainOffset.x,
         anchors.opposingActor.y + strainOffset.y,
       );
-      const actorState = [...skin.confrontation.opposingActor.states]
-        .reverse()
-        .find(({ minimumIntensity }) => dramaticIntensity >= minimumIntensity);
-      actorState?.assets.forEach(({ partId, asset }) => {
-        const partIndex = skin.confrontation.opposingActor.parts.findIndex(({ id }) => id === partId);
-        const authoredPart = skin.confrontation.opposingActor.parts[partIndex];
-        const renderedPart = opposingActorParts[partIndex];
-        if (authoredPart?.shape === "image" && renderedPart instanceof Phaser.GameObjects.Image) {
-          renderedPart.setTexture(asset.id)
-            .setDisplaySize(authoredPart.width, authoredPart.height);
-        }
-      });
+      // The actor reads the same physical danger as the resistance it is acting
+      // upon, so its effort is visibly the cause of the lift rather than a
+      // separate performance running on its own clock.
+      const actorPeak = holdPeakStateIndex(
+        activeActorState,
+        selectResistanceStateIndex(physicalDanger, skin.confrontation.opposingActor.states),
+      );
+      if (actorPeak !== activeActorState) {
+        activeActorState = actorPeak;
+        skin.confrontation.opposingActor.states[actorPeak].assets.forEach(({ partId, asset }) => {
+          const partIndex = skin.confrontation.opposingActor.parts
+            .findIndex(({ id }) => id === partId);
+          const authoredPart = skin.confrontation.opposingActor.parts[partIndex];
+          const renderedPart = opposingActorParts[partIndex];
+          if (authoredPart?.shape !== "image"
+            || !(renderedPart instanceof Phaser.GameObjects.Image)) return;
+          const outgoing = opposingActorFadeParts[partIndex];
+          if (!outgoing || actorCrossfadeMs === 0) {
+            renderedPart.setTexture(asset.id)
+              .setDisplaySize(authoredPart.width, authoredPart.height)
+              .setAlpha(1);
+            return;
+          }
+          // A second change can arrive mid-dissolve, so the twin takes whatever
+          // the part is showing right now rather than assuming the previous
+          // state's drawing.
+          scene.tweens.killTweensOf(renderedPart);
+          scene.tweens.killTweensOf(outgoing);
+          outgoing
+            .setTexture(renderedPart.texture.key)
+            .setDisplaySize(authoredPart.width, authoredPart.height)
+            .setAlpha(1);
+          renderedPart
+            .setTexture(asset.id)
+            .setDisplaySize(authoredPart.width, authoredPart.height)
+            .setAlpha(0);
+          addTween(scene, outgoing, {
+            alpha: 0,
+            duration: actorCrossfadeMs,
+            ease: actorTransition.ease,
+          });
+          addTween(scene, renderedPart, {
+            alpha: 1,
+            duration: actorCrossfadeMs,
+            ease: actorTransition.ease,
+          });
+        });
+      }
     },
 
     animateVictory(): void {

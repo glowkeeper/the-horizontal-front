@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   getResistanceAngleDegrees,
+  holdPeakStateIndex,
   resolveResistanceTransition,
   selectResistanceStateIndex,
   smoothResistanceAngleDegrees,
@@ -23,6 +24,19 @@ describe("resistance-state transitions", () => {
     expect(selectResistanceStateIndex(1, states)).toBe(3);
     expect(selectResistanceStateIndex(2, states)).toBe(3);
     expect(selectResistanceStateIndex(0.4, states)).toBe(1);
+  });
+
+  it("holds an opposing actor at its greatest exertion as danger falls back", () => {
+    // The same danger the bed reads, ratcheted: rising danger advances the pose,
+    // falling danger leaves it where it got to.
+    const reached = [0.1, 0.3, 0.62, 0.4, 0.95, 0.2].reduce(
+      (peak, danger) => holdPeakStateIndex(peak, selectResistanceStateIndex(danger, states)),
+      0,
+    );
+    expect(reached).toBe(3);
+    expect(holdPeakStateIndex(2, 0)).toBe(2);
+    expect(holdPeakStateIndex(2, 3)).toBe(3);
+    expect(holdPeakStateIndex(0, 0)).toBe(0);
   });
 
   it("rotates continuously with clamped physical danger", () => {

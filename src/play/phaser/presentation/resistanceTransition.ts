@@ -26,6 +26,13 @@ export function selectResistanceStateIndex(
   return 0;
 }
 
+// An opposing actor holds whatever effort it has reached. Someone straining at a
+// lever does not visibly relax the instant the load lightens, and the held pose
+// is what makes sustained exertion legible across a finite set of drawings.
+export function holdPeakStateIndex(previousPeak: number, candidate: number): number {
+  return Math.max(previousPeak, candidate);
+}
+
 export function getResistanceAngleDegrees(
   physicalDanger: number,
   dangerAngleDegrees: number,

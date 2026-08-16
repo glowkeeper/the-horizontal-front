@@ -61,8 +61,11 @@ angle alone communicates the lift.
   production sheets; accepted forced-verticalisation debrief illustration.
 - Edits: each sheet copied without alteration into the concept archive.
 - Runtime status: four registered derivatives are catalogued and selected by
-  the episode-owned presentation skin; they remain `prototype-placeholder`
-  pending integrated perceptual review and human refinement.
+  the episode-owned presentation skin. The maintainer accepted the bed animation
+  in play on 16 August 2026 and they are catalogued `production-approved`.
+  They depict the protagonist and were therefore approved as identity-critical
+  work without a human repainting pass, a deliberate decision recorded on
+  issue #22 and published as a known limitation on issue #21.
 
 The corrected production prompt requested one fixed-camera 2×2 sheet containing
 four successive full-scene states. It repeatedly fixed the prototype map:

@@ -5,7 +5,7 @@
       "id": "monday-uprising-briefing",
       "file": "campaigns/the-monday-uprising/briefing.png",
       "origin": "ai-generated",
-      "status": "prototype-placeholder",
+      "status": "production-approved",
       "creator": "OpenAI image generation tool, directed by the project maintainer and Codex",
       "generatedAt": "2026-08-14",
       "generationTool": "OpenAI built-in image generation (gpt-image-2)",
@@ -15,13 +15,13 @@
         "Copied without cropping into the campaign-owned presentation assets directory; the generic renderer applies a non-destructive cover crop."
       ],
       "licence": "CC-BY-SA-4.0",
-      "replacementStatus": "First-draft campaign artwork awaiting integrated human perceptual review and substantial human refinement before production approval."
+      "replacementStatus": "Production-approved on 16 August 2026. The maintainer perceptually accepted this illustration in its player-facing campaign briefing scene in an earlier session. AI-generated under maintainer art direction and integrated without a human repainting pass, so its human authorship is thin; that is recorded as a known limitation of this release rather than resolved."
     },
     {
       "id": "monday-uprising-debriefing",
       "file": "campaigns/the-monday-uprising/debriefing.png",
       "origin": "ai-generated",
-      "status": "prototype-placeholder",
+      "status": "production-approved",
       "creator": "OpenAI image generation tool, directed by the project maintainer and Codex",
       "generatedAt": "2026-08-14",
       "generationTool": "OpenAI built-in image generation (gpt-image-2)",
@@ -31,13 +31,13 @@
         "Copied without cropping into the campaign-owned presentation assets directory; the generic renderer applies a non-destructive cover crop."
       ],
       "licence": "CC-BY-SA-4.0",
-      "replacementStatus": "First-draft campaign artwork awaiting integrated human perceptual review, tally-neutrality review and substantial human refinement before production approval."
+      "replacementStatus": "Production-approved on 16 August 2026. The maintainer perceptually accepted this illustration in its player-facing campaign debriefing scene, including its neutrality with respect to the computed episodes-held tally, in an earlier session. AI-generated under maintainer art direction and integrated without a human repainting pass, so its human authorship is thin; that is recorded as a known limitation of this release rather than resolved."
     },
     {
       "id": "the-alarm-victory",
       "file": "episodes/the-alarm/victory.png",
       "origin": "ai-generated",
-      "status": "prototype-placeholder",
+      "status": "production-approved",
       "creator": "OpenAI image generation tool, directed by the project maintainer and Codex",
       "generatedAt": "2026-08-14",
       "generationTool": "OpenAI built-in image generation (gpt-image-2)",
@@ -47,13 +47,13 @@
         "Copied without cropping into the episode-owned presentation assets directory; the generic renderer applies a non-destructive cover crop."
       ],
       "licence": "CC-BY-SA-4.0",
-      "replacementStatus": "First-draft episode artwork awaiting integrated human perceptual review and substantial human refinement before production approval."
+      "replacementStatus": "Production-approved on 16 August 2026. The maintainer perceptually accepted this illustration in its player-facing victory result scene in an earlier session. AI-generated under maintainer art direction and integrated without a human repainting pass, so its human authorship is thin; that is recorded as a known limitation of this release rather than resolved."
     },
     {
       "id": "the-alarm-forced-verticalisation",
       "file": "episodes/the-alarm/forced-verticalisation.png",
       "origin": "ai-generated",
-      "status": "prototype-placeholder",
+      "status": "production-approved",
       "creator": "OpenAI image generation tool, directed by the project maintainer and Codex",
       "generatedAt": "2026-08-14",
       "generationTool": "OpenAI built-in image generation (gpt-image-2)",
@@ -63,13 +63,13 @@
         "Copied without cropping into the episode-owned presentation assets directory; the generic renderer applies a non-destructive cover crop."
       ],
       "licence": "CC-BY-SA-4.0",
-      "replacementStatus": "First-draft episode artwork awaiting integrated human perceptual review and substantial human refinement before production approval."
+      "replacementStatus": "Production-approved on 16 August 2026. The maintainer perceptually accepted this illustration in its player-facing forced-verticalisation result scene in an earlier session. AI-generated under maintainer art direction and integrated without a human repainting pass, so its human authorship is thin; that is recorded as a known limitation of this release rather than resolved."
     },
     {
       "id": "bedroom-base",
       "file": "episodes/the-alarm/environment/bedroom-base.png",
       "origin": "ai-generated",
-      "status": "prototype-placeholder",
+      "status": "production-approved",
       "creator": "OpenAI image generation tool, directed by the project maintainer and Codex",
       "generatedAt": "2026-08-14",
       "generationTool": "OpenAI built-in image generation (gpt-image-2)",
@@ -78,13 +78,13 @@
         "Copied without cropping into the episode-owned environment directory."
       ],
       "licence": "CC-BY-SA-4.0",
-      "replacementStatus": "First-draft episode artwork awaiting integrated human perceptual review and human refinement before production approval."
+      "replacementStatus": "Production-approved on 16 August 2026 following the maintainer's perceptual acceptance of the integrated confrontation in play. AI-generated under maintainer art direction and integrated without a human repainting pass, so its human authorship is thin; that is recorded as a known limitation of this release rather than resolved."
     },
     {
       "id": "office-incursion",
       "file": "episodes/the-alarm/environment/office-incursion.png",
       "origin": "ai-generated",
-      "status": "prototype-placeholder",
+      "status": "production-approved",
       "creator": "OpenAI image generation tool, directed by the project maintainer and Codex",
       "generatedAt": "2026-08-14",
       "generationTool": "OpenAI built-in image generation (gpt-image-2), local chroma-key removal",
@@ -94,13 +94,13 @@
         "Preserved the full 16:9 overlay alignment without cropping."
       ],
       "licence": "CC-BY-SA-4.0",
-      "replacementStatus": "First-draft episode artwork awaiting integrated human perceptual review and human refinement before production approval."
+      "replacementStatus": "Production-approved on 16 August 2026 following the maintainer's perceptual acceptance of the integrated confrontation in play, including the change from an alpha ramp to a near-opaque sliding arrival that suits its cut-out construction. AI-generated under maintainer art direction and integrated without a human repainting pass, so its human authorship is thin; that is recorded as a known limitation of this release rather than resolved."
     },
     {
       "id": "management-rest-pose",
       "file": "episodes/the-alarm/characters/management/management-rest-pose.png",
       "origin": "ai-generated",
-      "status": "prototype-placeholder",
+      "status": "production-approved",
       "creator": "OpenAI image generation tool, directed by the project maintainer and Codex",
       "generatedAt": "2026-08-14",
       "generationTool": "OpenAI built-in image generation (gpt-image-2), local chroma-key removal",
@@ -111,13 +111,13 @@
         "Resampled from 1122x1402 to 680x850, twice the authored part size, because the canvas backing store is fixed at the design resolution. The full-resolution master is preserved outside the shipped tree."
       ],
       "licence": "CC-BY-SA-4.0",
-      "replacementStatus": "First-draft no-exertion Management state awaiting integrated maintainer perceptual acceptance and human refinement before production approval."
+      "replacementStatus": "Production-approved on 16 August 2026 following the maintainer's perceptual acceptance of the four-state progression in play. Management is the recurring boss and therefore identity-critical work approved without the human refinement pass that AGENTS.md and issue #22 prefer; that decision and its reasoning are recorded on issue #22. The riveted console is nominally fixed furniture but is redrawn by the generator in each state, its plinth measuring between 152 and 158 pixels across the four; position was registered by translation, the drawn object itself was not reconciled. AI-generated under maintainer art direction and integrated without a human repainting pass, so its human authorship is thin; that is recorded as a known limitation of this release rather than resolved."
     },
     {
       "id": "management-early-pressure-pose",
       "file": "episodes/the-alarm/characters/management/management-early-pressure-pose.png",
       "origin": "ai-generated",
-      "status": "prototype-placeholder",
+      "status": "production-approved",
       "creator": "OpenArt AI image generation, directed by the project maintainer and Claude",
       "generatedAt": "2026-08-15",
       "generationTool": "OpenArt AI MCP connector, GPT Image 2 image-to-image at 1344x1680 on a flat chroma field, local chroma-key removal and registration",
@@ -129,13 +129,13 @@
         "Resampled from 1344x1680 to 680x850, twice the authored part size, because the canvas backing store is fixed at the design resolution. The full-resolution master is preserved outside the shipped tree."
       ],
       "licence": "CC-BY-SA-4.0",
-      "replacementStatus": "First-draft early-effort Management state awaiting integrated maintainer perceptual acceptance and human refinement before production approval."
+      "replacementStatus": "Production-approved on 16 August 2026 following the maintainer's perceptual acceptance of the four-state progression in play. Identity-critical work approved without a human refinement pass, as recorded on issue #22. The riveted console is nominally fixed furniture but is redrawn by the generator in each state, its plinth measuring between 152 and 158 pixels across the four; position was registered by translation, the drawn object itself was not reconciled. AI-generated under maintainer art direction and integrated without a human repainting pass, so its human authorship is thin; that is recorded as a known limitation of this release rather than resolved."
     },
     {
       "id": "management-high-pressure-pose",
       "file": "episodes/the-alarm/characters/management/management-high-pressure-pose.png",
       "origin": "ai-generated",
-      "status": "prototype-placeholder",
+      "status": "production-approved",
       "creator": "OpenArt AI image generation, directed by the project maintainer and Claude",
       "generatedAt": "2026-08-15",
       "generationTool": "OpenArt AI MCP connector, GPT Image 2 image-to-image at 1344x1680 on a flat chroma field, local chroma-key removal and registration",
@@ -147,13 +147,13 @@
         "Resampled from 1344x1680 to 680x850, twice the authored part size, because the canvas backing store is fixed at the design resolution. The full-resolution master is preserved outside the shipped tree."
       ],
       "licence": "CC-BY-SA-4.0",
-      "replacementStatus": "First-draft sustained-effort Management state awaiting integrated maintainer perceptual acceptance and human refinement before production approval."
+      "replacementStatus": "Production-approved on 16 August 2026 following the maintainer's perceptual acceptance of the four-state progression in play. Identity-critical work approved without a human refinement pass, as recorded on issue #22. The riveted console is nominally fixed furniture but is redrawn by the generator in each state, its plinth measuring between 152 and 158 pixels across the four; position was registered by translation, the drawn object itself was not reconciled. AI-generated under maintainer art direction and integrated without a human repainting pass, so its human authorship is thin; that is recorded as a known limitation of this release rather than resolved."
     },
     {
       "id": "management-lifting-pose",
       "file": "episodes/the-alarm/characters/management/management-lifting-pose.png",
       "origin": "ai-generated",
-      "status": "prototype-placeholder",
+      "status": "production-approved",
       "creator": "OpenAI image generation tool, directed by the project maintainer and Codex",
       "generatedAt": "2026-08-14",
       "generationTool": "OpenAI built-in image generation (gpt-image-2), local chroma-key removal",
@@ -161,16 +161,17 @@
       "edits": [
         "Removed the chroma field locally with a soft matte and despill.",
         "Preserved the displaced connected lever, braced stance and sweat as the authored exertion state.",
-        "Resampled from 1122x1402 to 680x850, twice the authored part size, because the canvas backing store is fixed at the design resolution. The full-resolution master is preserved outside the shipped tree."
+        "Resampled from 1122x1402 to 680x850, twice the authored part size, because the canvas backing store is fixed at the design resolution. The full-resolution master is preserved outside the shipped tree.",
+        "Registered the fixed apparatus on 16 August 2026 by translating the drawing 13 pixels left and 36 pixels up, bringing its console into line with the other three states after the maintainer saw the remaining jump in play. The drawing itself is untouched; this is a whole-canvas translation with no repainting, resampling or recolouring."
       ],
       "licence": "CC-BY-SA-4.0",
-      "replacementStatus": "First-draft lifting-and-sweat Management state awaiting integrated maintainer perceptual acceptance and human refinement before production approval."
+      "replacementStatus": "Production-approved on 16 August 2026 following the maintainer's perceptual acceptance of the four-state progression in play, after its console was registered to match the other three states. Identity-critical work approved without a human refinement pass, as recorded on issue #22. The riveted console is nominally fixed furniture but is redrawn by the generator in each state, its plinth measuring between 152 and 158 pixels across the four; position was registered by translation, the drawn object itself was not reconciled. AI-generated under maintainer art direction and integrated without a human repainting pass, so its human authorship is thin; that is recorded as a known limitation of this release rather than resolved."
     },
     {
       "id": "the-alarm-resistance-states-rest",
       "file": "episodes/the-alarm/resistance-states/rest.png",
       "origin": "ai-generated",
-      "status": "prototype-placeholder",
+      "status": "production-approved",
       "creator": "OpenArt AI image generation, directed by the project maintainer",
       "generatedAt": "2026-08-15",
       "generationTool": "OpenArt AI, 4096x4096 four-quadrant sheet on a flat chroma field, local chroma-key removal and registration",
@@ -184,13 +185,13 @@
         "Left the drawn angle intact. The artwork carries the lift and the engine keeps only a small continuous creep, so no state was resampled by rotation."
       ],
       "licence": "CC-BY-SA-4.0",
-      "replacementStatus": "Second-generation resistance states with corrected and measured geometry: timber frame length varies 0.2 percent across the four and the foot pivot is identical in all of them. Awaiting maintainer perceptual acceptance before production approval."
+      "replacementStatus": "Production-approved on 16 August 2026 following the maintainer's perceptual acceptance of the bed animation in play. Second-generation resistance states with corrected and measured geometry: timber frame length varies 0.2 percent across the four and the foot pivot is identical in all of them. These states depict the protagonist and are therefore identity-critical work approved without the human refinement pass that AGENTS.md and issue #22 prefer; that decision and its reasoning are recorded on issue #22. AI-generated under maintainer art direction and integrated without a human repainting pass, so its human authorship is thin; that is recorded as a known limitation of this release rather than resolved."
     },
     {
       "id": "the-alarm-resistance-states-early-pressure",
       "file": "episodes/the-alarm/resistance-states/early-pressure.png",
       "origin": "ai-generated",
-      "status": "prototype-placeholder",
+      "status": "production-approved",
       "creator": "OpenArt AI image generation, directed by the project maintainer",
       "generatedAt": "2026-08-15",
       "generationTool": "OpenArt AI, 4096x4096 four-quadrant sheet on a flat chroma field, local chroma-key removal and registration",
@@ -204,13 +205,13 @@
         "Left the drawn angle intact. The artwork carries the lift and the engine keeps only a small continuous creep, so no state was resampled by rotation."
       ],
       "licence": "CC-BY-SA-4.0",
-      "replacementStatus": "Second-generation resistance states with corrected and measured geometry: timber frame length varies 0.2 percent across the four and the foot pivot is identical in all of them. Awaiting maintainer perceptual acceptance before production approval."
+      "replacementStatus": "Production-approved on 16 August 2026 following the maintainer's perceptual acceptance of the bed animation in play. Second-generation resistance states with corrected and measured geometry: timber frame length varies 0.2 percent across the four and the foot pivot is identical in all of them. These states depict the protagonist and are therefore identity-critical work approved without the human refinement pass that AGENTS.md and issue #22 prefer; that decision and its reasoning are recorded on issue #22. AI-generated under maintainer art direction and integrated without a human repainting pass, so its human authorship is thin; that is recorded as a known limitation of this release rather than resolved."
     },
     {
       "id": "the-alarm-resistance-states-high-pressure",
       "file": "episodes/the-alarm/resistance-states/high-pressure.png",
       "origin": "ai-generated",
-      "status": "prototype-placeholder",
+      "status": "production-approved",
       "creator": "OpenArt AI image generation, directed by the project maintainer",
       "generatedAt": "2026-08-15",
       "generationTool": "OpenArt AI, 4096x4096 four-quadrant sheet on a flat chroma field, local chroma-key removal and registration",
@@ -224,13 +225,13 @@
         "Left the drawn angle intact. The artwork carries the lift and the engine keeps only a small continuous creep, so no state was resampled by rotation."
       ],
       "licence": "CC-BY-SA-4.0",
-      "replacementStatus": "Second-generation resistance states with corrected and measured geometry: timber frame length varies 0.2 percent across the four and the foot pivot is identical in all of them. Awaiting maintainer perceptual acceptance before production approval."
+      "replacementStatus": "Production-approved on 16 August 2026 following the maintainer's perceptual acceptance of the bed animation in play. Second-generation resistance states with corrected and measured geometry: timber frame length varies 0.2 percent across the four and the foot pivot is identical in all of them. These states depict the protagonist and are therefore identity-critical work approved without the human refinement pass that AGENTS.md and issue #22 prefer; that decision and its reasoning are recorded on issue #22. AI-generated under maintainer art direction and integrated without a human repainting pass, so its human authorship is thin; that is recorded as a known limitation of this release rather than resolved."
     },
     {
       "id": "the-alarm-resistance-states-final-pressure",
       "file": "episodes/the-alarm/resistance-states/final-pressure.png",
       "origin": "ai-generated",
-      "status": "prototype-placeholder",
+      "status": "production-approved",
       "creator": "OpenArt AI image generation, directed by the project maintainer",
       "generatedAt": "2026-08-15",
       "generationTool": "OpenArt AI, 4096x4096 four-quadrant sheet on a flat chroma field, local chroma-key removal and registration",
@@ -244,7 +245,7 @@
         "Left the drawn angle intact. The artwork carries the lift and the engine keeps only a small continuous creep, so no state was resampled by rotation."
       ],
       "licence": "CC-BY-SA-4.0",
-      "replacementStatus": "Second-generation resistance states with corrected and measured geometry: timber frame length varies 0.2 percent across the four and the foot pivot is identical in all of them. Awaiting maintainer perceptual acceptance before production approval."
+      "replacementStatus": "Production-approved on 16 August 2026 following the maintainer's perceptual acceptance of the bed animation in play. Second-generation resistance states with corrected and measured geometry: timber frame length varies 0.2 percent across the four and the foot pivot is identical in all of them. These states depict the protagonist and are therefore identity-critical work approved without the human refinement pass that AGENTS.md and issue #22 prefer; that decision and its reasoning are recorded on issue #22. AI-generated under maintainer art direction and integrated without a human repainting pass, so its human authorship is thin; that is recorded as a known limitation of this release rather than resolved."
     }
   ]
 }

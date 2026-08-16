@@ -117,8 +117,8 @@ describe("presentation content", () => {
       .toEqual(["office-incursion"]);
     expect(presentation.skin.confrontation.opposingActor.parts.map(({ id }) => id))
       .toEqual(["figure"]);
-    expect(presentation.skin.confrontation.opposingActor.states.map(({ minimumIntensity, assets }) => [
-      minimumIntensity,
+    expect(presentation.skin.confrontation.opposingActor.states.map(({ minimumDanger, assets }) => [
+      minimumDanger,
       assets.map(({ partId, asset }) => [partId, asset.id]),
     ])).toEqual([
       [0, [["figure", "management-rest-pose"]]],
@@ -126,6 +126,19 @@ describe("presentation content", () => {
       [0.5, [["figure", "management-high-pressure-pose"]]],
       [0.78, [["figure", "management-lifting-pose"]]],
     ]);
+    // The actor dissolves between pose drawings rather than cutting, and reduced
+    // motion shortens that dissolve without removing it — a cross-fade is gentler
+    // than a hard swap, so zero would be the more jarring choice.
+    expect(presentation.skin.confrontation.opposingActor.transition.crossfadeDurationMs)
+      .toBeGreaterThan(0);
+    expect(presentation.skin.confrontation.opposingActor.reducedMotion.crossfadeDurationMs)
+      .toBeLessThanOrEqual(
+        presentation.skin.confrontation.opposingActor.transition.crossfadeDurationMs,
+      );
+    // Oscillation is the part reduced motion removes; the lean is a static pose
+    // offset and survives, so the actor still reads as straining.
+    expect(presentation.skin.confrontation.opposingActor.reducedMotion.amplitudeScale)
+      .toBeLessThan(1);
     expect([...presentation.interruptionSkins.entries()].map(([id, value]) => [
       id, value.id,
     ])).toEqual([
@@ -486,6 +499,25 @@ describe("presentation content", () => {
       },
       assetIds,
     )).toThrow(/unknown presentation asset: missing-resistance-state/);
+  });
+
+  it("rejects an opposing-actor dissolve that is instant or unbounded", () => {
+    const withTransition = (transition: unknown) => ({
+      ...skinContent,
+      confrontation: { ...skinContent.confrontation, opposingActor: {
+          ...skinContent.confrontation.opposingActor,
+          transition,
+      } },
+    });
+    expect(() => resistanceSkinSchema.parse(withTransition({
+      crossfadeDurationMs: 0, ease: "Sine.Out",
+    }))).toThrow();
+    expect(() => resistanceSkinSchema.parse(withTransition({
+      crossfadeDurationMs: 5_000, ease: "Sine.Out",
+    }))).toThrow();
+    expect(() => resistanceSkinSchema.parse(withTransition({
+      crossfadeDurationMs: 180, ease: "Bounce.Wobble",
+    }))).toThrow();
   });
 
   it("validates image references in opposing-actor parts", () => {

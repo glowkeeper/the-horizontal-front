@@ -110,7 +110,12 @@ cheerful, and requested derivation into runtime assets. That acceptance covers:
 
 It establishes the first-draft character identities and authorises runtime
 derivation. It does not by itself mark the derived assets production-approved;
-their transparent edges, pivots, integration and motion still require review.
+their transparent edges, pivots, integration and motion required separate
+review. That review happened on 16 August 2026, when the maintainer accepted the
+integrated confrontation in play and the derived assets were catalogued
+`production-approved` — deliberately, for identity-critical work, without a
+human repainting pass. See issue #22 for the decision and issue #21 for the
+known limitation it leaves open.
 
 ## Runtime derivation
 
@@ -229,11 +234,19 @@ widths of 158, 154, 152 and 153 pixels — so registration is a translation
 problem only. Both new states were translated until their console plinth
 matched the rest pose within one pixel.
 
-The accepted `management-lifting-pose` was left unmodified, and its console
-therefore still sits about 13 pixels right and 36 pixels below the other three.
-That is a pre-existing inconsistency in accepted artwork rather than one the
-new states introduced, and correcting it is a maintainer decision because it
-means editing an already-accepted asset.
+The accepted `management-lifting-pose` was initially left unmodified, and its
+console therefore sat about 13 pixels right and 36 pixels below the other three.
+That was a pre-existing inconsistency in accepted artwork rather than one the
+new states introduced, and correcting it was a maintainer decision because it
+meant editing an already-accepted asset.
+
+On 16 August 2026 the maintainer played the episode and saw the jump on the
+final state change, and the translation was applied: 13 pixels left and 36
+pixels up, matching the treatment already given to the two intermediate states.
+The drawing is otherwise untouched — no repainting, resampling or recolouring —
+and the alpha bounding box confirms nothing clipped at the canvas edge. Its
+lower edge now rests at 747 pixels against the intermediate states' 748,
+corroborating the measured offset independently of the plinth match.
 
 ### Naming
 
@@ -245,13 +258,30 @@ as provenance rather than rewritten to match later naming.
 
 ### Threshold change
 
-The episode skin now selects the four poses at dramatic intensities of 0, 0.22,
-0.5 and 0.78. The first threshold is unchanged, so the moment Management first
-commits to the work is exactly as authored before. The lifting pose is the
-behavioural change: it previously appeared at 0.22 and now waits until 0.78,
-reserving full tilt for genuine peak danger. Thresholds remain content, not
-episode-specific TypeScript, and the generic renderer still selects the highest
-eligible state with no knowledge of levers, sweat or this episode.
+The episode skin selects the four poses at 0, 0.22, 0.5 and 0.78. The first
+threshold is unchanged, so the moment Management first commits to the work is
+exactly as authored before. The lifting pose is the behavioural change: it
+previously appeared at 0.22 and now waits until 0.78, reserving full tilt for
+genuine peak danger. Thresholds remain content, not episode-specific TypeScript,
+and the generic renderer still selects the highest eligible state with no
+knowledge of levers, sweat or this episode.
+
+On 16 August 2026 the axis those numbers are read on changed. They were dramatic
+intensities, which `getDramaticIntensity` derives purely from elapsed time within
+the authored phases; they are now physical danger, the same live signal the bed
+reads, so Management's effort is visibly the cause of the lift rather than a
+performance on its own clock. The numbers themselves were kept, which leaves them
+sitting just below the bed's own 0, 0.28, 0.58 and 0.9 — Management strains into
+each pose fractionally before the bed answers. That lead is a consequence of
+reinterpreting existing values rather than a tuned decision, and is open to
+adjustment by eye.
+
+Management's pose also now ratchets: the renderer holds the greatest state
+reached for the attempt rather than easing back down as danger falls, because
+someone hauling on a lever does not visibly relax the instant the load lightens.
+The continuous strain oscillation deliberately still runs on dramatic intensity,
+so Management's agitation mounts with the working day whatever the player does.
+Only the pose reads danger.
 
 ## Protagonist perspective and downhill cloth
 

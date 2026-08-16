@@ -156,17 +156,32 @@ motion and the rhythm palette; skin data owns its parts, copy and typography.
 The selected skin must name the selected layout. Interruption skins must
 support their mechanic kind and obey the same ownership rules.
 
-`confrontation.opposingActor` authors two independent kinds of movement. Its
-`states` are discrete: each names a `minimumIntensity` and swaps artwork when
-the dramatic curve crosses it. Its `strain` is continuous: the actor oscillates
-and leans further into its apparatus as intensity rises, so a finite set of
-drawings still reads as sustained effort rather than a few abrupt changes of
-pose. A skin authors `restFrequencyHz` and `strainFrequencyHz`, a
-`restAmplitude` and `strainAmplitude` point each, and a `lean` point reached at
-full intensity; the engine interpolates between rest and strain by intensity.
+`confrontation.opposingActor` authors two independent kinds of movement, and
+they deliberately read different signals.
+
+Its `states` are discrete and read physical danger — the same live signal the
+resistance itself reads. Each names a `minimumDanger` and swaps artwork when
+danger crosses it, so the actor's effort is visibly the cause of what is
+happening to the resistance rather than a performance running on its own clock.
+The selection ratchets: the engine holds the greatest state reached for the
+attempt and never eases back down, because someone straining at apparatus does
+not visibly relax the instant the load lightens. A retry starts the ratchet
+again. `transition` authors the dissolve between drawings with a
+`crossfadeDurationMs` and an `ease`; the actor holds a continuous position
+throughout, so only the drawing beneath it changes.
+
+Its `strain` is continuous and reads the dramatic curve instead, so the actor's
+agitation mounts with the episode however well the player is doing. A skin
+authors `restFrequencyHz` and `strainFrequencyHz`, a `restAmplitude` and
+`strainAmplitude` point each, and a `lean` point reached at full intensity; the
+engine interpolates between rest and strain by intensity. The split is the
+point: what the actor *does* answers the player, while how wound up they are
+answers the clock.
+
 `reducedMotion.amplitudeScale` multiplies only the oscillation, so a reader who
 prefers reduced motion still sees the lean — a static pose offset — without
-anything shaking.
+anything shaking, and `reducedMotion.crossfadeDurationMs` shortens the dissolve
+without removing it, a cross-fade being gentler than a hard cut.
 
 `confrontation.copy` supplies `headline` and accessible `instructionsStatus`.
 `results` contains exactly `victory` and `forcedVerticalisation`; each supplies

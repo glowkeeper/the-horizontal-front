@@ -9,11 +9,14 @@ through the project's normal community process.
 
 The separated bed, pillow and duvet-state parts described here are retained as development material in [first-playable layered parts](first-playable-layered-parts/README.md) and are not catalogued runtime assets; the bedroom base, office incursion and whole bed tableaux ship in their place.
 
-All assets below are first-draft, AI-assisted production hypotheses. They are
-catalogued as `prototype-placeholder` until their composition, cut-out edges,
-human refinement and perceptual quality have been explicitly accepted. The
-runtime uses stable catalogue IDs selected by the episode-owned skin; it does
-not contain episode-specific file paths or TypeScript branches.
+All assets below originated as first-draft, AI-assisted production hypotheses.
+On 16 August 2026 the maintainer accepted them in the running game and they were
+catalogued as `production-approved`; the decision, including the deliberate
+approval of identity-critical work without a human repainting pass, is recorded
+on issue #22, and the resulting thin human authorship is published as a known
+limitation on issue #21. The runtime uses stable catalogue IDs selected by the
+episode-owned skin; it does not contain episode-specific file paths or
+TypeScript branches.
 
 ## Bed and duvet source atlas
 

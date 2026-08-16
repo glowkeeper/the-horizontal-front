@@ -486,7 +486,7 @@ export const resistanceSkinSchema = z.object({
     opposingActor: z.object({
       parts: z.array(shapePartSchema).min(1),
       states: z.array(z.object({
-        minimumIntensity: unitIntervalSchema,
+        minimumDanger: unitIntervalSchema,
         assets: z.array(z.object({
           partId: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
           asset: ownedContentReferenceSchema,
@@ -502,8 +502,15 @@ export const resistanceSkinSchema = z.object({
         strainAmplitude: pointSchema,
         lean: pointSchema,
       }).strict(),
+      // Dissolving between pose drawings rather than cutting. The actor holds a
+      // continuous position throughout, so only the drawing beneath it changes.
+      transition: z.object({
+        crossfadeDurationMs: z.number().int().positive().max(1_000),
+        ease: easeSchema,
+      }).strict(),
       reducedMotion: z.object({
         amplitudeScale: unitIntervalSchema,
+        crossfadeDurationMs: z.number().int().nonnegative().max(200),
       }).strict(),
     }).strict(),
   }).strict(),
@@ -518,14 +525,14 @@ export const resistanceSkinSchema = z.object({
   )) {
     context.addIssue({ code: "custom", message: "resistance-state danger thresholds must increase" });
   }
-  const actorThresholds = opposingActor.states.map(({ minimumIntensity }) => minimumIntensity);
+  const actorThresholds = opposingActor.states.map(({ minimumDanger }) => minimumDanger);
   if (actorThresholds[0] !== 0) {
-    context.addIssue({ code: "custom", message: "opposing-actor states must begin at zero intensity" });
+    context.addIssue({ code: "custom", message: "opposing-actor states must begin at zero danger" });
   }
   if (actorThresholds.some(
     (threshold, index) => index > 0 && threshold <= actorThresholds[index - 1],
   )) {
-    context.addIssue({ code: "custom", message: "opposing-actor state intensity thresholds must increase" });
+    context.addIssue({ code: "custom", message: "opposing-actor state danger thresholds must increase" });
   }
   for (const [index, state] of opposingActor.states.entries()) {
     const partIds = state.assets.map(({ partId }) => partId);
