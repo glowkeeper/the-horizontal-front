@@ -5,14 +5,29 @@
       "id": "raised-fist-favicon",
       "file": "favicon.svg",
       "origin": "human-created",
-      "status": "prototype-placeholder",
-      "creator": "The Horizontal Front project, directed by the project maintainer and implemented by Codex",
+      "status": "production-approved",
+      "creator": "The project maintainer, working in SVG with AI drafting assistance (Claude).",
       "edits": [
-        "Placed the project's existing raised-fist Unicode motif on a rounded resistance-red field.",
-        "Used the established semantic colour palette and system emoji fonts for the prototype favicon."
+        "Replaced the prototype, which set the ✊ Unicode character in an SVG text element and therefore rendered whichever emoji glyph the viewer's operating system supplied, or none. That glyph was third-party artwork the project could not license.",
+        "Redrew the raised fist as original geometry — a rounded field, fist mass, four knuckles, thumb and forearm — using only the project's own semantic palette. No font is involved, so the icon renders identically everywhere.",
+        "The initial geometry was drafted with AI assistance. Every shipped value and every compositional decision is the maintainer's: the knuckle heights and corner radii, the thumb's prominence, optical horizontal centring to counter the thumb's one-sided protrusion, a terminating forearm so the cream shape carries field above and below, and the removal of the cuff notch in favour of one continuous cream silhouette — made against the drafting advice, and correctly.",
+        "Reviewed and accepted at 128, 64, 32 and 16 pixels. Measured rather than eyeballed: the painted artwork sits 11.50 from the left, 11.50 from the right, 13.50 from the top and 12.50 from the bottom of the 64-unit field."
       ],
       "licence": "CC-BY-SA-4.0",
-      "replacementStatus": "Replace or substantially human-refine when the project adopts production-approved identity artwork."
+      "replacementStatus": "Production-approved on 16 August 2026 on the maintainer's perceptual acceptance at 128, 64, 32 and 16 pixels. Original project geometry using the project palette, with no third-party or font-supplied artwork. Recorded as human-created because the shipped composition is the maintainer's throughout; the AI drafting assistance behind the first draft is disclosed above rather than omitted. The geometry is seven primitive rectangles and remains trivially editable by hand."
+    },
+    {
+      "id": "application-icons",
+      "file": "icon-192.png, icon-512.png, icon-maskable-512.png",
+      "origin": "human-created",
+      "status": "production-approved",
+      "creator": "Derived mechanically from raised-fist-favicon; see that entry for authorship.",
+      "edits": [
+        "Rendered from favicon.svg by scripts/generate-icons.mjs using the repository's own Chromium, so the application icons cannot drift from the authored favicon. Re-run the script after editing favicon.svg.",
+        "The maskable variant is drawn at 90 per cent on a full-bleed field of the same colour, so its rounded corners merge into the backdrop and Android's own mask cannot clip the artwork."
+      ],
+      "licence": "CC-BY-SA-4.0",
+      "replacementStatus": "Production-approved on 16 August 2026, deriving from the accepted favicon. Regenerating them requires no separate approval because they are a mechanical derivation rather than independent artwork."
     }
   ]
 }
