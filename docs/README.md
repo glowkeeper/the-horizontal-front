@@ -45,7 +45,8 @@ Read [release process](release-process.md) for the difference between a public
 release and a production release, the invariants every public release must meet,
 supported environment claims, the no-placeholders rule that governs production
 releases alone, versioning and the Cloudflare publication and rollback
-sequence. Read [art direction](art-direction.md)
+sequence, and [releases](releases/README.md) for the notes published with each
+version. Read [art direction](art-direction.md)
 before producing, integrating or approving visual assets. Exploratory sheets
 are preserved separately under [art development](art/README.md); their presence
 there does not make them production assets.

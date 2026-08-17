@@ -115,9 +115,12 @@ Before publication:
 2. Freeze a release candidate and record the revision under review.
 3. Apply the intended version consistently to package metadata and release
    documentation.
-4. Prepare release notes covering content scope, controls, supported
+4. Write release notes covering content scope, controls, supported
    environments, accessibility boundaries, licences, provenance, offline use
-   and known limitations.
+   and known limitations. Commit them under [`docs/releases/`](releases/README.md)
+   as part of the release commit, so the record of what was shipped travels with
+   the repository rather than depending on one hosting account. The GitHub
+   release record carries the same text.
 5. Run the complete automated/source and browser-flow checks against the
    production-shaped build.
 6. Record the required human perceptual sessions separately, including real
