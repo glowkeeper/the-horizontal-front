@@ -80,7 +80,20 @@ a:focus-visible {
 .site-footer,
 .site-main,
 .document-page {
-  width: min(100% - 2rem, 72rem);
+  /*
+   * One width for the whole site.
+   *
+   * The container was 72rem while document prose was capped at 52rem, so the
+   * charter and governance pages ran three quarters of the width of their own
+   * header and footer and trailed a wide empty margin. The homepage hid it,
+   * because its grids and illustration filled the container.
+   *
+   * Widening the prose to 72rem would have made lines of about 120 characters,
+   * which is past comfortable reading. Narrowing the container instead lets
+   * every page — header, footer, prose, grids and illustration — share a single
+   * measure, so nothing is inset and nothing is stranded.
+   */
+  width: min(100% - 2rem, 60rem);
   margin-inline: auto;
 }
 
@@ -169,7 +182,7 @@ nav [aria-current="page"] {
 }
 
 .hero {
-  max-width: 62rem;
+  max-width: 100%;
 }
 
 .hero.compact {
@@ -331,7 +344,7 @@ h3 {
 }
 
 .statement {
-  max-width: 54rem;
+  max-width: 100%;
   padding: clamp(1.5rem, 5vw, 3.5rem);
   color: var(--colour-paper-white);
   background: var(--colour-ink-charcoal);
@@ -348,12 +361,17 @@ h3 {
  * capped on the landing page while staying left-aligned. Long text stays
  * comfortable to read; structure stays aligned with the rest of the site.
  */
+/*
+ * Prose fills the shared measure. The cap that used to live here narrowed the
+ * column inside an already wider container, which is what made these pages look
+ * unfinished beside the landing page.
+ */
 .document-page > p,
 .document-page > ul,
 .document-page > ol,
 .document-page > blockquote,
 .document-page > table {
-  max-width: 52rem;
+  max-width: 100%;
 }
 
 .document-page > * {
