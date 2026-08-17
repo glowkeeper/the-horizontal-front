@@ -9,12 +9,13 @@
       "creator": "The project maintainer, working in SVG with AI drafting assistance (Claude).",
       "edits": [
         "Replaced the prototype, which set the \u270a Unicode character in an SVG text element and therefore rendered whichever emoji glyph the viewer's operating system supplied, or none. That glyph was third-party artwork the project could not license.",
-        "Redrew the raised fist as original geometry \u2014 a rounded field, fist mass, four knuckles, thumb and forearm \u2014 using only the project's own semantic palette. No font is involved, so the icon renders identically everywhere.",
-        "The initial geometry was drafted with AI assistance. Every shipped value and every compositional decision is the maintainer's: the knuckle heights and corner radii, the thumb's prominence, optical horizontal centring to counter the thumb's one-sided protrusion, a terminating forearm so the cream shape carries field above and below, and the removal of the cuff notch in favour of one continuous cream silhouette \u2014 made against the drafting advice, and correctly.",
-        "Reviewed and accepted at 128, 64, 32 and 16 pixels. Measured rather than eyeballed: the painted artwork sits 11.50 from the left, 11.50 from the right, 13.50 from the top and 12.50 from the bottom of the 64-unit field."
+        "Redrew the raised fist as original geometry using only primitive rounded rectangles: a white field, four fingers, a palm, a folded thumb and a forearm. No font is involved, so the icon renders identically everywhere.",
+        "The charcoal linework is drawn as a second copy of each shape, 1.5 units larger, sitting behind the red. Overlaps hide it and the gaps between the fingers do not, so one set of numbers produces both the outline and the separations without any shape being drawn twice by hand.",
+        "The hand is a right hand seen palm-on, which puts the thumb on the viewer's right and makes the leftmost finger the little one. The fingers are rotated progressively \u2014 about -16, -9, -3 and +2 degrees \u2014 so the little and ring curl furthest across the palm, and each is drawn over the palm so its rounded end stays visible rather than being absorbed.",
+        "Composition set and accepted by the maintainer across successive reviews at 128, 64, 32 and 16 pixels. Measured rather than eyeballed: the artwork sits 6.88 from the left, 7.38 from the right, 9.50 from the top and 5.50 from the bottom of the 64-unit field."
       ],
       "licence": "CC-BY-SA-4.0",
-      "replacementStatus": "Production-approved on 16 August 2026 on the maintainer's perceptual acceptance at 128, 64, 32 and 16 pixels. Original project geometry using the project palette, with no third-party or font-supplied artwork. Recorded as human-created because the shipped composition is the maintainer's throughout; the AI drafting assistance behind the first draft is disclosed above rather than omitted. The geometry is seven primitive rectangles and remains trivially editable by hand."
+      "replacementStatus": "Production-approved on 17 August 2026 on the maintainer's perceptual acceptance at 128, 64, 32 and 16 pixels. Original project geometry in the project palette, with no third-party or font-supplied artwork. Recorded as human-created because the shipped composition is the maintainer's throughout, with the palm-out orientation, the finger curl and the colour reversal all directed by them; the AI drafting assistance behind the geometry is disclosed above rather than omitted. The drawing is fifteen primitive rectangles and remains editable by hand."
     },
     {
       "id": "application-icons",
@@ -24,7 +25,7 @@
       "creator": "Derived mechanically from raised-fist-favicon; see that entry for authorship.",
       "edits": [
         "Rendered from favicon.svg by scripts/generate-icons.mjs using the repository's own Chromium, so the application icons cannot drift from the authored favicon. Re-run the script after editing favicon.svg.",
-        "The maskable variant is drawn at 90 per cent on a full-bleed field of the same colour, so its rounded corners merge into the backdrop and Android's own mask cannot clip the artwork."
+        "The maskable variant is drawn at 90 per cent on a full-bleed field of the same colour as the artwork's own, so its rounded corners merge into the backdrop and Android's own mask cannot clip the hand. That colour is a constant in the script and must be changed with the field."
       ],
       "licence": "CC-BY-SA-4.0",
       "replacementStatus": "Production-approved on 16 August 2026, deriving from the accepted favicon. Regenerating them requires no separate approval because they are a mechanical derivation rather than independent artwork."
