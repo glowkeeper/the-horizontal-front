@@ -8,9 +8,9 @@
       "status": "production-approved",
       "creator": "The project maintainer, working in SVG with AI drafting assistance (Claude).",
       "edits": [
-        "Replaced the prototype, which set the ✊ Unicode character in an SVG text element and therefore rendered whichever emoji glyph the viewer's operating system supplied, or none. That glyph was third-party artwork the project could not license.",
-        "Redrew the raised fist as original geometry — a rounded field, fist mass, four knuckles, thumb and forearm — using only the project's own semantic palette. No font is involved, so the icon renders identically everywhere.",
-        "The initial geometry was drafted with AI assistance. Every shipped value and every compositional decision is the maintainer's: the knuckle heights and corner radii, the thumb's prominence, optical horizontal centring to counter the thumb's one-sided protrusion, a terminating forearm so the cream shape carries field above and below, and the removal of the cuff notch in favour of one continuous cream silhouette — made against the drafting advice, and correctly.",
+        "Replaced the prototype, which set the \u270a Unicode character in an SVG text element and therefore rendered whichever emoji glyph the viewer's operating system supplied, or none. That glyph was third-party artwork the project could not license.",
+        "Redrew the raised fist as original geometry \u2014 a rounded field, fist mass, four knuckles, thumb and forearm \u2014 using only the project's own semantic palette. No font is involved, so the icon renders identically everywhere.",
+        "The initial geometry was drafted with AI assistance. Every shipped value and every compositional decision is the maintainer's: the knuckle heights and corner radii, the thumb's prominence, optical horizontal centring to counter the thumb's one-sided protrusion, a terminating forearm so the cream shape carries field above and below, and the removal of the cuff notch in favour of one continuous cream silhouette \u2014 made against the drafting advice, and correctly.",
         "Reviewed and accepted at 128, 64, 32 and 16 pixels. Measured rather than eyeballed: the painted artwork sits 11.50 from the left, 11.50 from the right, 13.50 from the top and 12.50 from the bottom of the 64-unit field."
       ],
       "licence": "CC-BY-SA-4.0",
@@ -28,6 +28,19 @@
       ],
       "licence": "CC-BY-SA-4.0",
       "replacementStatus": "Production-approved on 16 August 2026, deriving from the accepted favicon. Regenerating them requires no separate approval because they are a mechanical derivation rather than independent artwork."
+    },
+    {
+      "id": "home-briefing-illustration",
+      "file": "briefing.webp",
+      "origin": "ai-generated",
+      "status": "production-approved",
+      "creator": "Derived mechanically from the catalogued campaign illustration monday-uprising-briefing; see src/play/content/presentation/asset-catalog.json for its authorship and provenance.",
+      "edits": [
+        "Resampled from the 1374x1145 original to 1200px wide and encoded as WebP by scripts/generate-site-images.mjs, using the repository's own Chromium. The artwork is otherwise unaltered: no cropping, retouching or recolouring.",
+        "Derived because the authored original is roughly 3MB. A landing page carrying that would be slow to arrive and would be written into every visitor's offline cache, which matters here because the release is meant to keep working once cached."
+      ],
+      "licence": "CC-BY-SA-4.0",
+      "replacementStatus": "Production-approved on 17 August 2026 as a mechanical derivation of an already accepted illustration. Regenerating it after a change to the source requires no separate approval; replacing the source does."
     }
   ]
 }

@@ -828,11 +828,23 @@ requirePolicy(
   indexHtml.includes("Content-Security-Policy"),
   "index.html must retain its restrictive Content Security Policy.",
 );
+/*
+ * The landing page leads with the satire and states the commons.
+ *
+ * It previously led with the commons brief, which described the project
+ * accurately but left a game about capitalism reading as a governance document
+ * with a game attached. The satire now comes first and the commons sentence
+ * follows it, so both survive: a reader learns what the game is arguing before
+ * being told how the project is run, and neither can be quietly dropped.
+ */
 requirePolicy(
-  indexHtml.includes("A free, open-source game about collective power") &&
+  indexHtml.includes("satirical rhythm game") &&
+    indexHtml.includes("A free, open-source game about collective power") &&
+    indexHtml.indexOf("satirical rhythm game")
+      < indexHtml.indexOf("A free, open-source game about collective power") &&
     indexHtml.includes('href="/commons/"') &&
     indexHtml.match(/github\.com\/glowkeeper\/the-horizontal-front/g)?.length >= 3,
-  "The public landing page must lead with the strong brief and link to The Commons and public repository from its header, body and footer.",
+  "The public landing page must lead with the satire, still state the commons brief, and link to The Commons and public repository from its header, body and footer.",
 );
 requirePolicy(
   commonsHtml.match(/github\.com\/glowkeeper\/the-horizontal-front/g)?.length >= 3,

@@ -15,7 +15,7 @@ const source = readFileSync(join(assets, "favicon.svg"), "utf8");
 // artwork's own rounded field exactly, the corners disappear into it and the
 // icon becomes full-bleed — which is what Android needs before applying its
 // own mask.
-const FIELD = "#b8322a";
+const FIELD = "#ffffff";
 
 // Android masks a maskable icon down to a safe circle 80% of the width. The
 // artwork is inset so nothing important can be clipped by that mask.

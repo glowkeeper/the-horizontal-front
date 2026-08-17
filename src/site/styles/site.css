@@ -447,3 +447,23 @@ h3 {
     transform: none;
   }
 }
+
+/*
+ * The confrontation, shown rather than described. A landing page for a game
+ * about a grotesque in a pinstripe suit should not be entirely text.
+ */
+.hero-illustration {
+  margin: var(--space-xl) 0 var(--space-3xl);
+}
+.hero-illustration img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 2px solid var(--colour-ink-charcoal);
+  box-shadow: 6px 6px 0 var(--colour-ink-charcoal);
+}
+.hero-illustration figcaption {
+  margin-top: var(--space-md);
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
