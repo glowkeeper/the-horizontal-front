@@ -148,7 +148,7 @@ function pageTemplate({ title, description, content, documentPage = false }) {
       </aside>
     </main>
     <footer class="site-footer">
-      <p>Free to play. No ads. No tracking. No purchases ✊ 🛏️</p>
+      <p class="footer-mark">Free to play. No ads. No tracking. No purchases<img src="/assets/mark.svg" alt="" width="20" height="20" /></p>
       <nav aria-label="Project information">
         <a href="/charter/">Charter</a>
         <a href="/governance/">Governance</a>

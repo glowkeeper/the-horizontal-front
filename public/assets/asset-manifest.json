@@ -19,13 +19,14 @@
     },
     {
       "id": "application-icons",
-      "file": "icon-192.png, icon-512.png, icon-maskable-512.png",
+      "file": "icon-192.png, icon-512.png, icon-maskable-512.png, mark.svg",
       "origin": "human-created",
       "status": "production-approved",
       "creator": "Derived mechanically from raised-fist-favicon; see that entry for authorship.",
       "edits": [
         "Rendered from favicon.svg by scripts/generate-icons.mjs using the repository's own Chromium, so the application icons cannot drift from the authored favicon. Re-run the script after editing favicon.svg.",
-        "The maskable variant is drawn at 90 per cent on a full-bleed field of the same colour as the artwork's own, so its rounded corners merge into the backdrop and Android's own mask cannot clip the hand. That colour is a constant in the script and must be changed with the field."
+        "The maskable variant is drawn at 90 per cent on a full-bleed field of the same colour as the artwork's own, so its rounded corners merge into the backdrop and Android's own mask cannot clip the hand. That colour is a constant in the script and must be changed with the field.",
+        "mark.svg is the same drawing with its field rectangle removed, for placing the mark on the site's own background \u2014 in a footer the rounded field reads as a sticker stuck over the page. Derived by the same script, so the hand is never drawn twice and cannot drift from the icon."
       ],
       "licence": "CC-BY-SA-4.0",
       "replacementStatus": "Production-approved on 16 August 2026, deriving from the accepted favicon. Regenerating them requires no separate approval because they are a mechanical derivation rather than independent artwork."

@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -26,6 +26,27 @@ const icons = [
   { file: "icon-512.png", size: 512, maskable: false },
   { file: "icon-maskable-512.png", size: 512, maskable: true },
 ];
+
+/*
+ * A fieldless version of the same drawing, for placing the mark on the site's
+ * own background — in a footer the rounded white field reads as a sticker stuck
+ * over the page rather than as the project's mark.
+ *
+ * Derived by dropping the field rectangle, so the hand itself is never drawn
+ * twice and cannot drift from the icon.
+ */
+const fieldRectangle = /\n\s*<rect width="64" height="64"[^>]*\/>/;
+if (!fieldRectangle.test(source)) {
+  throw new Error("favicon.svg must open with its full-bleed field rectangle");
+}
+writeFileSync(
+  join(assets, "mark.svg"),
+  source.replace(fieldRectangle, "").replace(
+    'aria-label="The Horizontal Front raised fist"',
+    'aria-hidden="true"',
+  ),
+);
+console.log("mark.svg (no field)");
 
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 512, height: 512 } });

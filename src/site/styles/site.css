@@ -499,3 +499,21 @@ h3 {
   font-size: 0.9rem;
   opacity: 0.8;
 }
+
+/*
+ * The footer mark is the project's own icon rather than emoji. Emoji render as
+ * whichever glyph the viewer's system supplies, or as nothing at all — the
+ * exact problem the favicon was redrawn to solve, so the footer should not
+ * reintroduce it.
+ */
+.footer-mark img {
+  /*
+   * Inline rather than a flex item, so the mark follows the last word the way
+   * the emoji it replaces did. As a flex item it drifted to the far end of the
+   * paragraph as soon as the text wrapped.
+   */
+  width: 1.35em;
+  height: 1.35em;
+  margin-left: 0.45em;
+  vertical-align: -0.3em;
+}
