@@ -106,6 +106,44 @@ async function findEpisodeFictionInEngine() {
   return findings;
 }
 
+/**
+ * Emoji-free player copy invariant.
+ *
+ * Validated content is drawn into the canvas as Phaser text, which resolves
+ * each glyph through whatever fonts the device offers. An emoji therefore
+ * renders as whichever picture the operating system happens to supply, or as a
+ * tofu box on a device carrying no emoji font at all. The hit feedback is the
+ * copy a player sees most often in the game, so that failure lands at the exact
+ * moment the game is congratulating them.
+ *
+ * The same fault has now been found three times: the favicon set the raised
+ * fist as a text glyph, the site footer used it as punctuation, and the hit
+ * feedback carried it into the canvas. Twice it was fixed by inspection. The
+ * project owns a drawn mark for this job, so the rule is that player copy is
+ * words and the mark is artwork.
+ *
+ * `Extended_Pictographic` is the property that separates the two cases. It
+ * matches the emoji forms, including the heavy check and cross, and does not
+ * match the plain typographic marks the feedback uses for hits and misses,
+ * which are ordinary text characters a font is far more likely to carry.
+ */
+const EMOJI_PATTERN = /\p{Extended_Pictographic}/u;
+
+async function findEmojiInPlayerCopy(directory) {
+  const findings = [];
+  for (const file of await listFiles(directory)) {
+    if (extname(file) !== ".json") continue;
+    const relativePath = relative(projectRoot, file).split("\\").join("/");
+    const lines = (await readFile(file, "utf8")).split("\n");
+    for (const [index, line] of lines.entries()) {
+      if (EMOJI_PATTERN.test(line)) {
+        findings.push(`${relativePath}:${index + 1}`);
+      }
+    }
+  }
+  return findings;
+}
+
 async function findPersonReferences(directory) {
   const findings = [];
   for (const file of await listFiles(directory)) {
@@ -318,6 +356,9 @@ const embeddedPlayerCopy = await findEmbeddedPlayerCopy(
 const hardCodedPresentationValues = await findHardCodedPresentationValues(
   join(projectRoot, "src/play/phaser"),
 );
+const emojiInPlayerCopy = await findEmojiInPlayerCopy(
+  join(projectRoot, "src/play/content"),
+);
 const personReferences = [
   ...await findPersonReferences(join(projectRoot, "src")),
   ...await findPersonReferences(join(projectRoot, "docs")),
@@ -346,6 +387,10 @@ const missingGameThemeTokens = await findMissingGameThemeTokens();
 requirePolicy(
   missingGameThemeTokens.length === 0,
   `The game canvas reads these theme tokens at runtime, but neither src/play/styles/game.css nor the shared tokens define them: ${missingGameThemeTokens.join(", ")}`,
+);
+requirePolicy(
+  emojiInPlayerCopy.length === 0,
+  `Validated player-visible content must not depend on an emoji font to render. Let the words carry it, or catalogue the project's own mark as an asset and position it from authored layout data: ${emojiInPlayerCopy.join(", ")}`,
 );
 requirePolicy(
   personReferences.length === 0,
