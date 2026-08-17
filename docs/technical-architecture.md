@@ -390,7 +390,7 @@ The overlay is a design-space surface. It is exactly the design size, then scale
 
 In-world controls are not affected. The rhythm gates, notes and emitter are authored world composition and remain on the canvas.
 
-Campaign selection uses the same overlay: each campaign card is a real button, so the catalogue is reachable by keyboard and announced by assistive technology. The screen's headings and instruction line remain canvas text, because they are read rather than operated and the live region carries them. Mobile screen-reader behaviour has not been verified on device, and remains production work.
+Campaign selection uses the same overlay: each campaign card is a real button, so the catalogue is reachable by keyboard and announced by assistive technology. The screen's headings and instruction line remain canvas text and are not currently exposed to assistive technology. Mobile screen-reader behaviour has not been verified on device, and remains production work.
 
 Reusable scenes receive the validated episode as scene data; they do not import an episode file or choose an episode ID themselves. Episode presentation data selects a layout and skin. Validated layout JSON owns design-space anchors, pivots, interface slots and reusable motion parameters; validated skin JSON owns prototype primitive geometry or semantic layered-asset references. Phaser code interprets this finite vocabulary and applies runtime state—it does not contain the authored composition coordinates.
 
