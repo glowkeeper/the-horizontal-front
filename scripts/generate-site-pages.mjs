@@ -76,12 +76,38 @@ function escapeHtml(value) {
     .replaceAll('"', "&quot;");
 }
 
+const repositoryBlobBase =
+  "https://github.com/glowkeeper/the-horizontal-front/blob/main/";
+
+/**
+ * Point every repository link somewhere that resolves.
+ *
+ * The seven governing documents are published as site pages, so links between
+ * them become site paths and a reader never leaves. Everything else in the
+ * repository — the architecture notes, the grammar reference, the research —
+ * is contributor documentation that deliberately stays on GitHub, where it sits
+ * beside the source it describes.
+ *
+ * Those links must become absolute. A repository-relative path survives being
+ * rendered into HTML and then resolves against the page it landed on, so
+ * `docs/game-concept.md` linked from the contribute page became
+ * `/contribute/docs/game-concept.md` and pointed at nothing. Worse, a static
+ * host with an HTML fallback answers that with a page rather than an error, so
+ * the reader gets something that is neither the document nor a visible failure.
+ */
 function rewriteInternalLinks(markdown) {
   let rewritten = markdown;
 
   for (const [source, publicPath] of internalLinks) {
     rewritten = rewritten.replaceAll(`](${source})`, `](${publicPath})`);
   }
+
+  // Anything still pointing at a repository path is documentation that lives on
+  // GitHub. Absolute URLs and in-page anchors are left alone.
+  rewritten = rewritten.replaceAll(
+    /\]\((?!https?:|\/|#)([^)\s]+)\)/g,
+    (match, target) => `](${repositoryBlobBase}${target})`,
+  );
 
   return rewritten;
 }

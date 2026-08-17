@@ -279,3 +279,35 @@ test("every page shares one content column", async ({ page }) => {
     ).toBeLessThanOrEqual(geometry.clientWidth + 1);
   }
 });
+
+test("every internal link points at a page that exists", async ({ page }) => {
+  // A repository-relative link survives being rendered into HTML and then
+  // resolves against whatever page it landed on, so `docs/game-concept.md` on
+  // the contribute page became `/contribute/docs/game-concept.md`. A static
+  // host with an HTML fallback answers that with 200 and a page, so checking
+  // status codes would not have caught it. The rule is checked instead: the
+  // site publishes a known set of paths, and contributor documentation lives on
+  // GitHub as an absolute URL.
+  const published = new Set([
+    "/", "/play/", "/commons/", "/sound/",
+    "/charter/", "/governance/", "/identity/", "/contribute/",
+    "/licences/", "/licences/agpl/", "/licences/cc-by-sa/",
+  ]);
+  const offSite: string[] = [];
+
+  for (const path of [...published].filter((entry) => entry !== "/play/")) {
+    await page.goto(path);
+    const hrefs = await page.$$eval(
+      "a[href]",
+      (anchors) => anchors.map((anchor) => anchor.getAttribute("href") ?? ""),
+    );
+    for (const href of hrefs) {
+      if (!href || href.startsWith("#") || /^[a-z]+:/i.test(href)) continue;
+      const resolved = new URL(href, new URL(page.url())).pathname;
+      if (resolved.startsWith("/assets/") || resolved === "/manifest.webmanifest") continue;
+      if (!published.has(resolved)) offSite.push(`${path} -> ${href}`);
+    }
+  }
+
+  expect(offSite, "links must reach a published page or an absolute URL").toEqual([]);
+});
