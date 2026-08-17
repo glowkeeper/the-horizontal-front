@@ -48,6 +48,8 @@ IDs do not contain numeric sequence segments; spell meaningful numbers as words,
 
 The generic loader discovers every campaign and episode JSON file without per-content TypeScript imports. It rejects duplicate IDs or files, missing or unlisted files, identity/filename disagreement and episodes listed by more than one campaign.
 
+The Campaigns screen presents every validated campaign on one page, so the build currently accepts at most five. A sixth is a deliberate design task rather than a data change: the catalogue needs paging or scrolling before it can hold one, and `npm run check:policy` fails until that exists.
+
 Each campaign has a finite narrative flow:
 
 ```text
