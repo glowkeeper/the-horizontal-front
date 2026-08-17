@@ -338,7 +338,21 @@ h3 {
   border-top: 0.5rem solid var(--colour-authority-gold);
 }
 
-.document-page {
+/*
+ * Document pages share the site container so their headings line up with the
+ * site name and navigation above them. Narrowing the whole column instead left
+ * the charter's title indented from its own header, which read as a broken
+ * page rather than a considered measure.
+ *
+ * The measure is applied to the prose itself, the same way `.statement` is
+ * capped on the landing page while staying left-aligned. Long text stays
+ * comfortable to read; structure stays aligned with the rest of the site.
+ */
+.document-page > p,
+.document-page > ul,
+.document-page > ol,
+.document-page > blockquote,
+.document-page > table {
   max-width: 52rem;
 }
 

@@ -243,3 +243,39 @@ test("keeps focus inside the game across every scene transition", async ({ page 
     .toHaveText(/Press R or tap Try Again to retry/);
   expect(await focusedDescription(), "the outcome must take focus").not.toBe("body");
 });
+
+test("every page shares one content column", async ({ page }) => {
+  // Generated document pages once narrowed their whole column rather than the
+  // prose inside it, so the charter's title sat indented from the site name
+  // directly above it. Aligning the container and capping the measure keeps
+  // long text readable without the page looking broken.
+  for (const path of [
+    "/", "/commons/", "/sound/",
+    "/charter/", "/governance/", "/identity/", "/contribute/", "/licences/",
+    "/licences/agpl/", "/licences/cc-by-sa/",
+  ]) {
+    await page.goto(path);
+    const geometry = await page.evaluate(() => {
+      const main = document.querySelector("main");
+      const header = document.querySelector(".site-header");
+      const root = document.scrollingElement ?? document.documentElement;
+      if (!main || !header) return null;
+      return {
+        mainLeft: Math.round(main.getBoundingClientRect().left),
+        headerLeft: Math.round(header.getBoundingClientRect().left),
+        scrollWidth: root.scrollWidth,
+        clientWidth: root.clientWidth,
+      };
+    });
+    expect(geometry, `${path} must have a header and a main`).not.toBeNull();
+    if (!geometry) continue;
+    expect(
+      geometry.mainLeft,
+      `${path} content must start where its header does`,
+    ).toBe(geometry.headerLeft);
+    expect(
+      geometry.scrollWidth,
+      `${path} must not scroll sideways`,
+    ).toBeLessThanOrEqual(geometry.clientWidth + 1);
+  }
+});
