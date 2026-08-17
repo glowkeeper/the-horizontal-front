@@ -31,7 +31,7 @@ export function acceptCampaignOutcome(
   }
   return {
     ...run,
-    episodesHeld: run.episodesHeld + (outcome === "victory" ? 1 : 0),
+    episodesHeld: run.episodesHeld + (outcome === "success" ? 1 : 0),
     episodesAttempted: run.episodesAttempted + 1,
   };
 }

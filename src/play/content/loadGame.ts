@@ -107,8 +107,8 @@ export function loadGame(
         throw new Error(`Episode ID mismatch for ${episodePath}: expected ${entry.id}`);
       }
       for (const result of [
-        episode.results.victory,
-        episode.results.forcedVerticalisation,
+        episode.results.success,
+        episode.results.failure,
       ]) {
         if (result.illustration) {
           resolveIllustrationAsset(result.illustration, episode.id);

@@ -155,7 +155,7 @@ describe("presentation content", () => {
     }
     expect(layout.anchors.opposingActor).toEqual({ x: 1155, y: 365 });
     expect(layout.statusPanel).toMatchObject({
-      fill: "duvetCream",
+      fill: "restCream",
       fillAlpha: 0.86,
       stroke: "inkCharcoal",
     });
@@ -212,7 +212,7 @@ describe("presentation content", () => {
         instructionColour: "inkCharcoal", actionColour: "inkCharcoal",
       },
       choice: {
-        fill: "paperWhite", activeFill: "managementGold",
+        fill: "paperWhite", activeFill: "authorityGold",
         stroke: "inkCharcoal", strokeWidth: 1,
         activeLabelAlpha: 1, inactiveLabelAlpha: 0.5,
       },

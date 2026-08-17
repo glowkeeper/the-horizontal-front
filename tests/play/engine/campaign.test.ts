@@ -19,10 +19,10 @@ describe("campaign progression", () => {
   });
 
   it("counts accepted victories as held and failures as attempted", () => {
-    const afterVictory = acceptCampaignOutcome(createCampaignRun(2), "victory");
+    const afterVictory = acceptCampaignOutcome(createCampaignRun(2), "success");
     const complete = acceptCampaignOutcome(
       afterVictory,
-      "forced-verticalisation",
+      "failure",
     );
     expect(complete).toEqual({
       episodesHeld: 1,
@@ -42,15 +42,15 @@ describe("campaign progression", () => {
   it("advances through episode positions in order", () => {
     const first = createCampaignRun(2);
     expect(getCurrentCampaignEpisodeIndex(first)).toBe(0);
-    const second = acceptCampaignOutcome(first, "forced-verticalisation");
+    const second = acceptCampaignOutcome(first, "failure");
     expect(getCurrentCampaignEpisodeIndex(second)).toBe(1);
-    const complete = acceptCampaignOutcome(second, "victory");
+    const complete = acceptCampaignOutcome(second, "success");
     expect(getCurrentCampaignEpisodeIndex(complete)).toBeNull();
   });
 
   it("cannot record an episode twice after campaign completion", () => {
-    const complete = acceptCampaignOutcome(createCampaignRun(1), "victory");
-    expect(() => acceptCampaignOutcome(complete, "victory"))
+    const complete = acceptCampaignOutcome(createCampaignRun(1), "success");
+    expect(() => acceptCampaignOutcome(complete, "success"))
       .toThrow(/already recorded every episode/);
   });
 

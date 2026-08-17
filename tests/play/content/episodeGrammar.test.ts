@@ -114,13 +114,15 @@ describe("minimum validated episode grammar", () => {
   });
 
   it("requires exactly the two implemented results with non-empty copy", () => {
-    expect(() => load(episodeWithout(["results", "forcedVerticalisation"])))
-      .toThrow(/forcedVerticalisation/);
-    expect(() => load(episodeWith(["results", "victory", "headline"], "")))
-      .toThrow(/results.*victory.*headline/);
-    expect(() => load(episodeWith(["results", "failure"], {
-      headline: "FAILURE", feedback: "NOT AN OUTCOME",
-    }))).toThrow(/failure[\s\S]*results/);
+    expect(() => load(episodeWithout(["results", "failure"])))
+      .toThrow(/failure/);
+    expect(() => load(episodeWith(["results", "success", "headline"], "")))
+      .toThrow(/results.*success.*headline/);
+    // Exactly two outcomes exist. A third, however plausibly named, is not a
+    // quiet extension point — it is rejected.
+    expect(() => load(episodeWith(["results", "abandoned"], {
+      headline: "ABANDONED", feedback: "NOT AN OUTCOME",
+    }))).toThrow(/abandoned[\s\S]*results|results[\s\S]*abandoned/);
   });
 
   it("rejects invalid rhythm and curve timing", () => {

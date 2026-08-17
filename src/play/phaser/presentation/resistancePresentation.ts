@@ -12,11 +12,11 @@ type Motion = {
 const MAXIMUM_AUTHORED_LIGHT_INTRUSION = 0.5;
 
 export function getResistancePresentation(
-  duvetSafety: number,
+  resistanceSafety: number,
   dramaticIntensity: number,
   motion: Motion,
 ): ResistancePresentation {
-  const physicalDanger = 1 - clamp01(duvetSafety);
+  const physicalDanger = 1 - clamp01(resistanceSafety);
   const lightIntrusion = Math.max(
     physicalDanger,
     clamp01(dramaticIntensity) * MAXIMUM_AUTHORED_LIGHT_INTRUSION,

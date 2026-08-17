@@ -16,9 +16,9 @@ export type ResistanceStateListener = (direction: 1 | -1) => void;
 export type ResistanceLayout = {
   readonly content: ResistanceLayoutContent;
   readonly interruptionSkins: ReadonlyMap<string, InterruptionSkin>;
-  render(duvetSafety: number, dramaticIntensity: number): void;
-  animateVictory(): void;
-  animateForcedVerticalisation(): void;
+  render(resistanceSafety: number, dramaticIntensity: number): void;
+  animateSuccess(): void;
+  animateFailure(): void;
 };
 
 export function createResistanceLayout(

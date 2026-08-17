@@ -1,11 +1,11 @@
 import type Phaser from "phaser";
 
 const cssColourRoles = {
-  duvetCream: "--colour-duvet-cream",
+  restCream: "--colour-rest-cream",
   inkCharcoal: "--colour-ink-charcoal",
   resistanceRed: "--colour-resistance-red",
   workLightBlue: "--colour-work-light-blue",
-  managementGold: "--colour-management-gold",
+  authorityGold: "--colour-authority-gold",
   paperWhite: "--colour-paper-white",
 } as const;
 

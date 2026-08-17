@@ -106,7 +106,7 @@ describe("game content loading", () => {
     expect(resistance.config).toBe(episode.confrontation.resistance);
     // Assert the authored starting safety rather than a literal, so retuning
     // the episode does not break a test about configuration plumbing.
-    expect(resistance.state.duvetSafety)
+    expect(resistance.state.resistanceSafety)
       .toBe(episode.confrontation.resistance.startingSafety);
   });
 

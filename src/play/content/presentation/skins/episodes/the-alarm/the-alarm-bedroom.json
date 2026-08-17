@@ -9,7 +9,7 @@
     },
     "typography": {
       "opposingActorLabel": { "offsetY": 45, "sizePx": 16, "wrapWidth": 125, "colour": "paperWhite" },
-      "pressureCaption": { "sizePx": 14, "colour": "managementGold" }
+      "pressureCaption": { "sizePx": 14, "colour": "authorityGold" }
     },
     "resistance": {
       "x": 381.1,

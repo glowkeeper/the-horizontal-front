@@ -14,7 +14,7 @@ id: descriptive-lowercase-kebab-case
 title: player-facing title
 definitions: optional private rhythms, dramatic curves and interruption mechanics
 confrontation: resistance, interruptions, presentation and copy
-results: victory and forcedVerticalisation
+results: success and failure
 ```
 
 Campaign briefing and debriefing prose is not episode content. Global interface
@@ -190,7 +190,7 @@ anything shaking, and `reducedMotion.crossfadeDurationMs` shortens the dissolve
 without removing it, a cross-fade being gentler than a hard cut.
 
 `confrontation.copy` supplies `headline` and accessible `instructionsStatus`.
-`results` contains exactly `victory` and `forcedVerticalisation`; each supplies
+`results` contains exactly `success` and `failure`; each supplies
 non-empty `headline` and `feedback` and may select a catalogued illustration
 through a `shared` or same-episode reference. The illustration contains no
 story copy and is rendered by the shared illustrated narrative layout. No
@@ -220,8 +220,15 @@ A soundscape maps every one of the twenty-three semantic roles to a cue:
 `resistance-strain`, `resistance-ease`, `hold-start`, `hold-release`,
 `hold-broken`, `interruption-warning`, `interruption-input`,
 `interruption-success`, `interruption-failure`, `interruption-return`,
-`management-bluster`, `victory`, `forced-verticalisation` and
+`opposing-actor-voice`, `outcome-success`, `outcome-failure` and
 `interface-action`.
+
+The engine names outcomes `success` and `failure`, not the fiction an episode
+dresses them in. Being forced upright is how The Alarm loses; another episode
+may lose by being marched to a desk, and only its copy and illustration change.
+The same holds for the antagonist: the recurring role is Management today, but a
+CEO, a colleague or a whole department could oppose a later episode's player, so
+the grammar says opposing actor and content says who.
 
 All twenty-three are required. A moment meant to pass quietly is authored as a
 quiet cue rather than left out, so silence is always a decision on record.
@@ -304,29 +311,32 @@ whether they are in trouble or merely late in the day.
 | Layer | Follows | What it is |
 | --- | --- | --- |
 | `ambience` | dramatic intensity | the room, tightening with the working day |
-| `managementPresence` | dramatic intensity | the antagonist, grumbling throughout rather than only when interrupting |
+| `opposingActorPresence` | dramatic intensity | the antagonist, grumbling throughout rather than only when interrupting |
 | `resistanceStrain` | physical danger | the sustained body of the structure under load |
-| `resistanceCreak` | physical danger | discrete creaks, quickening and growing as ground is lost |
+| `resistanceStressBursts` | physical danger | discrete creaks, quickening and growing as ground is lost |
 
 The two clock-driven beds rise however well the player is doing, because the
 working day advances regardless. The two danger-driven layers answer the player
 alone, and are silent while the duvet is held.
 
-`resistanceCreak` is a train of cues rather than a bed, because a structure
-under stress emits discrete bursts rather than a tone — a sustained layer
+`resistanceStressBursts` is a train of cues rather than a bed, because a
+structure under stress emits discrete bursts rather than a tone — a sustained layer
 following danger sounds like a hum, not like timber being worked. It authors a
 `cue`, a `minimumDanger` below which the structure is silent, `restIntervalMs`
 and `strainIntervalMs` between which the creaking quickens, `restGain` and
 `strainGain` between which it grows, and an `intervalPattern` of uneven
-multipliers. The pattern is authored rather than random so an episode creaks the
-same way twice, and uneven because evenly spaced bursts read as machinery.
+multipliers. The pattern is authored rather than random so an episode sounds the
+same way twice, and uneven because evenly spaced bursts read as machinery. What
+a burst sounds like is content: The Alarm's timber creaks, and another episode's
+resistance might groan or ring without any code changing.
 Validation rejects a pattern whose values are all equal, and a strain interval
 no shorter than the rest interval.
 
-`resistanceStrain` exists only to bind the creaks together. Transients separated
-by silence are heard as separate events, so without a quiet sustained groan in
-the same register a run of creaks reads as a series of squeaks rather than as
-one object. It is authored well below them and is not a substitute for them.
+`resistanceStrain` exists only to bind the bursts together. Transients separated
+by silence are heard as separate events, so without a quiet sustained layer in
+the same register a run of bursts reads as a series of unrelated squeaks rather
+than as one object. It is authored well below them, and is not a substitute for
+them: on its own it is just a hum.
 
 Each bed takes the same shape:
 

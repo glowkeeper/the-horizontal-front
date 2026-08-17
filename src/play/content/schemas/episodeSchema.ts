@@ -118,8 +118,8 @@ export const episodeSchema = z
       .strict(),
     results: z
       .object({
-        victory: resultSchema,
-        forcedVerticalisation: resultSchema,
+        success: resultSchema,
+        failure: resultSchema,
       })
       .strict(),
   })

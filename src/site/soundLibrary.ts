@@ -1,5 +1,5 @@
 import { composeCue } from "../play/audio/composeCue";
-import { collectDueCreaks, createCreakState } from "../play/audio/creakScheduler";
+import { collectDueStressBursts, createStressBurstState } from "../play/audio/stressBurstScheduler";
 import { collectDueCues, createCueScheduler } from "../play/audio/cueScheduler";
 import { createAudioOutput, type AmbienceHandle } from "../play/audio/webAudioOutput";
 import { game } from "../play/content/game";
@@ -107,7 +107,7 @@ document.querySelector("#presence-toggle")?.addEventListener("click", (event) =>
       setToggle(control, false);
       return;
     }
-    presence = output.startAmbience(soundscape.managementPresence, soundscape.gain);
+    presence = output.startAmbience(soundscape.opposingActorPresence, soundscape.gain);
     presence.setIntensity(Number(slider?.value ?? 0));
     setToggle(control, true);
   });
@@ -118,7 +118,7 @@ document.querySelector("#presence-toggle")?.addEventListener("click", (event) =>
 // danger the listener controls.
 let creaking: number | null = null;
 let groan: AmbienceHandle | null = null;
-let creakState = createCreakState();
+let burstState = createStressBurstState();
 const dangerSlider = document.querySelector<HTMLInputElement>("#danger");
 const dangerReadout = document.querySelector<HTMLElement>("#danger-readout");
 
@@ -139,7 +139,7 @@ document.querySelector("#creak-toggle")?.addEventListener("click", (event) => {
       stopCreaking();
       return;
     }
-    creakState = createCreakState();
+    burstState = createStressBurstState();
     groan = output.startAmbience(soundscape.resistanceStrain, soundscape.gain);
     groan.setIntensity(Number(dangerSlider?.value ?? 0));
     const startedAt = performance.now();
@@ -147,11 +147,11 @@ document.querySelector("#creak-toggle")?.addEventListener("click", (event) => {
     creaking = globalThis.setInterval(() => {
       const elapsed = performance.now() - startedAt;
       const danger = Number(dangerSlider?.value ?? 0);
-      const burst = collectDueCreaks(creakState, danger, elapsed, soundscape.resistanceCreak);
-      creakState = burst.next;
+      const burst = collectDueStressBursts(burstState, danger, elapsed, soundscape.resistanceStressBursts);
+      burstState = burst.next;
       for (const creak of burst.due) {
         output.play(
-          composeCue(soundscape.resistanceCreak.cue, soundscape.gain * creak.gainScale),
+          composeCue(soundscape.resistanceStressBursts.cue, soundscape.gain * creak.gainScale),
           creak.inMs,
         );
       }
@@ -218,7 +218,7 @@ document.querySelector("#play-score")?.addEventListener("click", () => {
       setToggle(document.querySelector("#ambience-toggle"), true);
     }
     if (!presence) {
-      presence = output.startAmbience(soundscape.managementPresence, soundscape.gain);
+      presence = output.startAmbience(soundscape.opposingActorPresence, soundscape.gain);
       setToggle(document.querySelector("#presence-toggle"), true);
     }
     setToggle(document.querySelector("#play-score"), true);

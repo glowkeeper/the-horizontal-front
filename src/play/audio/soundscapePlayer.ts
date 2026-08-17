@@ -97,7 +97,7 @@ export function createSoundscapePlayer(
   };
 
   let ambience: AmbienceHandle | null = null;
-  let managementPresence: AmbienceHandle | null = null;
+  let opposingActorPresence: AmbienceHandle | null = null;
   let resistanceStrain: AmbienceHandle | null = null;
 
   return {
@@ -110,13 +110,13 @@ export function createSoundscapePlayer(
         ambience = output.startAmbience(soundscape.ambience, soundscape.gain);
         // Management is present throughout rather than only when interrupting,
         // and grumbles harder as the day advances whatever the player does.
-        managementPresence = output.startAmbience(
-          soundscape.managementPresence,
+        opposingActorPresence = output.startAmbience(
+          soundscape.opposingActorPresence,
           soundscape.gain,
         );
       }
       ambience?.setIntensity(intensity);
-      managementPresence?.setIntensity(intensity);
+      opposingActorPresence?.setIntensity(intensity);
     },
     setDanger(danger): void {
       if (!resistanceStrain && !output.isMuted()) {
@@ -141,16 +141,16 @@ export function createSoundscapePlayer(
     stopAmbience(): void {
       ambience?.stop();
       ambience = null;
-      managementPresence?.stop();
-      managementPresence = null;
+      opposingActorPresence?.stop();
+      opposingActorPresence = null;
       resistanceStrain?.stop();
       resistanceStrain = null;
     },
     stop(): void {
       ambience?.stop();
       ambience = null;
-      managementPresence?.stop();
-      managementPresence = null;
+      opposingActorPresence?.stop();
+      opposingActorPresence = null;
       resistanceStrain?.stop();
       resistanceStrain = null;
       output.stopAll();

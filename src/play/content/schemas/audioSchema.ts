@@ -51,9 +51,9 @@ export const audioCueRoles = [
   "interruption-success",
   "interruption-failure",
   "interruption-return",
-  "management-bluster",
-  "victory",
-  "forced-verticalisation",
+  "opposing-actor-voice",
+  "outcome-success",
+  "outcome-failure",
   "interface-action",
 ] as const;
 
@@ -183,7 +183,7 @@ export const audioSoundscapeSchema = z.object({
    * strain uses, and the same argument: the clock is Management's weapon.
    * Authored low, because it is a presence rather than an event.
    */
-  managementPresence: audioAmbienceSchema,
+  opposingActorPresence: audioAmbienceSchema,
   /**
    * The sustained component of the structure under load, following danger.
    *
@@ -204,7 +204,7 @@ export const audioSoundscapeSchema = z.object({
    * creaks rather than a sustained tone: a continuous oscillator following
    * danger sounds like a hum, not like timber being worked.
    */
-  resistanceCreak: z.object({
+  resistanceStressBursts: z.object({
     cue: ownedContentReferenceSchema,
     minimumDanger: unitIntervalSchema,
     restIntervalMs: z.number().int().positive().max(10_000),

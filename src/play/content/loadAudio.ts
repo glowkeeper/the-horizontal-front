@@ -27,9 +27,9 @@ export type CompiledSoundscape = {
   readonly id: string;
   readonly gain: number;
   readonly ambience: AudioAmbienceContent;
-  readonly managementPresence: AudioAmbienceContent;
+  readonly opposingActorPresence: AudioAmbienceContent;
   readonly resistanceStrain: AudioAmbienceContent;
-  readonly resistanceCreak: {
+  readonly resistanceStressBursts: {
     readonly cue: AudioCueContent;
     readonly minimumDanger: number;
     readonly restIntervalMs: number;
@@ -113,11 +113,11 @@ export function compileSoundscape(
     id: soundscape.id,
     gain: soundscape.gain,
     ambience: soundscape.ambience,
-    managementPresence: soundscape.managementPresence,
+    opposingActorPresence: soundscape.opposingActorPresence,
     resistanceStrain: soundscape.resistanceStrain,
-    resistanceCreak: {
-      ...soundscape.resistanceCreak,
-      cue: resolveNamedCue(soundscape, soundscape.resistanceCreak.cue, scope),
+    resistanceStressBursts: {
+      ...soundscape.resistanceStressBursts,
+      cue: resolveNamedCue(soundscape, soundscape.resistanceStressBursts.cue, scope),
     },
     cues,
   };
@@ -125,7 +125,7 @@ export function compileSoundscape(
 
 function resolveNamedCue(
   soundscape: AudioSoundscapeContent,
-  reference: AudioSoundscapeContent["resistanceCreak"]["cue"],
+  reference: AudioSoundscapeContent["resistanceStressBursts"]["cue"],
   scope: EpisodeAudioScope,
 ): AudioCueContent {
   const cue = reference.source === "shared"

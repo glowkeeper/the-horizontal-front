@@ -88,7 +88,7 @@ describe("confrontation coordinator", () => {
     expect(attack.interaction.kind).toBe("sequence");
     if (attack.interaction.kind !== "sequence") return;
     let confrontation = advanceConfrontation(createConfrontation(config), attack.startsAtMs);
-    const startingSafety = confrontation.resistance.state.duvetSafety;
+    const startingSafety = confrontation.resistance.state.resistanceSafety;
     for (const [index, choiceId] of attack.interaction.steps.entries()) {
       confrontation = applyConfrontationInput(confrontation, {
         kind: "sequence", choiceId, atMs: attack.startsAtMs + index * 50,
@@ -97,7 +97,7 @@ describe("confrontation coordinator", () => {
     expect(confrontation.activeInterruption).toMatchObject({
       outcome: "success", sequenceStep: attack.interaction.steps.length,
     });
-    expect(confrontation.resistance.state.duvetSafety)
+    expect(confrontation.resistance.state.resistanceSafety)
       .toBeCloseTo(Math.min(1, startingSafety + attack.consequences.successSafety));
     expect(getConfrontationControlOwner(confrontation)).toBe("none");
     confrontation = advanceConfrontation(confrontation, attack.returnsAtMs);
@@ -155,14 +155,14 @@ describe("confrontation coordinator", () => {
     let cancelled = applyConfrontationInput(ready, {
       kind: "hold", action: "press", atMs: pressedAt,
     });
-    const safetyBeforeCancellation = cancelled.resistance.state.duvetSafety;
+    const safetyBeforeCancellation = cancelled.resistance.state.resistanceSafety;
     cancelled = applyConfrontationInput(cancelled, {
       kind: "hold", action: "cancel", atMs: pressedAt + 100,
     });
     expect(cancelled.activeInterruption).toMatchObject({
       outcome: "cancelled", feedback: "cancelled", holdStartedAtMs: null,
     });
-    expect(cancelled.resistance.state.duvetSafety).toBe(safetyBeforeCancellation);
+    expect(cancelled.resistance.state.resistanceSafety).toBe(safetyBeforeCancellation);
   });
 
   it("ignores cancellation unless a hold is actually in progress", () => {
@@ -193,7 +193,7 @@ describe("confrontation coordinator", () => {
     const attack = config.interruptions[0];
     let confrontation = advanceConfrontation(createConfrontation(config), attack.startsAtMs);
     confrontation = advanceConfrontation(confrontation, attack.endsAtMs + 1);
-    const safetyAfterConsequence = confrontation.resistance.state.duvetSafety;
+    const safetyAfterConsequence = confrontation.resistance.state.resistanceSafety;
     expect(getInterruptionPresentationState(confrontation).stage).toBe("returning");
     expect(getConfrontationControlOwner(confrontation)).toBe("none");
     expect(getRhythmGuide(confrontation.resistance).some(
@@ -201,7 +201,7 @@ describe("confrontation coordinator", () => {
     )).toBe(true);
 
     confrontation = advanceConfrontation(confrontation, attack.returnsAtMs - 1);
-    expect(confrontation.resistance.state.duvetSafety)
+    expect(confrontation.resistance.state.resistanceSafety)
       .toBeCloseTo(safetyAfterConsequence);
     expect(getConfrontationControlOwner(confrontation)).toBe("none");
   });

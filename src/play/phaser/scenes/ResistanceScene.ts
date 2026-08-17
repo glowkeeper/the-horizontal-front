@@ -1,10 +1,10 @@
 import Phaser from "phaser";
 
 import {
-  collectDueCreaks,
-  createCreakState,
-  type CreakState,
-} from "../../audio/creakScheduler";
+  collectDueStressBursts,
+  createStressBurstState,
+  type StressBurstState,
+} from "../../audio/stressBurstScheduler";
 import {
   collectDueCues,
   createCueScheduler,
@@ -121,7 +121,7 @@ export class ResistanceScene extends Phaser.Scene {
   private cueScheduler: CueSchedulerState = createCueScheduler();
   private countInScheduler: CueSchedulerState = createCueScheduler();
   private beatScheduler: CueSchedulerState = createCueScheduler();
-  private creakState: CreakState = createCreakState();
+  private burstState: StressBurstState = createStressBurstState();
   private downbeatScheduler: CueSchedulerState = createCueScheduler();
   private approachScheduler: CueSchedulerState = createCueScheduler();
   private scoredCueTimesMs: readonly number[] = [];
@@ -188,7 +188,7 @@ export class ResistanceScene extends Phaser.Scene {
     this.cueScheduler = createCueScheduler();
     this.countInScheduler = createCueScheduler();
     this.beatScheduler = createCueScheduler();
-    this.creakState = createCreakState();
+    this.burstState = createStressBurstState();
     this.downbeatScheduler = createCueScheduler();
     this.approachScheduler = createCueScheduler();
     this.holdSounding = false;
@@ -229,7 +229,7 @@ export class ResistanceScene extends Phaser.Scene {
     void this.audio.unlock();
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.audio.stop());
 
-    this.createBedroom();
+    this.createConfrontationScene();
     this.createRhythmInterface();
     this.interruptionPresentation = createInterruptionPresentation(
       this,
@@ -342,18 +342,18 @@ export class ResistanceScene extends Phaser.Scene {
     // amplitude both climb with the same physical danger the bed is drawn from,
     // so what the player sees lifting and what they hear working are one
     // signal rather than two presentations that can disagree.
-    const danger = 1 - this.resistance.state.duvetSafety;
+    const danger = 1 - this.resistance.state.resistanceSafety;
     this.audio.setDanger(danger);
-    const creak = collectDueCreaks(
-      this.creakState,
+    const creak = collectDueStressBursts(
+      this.burstState,
       danger,
       elapsedMs,
-      this.episode.audio.resistanceCreak,
+      this.episode.audio.resistanceStressBursts,
     );
-    this.creakState = creak.next;
+    this.burstState = creak.next;
     for (const burst of creak.due) {
       this.audio.playScaled(
-        this.episode.audio.resistanceCreak.cue,
+        this.episode.audio.resistanceStressBursts.cue,
         burst.inMs,
         burst.gainScale,
       );
@@ -365,7 +365,7 @@ export class ResistanceScene extends Phaser.Scene {
     this.holdSounding = holding;
   }
 
-  private createBedroom(): void {
+  private createConfrontationScene(): void {
     this.layout = createResistanceLayout(
       this,
       this.episode,
@@ -707,7 +707,7 @@ export class ResistanceScene extends Phaser.Scene {
       this.renderJudgement(state.lastRhythmJudgement);
     }
 
-    this.layout.render(state.duvetSafety, state.dramaticIntensity);
+    this.layout.render(state.resistanceSafety, state.dramaticIntensity);
 
     const remainingMs = Math.max(
       0,
@@ -1147,7 +1147,7 @@ export class ResistanceScene extends Phaser.Scene {
     const palette = this.resolvedPalette;
     this.finished = true;
     this.audio.play(
-      this.resistance.state.outcome === "victory" ? "victory" : "forced-verticalisation",
+      this.resistance.state.outcome === "success" ? "outcome-success" : "outcome-failure",
     );
     // The confrontation is over but the scene lives on through the outcome and
     // the debrief, so the room has to be told to go quiet. The sting is already
@@ -1173,10 +1173,10 @@ export class ResistanceScene extends Phaser.Scene {
     this.rightCueLabel
       .setAlpha(1)
       .setColor(getThemeColour(palette.label.rest));
-    const victory = this.resistance.state.outcome === "victory";
+    const victory = this.resistance.state.outcome === "success";
     const resultContent = victory
-      ? this.episode.results.victory
-      : this.episode.results.forcedVerticalisation;
+      ? this.episode.results.success
+      : this.episode.results.failure;
 
     if (resultContent.illustration) {
       this.children.removeAll(true);
@@ -1192,12 +1192,12 @@ export class ResistanceScene extends Phaser.Scene {
       this.result
         .setText(resultContent.headline)
         .setColor(getThemeColour(
-        victory ? palette.result.victory : palette.result.forcedVerticalisation,
+        victory ? palette.result.success : palette.result.failure,
       ))
         .setVisible(true);
       this.feedback.setText(resultContent.feedback).setVisible(true);
-      if (victory) this.layout.animateVictory();
-      else this.layout.animateForcedVerticalisation();
+      if (victory) this.layout.animateSuccess();
+      else this.layout.animateFailure();
     }
 
     announce(formatCopy(game.interface.resolutionStatus, {
@@ -1340,7 +1340,7 @@ function soundForJudgement(judgement: RhythmJudgement): AudioCueRole {
  */
 function soundForInterruptionState(id: string): AudioCueRole | null {
   if (id.endsWith(":warning")) return "interruption-warning";
-  if (id.endsWith(":active")) return "management-bluster";
+  if (id.endsWith(":active")) return "opposing-actor-voice";
   if (id.endsWith(":returning")) return "interruption-return";
   if (id.endsWith(":resolved:success")) return "interruption-success";
   if (id.endsWith(":resolved:failure") || id.endsWith(":resolved:expired")) {

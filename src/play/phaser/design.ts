@@ -12,7 +12,7 @@ export const GAME_CENTRE_X = GAME_WIDTH / 2;
  * validated content, and every remaining presentation value is a named constant
  * in this file. See docs/technical-architecture.md.
  */
-export const CHROME_BACKGROUND: ColourRole = "duvetCream";
+export const CHROME_BACKGROUND: ColourRole = "restCream";
 
 /**
  * Default height for an interface-chrome control, in design pixels.
@@ -30,7 +30,7 @@ export const CHROME_MENU = {
 } as const;
 
 export const CHROME_PANEL = {
-  background: "duvetCream",
+  background: "restCream",
   accent: "resistanceRed",
 } as const satisfies {
   readonly background: ColourRole;

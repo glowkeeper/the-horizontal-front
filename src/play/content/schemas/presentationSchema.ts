@@ -3,11 +3,11 @@ import { assetFilePattern } from "../contentRules.mjs";
 import { ownedContentReferenceSchema } from "./ownershipSchema";
 
 const colourRoleSchema = z.enum([
-  "duvetCream",
+  "restCream",
   "inkCharcoal",
   "resistanceRed",
   "workLightBlue",
-  "managementGold",
+  "authorityGold",
   "paperWhite",
 ]);
 const pointSchema = z.object({ x: z.number(), y: z.number() }).strict();
@@ -393,8 +393,8 @@ export const resistanceLayoutSchema = z.object({
         stroke: colourRoleSchema,
       }).strict(),
       result: z.object({
-        victory: colourRoleSchema,
-        forcedVerticalisation: colourRoleSchema,
+        success: colourRoleSchema,
+        failure: colourRoleSchema,
       }).strict(),
     }).strict(),
     layers: z.object({
@@ -441,10 +441,10 @@ export const resistanceLayoutSchema = z.object({
       workLightAlpha: unitIntervalSchema,
     }).strict(),
     rest: z.object({ workLightAlpha: unitIntervalSchema }).strict(),
-    victory: z.object({
+    success: z.object({
       durationMs: z.number().int().positive(), ease: easeSchema,
     }).strict(),
-    forcedVerticalisation: z.object({
+    failure: z.object({
       durationMs: z.number().int().positive(), ease: easeSchema,
     }).strict(),
   }).strict(),

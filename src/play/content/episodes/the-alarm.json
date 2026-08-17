@@ -223,7 +223,7 @@
     }
   },
   "results": {
-    "victory": {
+    "success": {
       "headline": "THE LINE HOLDS",
       "feedback": "REST, BRIEFLY",
       "illustration": {
@@ -231,7 +231,7 @@
         "id": "the-alarm-victory"
       }
     },
-    "forcedVerticalisation": {
+    "failure": {
       "headline": "FORCED VERTICALISATION",
       "feedback": "MANAGEMENT PREVAILS",
       "illustration": {

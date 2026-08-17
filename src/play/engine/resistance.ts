@@ -17,7 +17,7 @@ export function createResistance(config: ResistanceConfig): Resistance {
   return {
     config,
     state: {
-      duvetSafety: config.startingSafety,
+      resistanceSafety: config.startingSafety,
       resistanceStrength: 0,
       nextRhythmStep: 0,
       activeHold: null,
@@ -35,7 +35,7 @@ export function advanceResistance(resistance: Resistance, toMs: number): Resista
 
   const effectiveToMs = Math.min(toMs, resistance.config.durationMs);
   let cursorMs = resistance.state.elapsedMs;
-  let duvetSafety = resistance.state.duvetSafety;
+  let resistanceSafety = resistance.state.resistanceSafety;
   let resistanceStrength = resistance.state.resistanceStrength;
   let nextRhythmStep = resistance.state.nextRhythmStep;
   let activeHold = resistance.state.activeHold;
@@ -55,19 +55,19 @@ export function advanceResistance(resistance: Resistance, toMs: number): Resista
       deadline,
       resistanceStrength,
     );
-    if (pressureLoss >= duvetSafety) {
-      return pressureFailure(resistance, cursorMs, deadline, duvetSafety, {
+    if (pressureLoss >= resistanceSafety) {
+      return pressureFailure(resistance, cursorMs, deadline, resistanceSafety, {
         resistanceStrength,
         nextRhythmStep,
         activeHold,
         lastRhythmJudgement,
       });
     }
-    duvetSafety -= pressureLoss;
+    resistanceSafety -= pressureLoss;
     cursorMs = deadline;
 
     const phase = resistance.config.phases[cue.phaseIndex];
-    duvetSafety = clamp01(duvetSafety - phase.safetyPenaltyPerMiss);
+    resistanceSafety = clamp01(resistanceSafety - phase.safetyPenaltyPerMiss);
     resistanceStrength = clamp01(
       resistanceStrength - phase.resistanceLossPerMiss,
     );
@@ -81,16 +81,16 @@ export function advanceResistance(resistance: Resistance, toMs: number): Resista
     };
     nextRhythmStep += 1;
     activeHold = null;
-    if (duvetSafety === 0) {
+    if (resistanceSafety === 0) {
       return withState(resistance, {
         ...resistance.state,
-        duvetSafety: 0,
+        resistanceSafety: 0,
         resistanceStrength,
         nextRhythmStep,
         activeHold,
         elapsedMs: deadline,
         dramaticIntensity: getDramaticIntensity(resistance.config, deadline),
-        outcome: "forced-verticalisation",
+        outcome: "failure",
         lastRhythmJudgement,
       });
     }
@@ -102,18 +102,18 @@ export function advanceResistance(resistance: Resistance, toMs: number): Resista
     effectiveToMs,
     resistanceStrength,
   );
-  if (finalPressureLoss >= duvetSafety) {
-    return pressureFailure(resistance, cursorMs, effectiveToMs, duvetSafety, {
+  if (finalPressureLoss >= resistanceSafety) {
+    return pressureFailure(resistance, cursorMs, effectiveToMs, resistanceSafety, {
       resistanceStrength,
       nextRhythmStep,
       activeHold,
       lastRhythmJudgement,
     });
   }
-  duvetSafety -= finalPressureLoss;
+  resistanceSafety -= finalPressureLoss;
   const nextState: ResistanceState = {
     ...resistance.state,
-    duvetSafety: clamp01(duvetSafety),
+    resistanceSafety: clamp01(resistanceSafety),
     resistanceStrength,
     nextRhythmStep,
     activeHold,
@@ -122,7 +122,7 @@ export function advanceResistance(resistance: Resistance, toMs: number): Resista
     lastRhythmJudgement,
   };
   return withState(resistance, effectiveToMs === resistance.config.durationMs
-    ? { ...nextState, outcome: "victory" }
+    ? { ...nextState, outcome: "success" }
     : nextState);
 }
 
@@ -203,11 +203,11 @@ export function adjustResistanceSafety(
   amount: number,
 ): Resistance {
   if (!Number.isFinite(amount)) throw new Error("safety adjustment must be finite");
-  const duvetSafety = clamp01(resistance.state.duvetSafety + amount);
+  const resistanceSafety = clamp01(resistance.state.resistanceSafety + amount);
   return withState(resistance, {
     ...resistance.state,
-    duvetSafety,
-    outcome: duvetSafety === 0 ? "forced-verticalisation" : resistance.state.outcome,
+    resistanceSafety,
+    outcome: resistanceSafety === 0 ? "failure" : resistance.state.outcome,
   });
 }
 
@@ -263,7 +263,7 @@ function hit(resistance: Resistance, cue: ScoredRhythmCue, step: number, side: "
     * (1 + resistanceStrength * phase.resistanceRecoveryBonus);
   return withState(resistance, {
     ...resistance.state,
-    duvetSafety: clamp01(resistance.state.duvetSafety + recovery),
+    resistanceSafety: clamp01(resistance.state.resistanceSafety + recovery),
     resistanceStrength,
     nextRhythmStep: step + 1,
     activeHold: null,
@@ -275,12 +275,12 @@ function hit(resistance: Resistance, cue: ScoredRhythmCue, step: number, side: "
 
 function miss(resistance: Resistance, cue: ScoredRhythmCue, step: number, reason: "early" | "wrong-side" | "released-early", side: "left" | "right", consume: boolean): Resistance {
   const phase = resistance.config.phases[cue.phaseIndex];
-  const duvetSafety = clamp01(
-    resistance.state.duvetSafety - phase.safetyPenaltyPerMiss,
+  const resistanceSafety = clamp01(
+    resistance.state.resistanceSafety - phase.safetyPenaltyPerMiss,
   );
   return withState(resistance, {
     ...resistance.state,
-    duvetSafety,
+    resistanceSafety,
     resistanceStrength: clamp01(
       resistance.state.resistanceStrength - phase.resistanceLossPerMiss,
     ),
@@ -289,8 +289,8 @@ function miss(resistance: Resistance, cue: ScoredRhythmCue, step: number, reason
     lastRhythmJudgement: {
       kind: "miss", reason, expectedSide: cue.side, actualSide: side, step, action: cue.action,
     },
-    outcome: duvetSafety === 0
-      ? "forced-verticalisation"
+    outcome: resistanceSafety === 0
+      ? "failure"
       : resistance.state.outcome,
   });
 }
@@ -330,10 +330,10 @@ function pressureFailure(
   return withState(resistance, {
     ...resistance.state,
     ...progress,
-    duvetSafety: 0,
+    resistanceSafety: 0,
     elapsedMs: failureAtMs,
     dramaticIntensity: getDramaticIntensity(resistance.config, failureAtMs),
-    outcome: "forced-verticalisation",
+    outcome: "failure",
   });
 }
 

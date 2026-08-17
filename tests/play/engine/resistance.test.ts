@@ -47,7 +47,7 @@ const config: ResistanceConfig = {
 describe("resistance engine", () => {
   it("creates bounded state from a finite resolved score", () => {
     expect(createResistance(config).state).toMatchObject({
-      duvetSafety: 0.8, resistanceStrength: 0, nextRhythmStep: 0,
+      resistanceSafety: 0.8, resistanceStrength: 0, nextRhythmStep: 0,
       activeHold: null, elapsedMs: 0, dramaticIntensity: 0, outcome: "active",
     });
   });
@@ -57,7 +57,7 @@ describe("resistance engine", () => {
     const once = advanceResistance(initial, 3_000);
     const split = advanceResistance(advanceResistance(initial, 1_000), 3_000);
     expect(split).toEqual(once);
-    expect(once.state.duvetSafety).toBeCloseTo(0.32);
+    expect(once.state.resistanceSafety).toBeCloseTo(0.32);
   });
 
   it("lets earned resistance protect the player between slow beats", () => {
@@ -73,7 +73,7 @@ describe("resistance engine", () => {
       state: { ...initial.state, resistanceStrength: 0.75 },
     };
     const afterOneSecond = advanceResistance(protectedResistance, 1_000);
-    expect(afterOneSecond.state.duvetSafety).toBeCloseTo(0.775);
+    expect(afterOneSecond.state.resistanceSafety).toBeCloseTo(0.775);
     expect(afterOneSecond.state.resistanceStrength).toBe(0.75);
   });
 
@@ -83,7 +83,7 @@ describe("resistance engine", () => {
     for (let atMs = 100; atMs <= 3_500; atMs += 100) {
       stepped = advanceResistance(stepped, atMs);
     }
-    expect(stepped.state.duvetSafety).toBeCloseTo(once.state.duvetSafety);
+    expect(stepped.state.resistanceSafety).toBeCloseTo(once.state.resistanceSafety);
     expect(stepped.state.resistanceStrength)
       .toBeCloseTo(once.state.resistanceStrength);
     expect(stepped.state.nextRhythmStep).toBe(once.state.nextRhythmStep);
@@ -105,18 +105,18 @@ describe("resistance engine", () => {
       state: { ...initial.state, resistanceStrength: 0.6 },
     };
     const duringReady = advanceResistance(earned, 250);
-    expect(duringReady.state.duvetSafety).toBeCloseTo(0.8);
+    expect(duringReady.state.resistanceSafety).toBeCloseTo(0.8);
     expect(duringReady.state.dramaticIntensity).toBeCloseTo(0);
     expect(duringReady.state.resistanceStrength).toBe(0.6);
 
     const atRestStart = advanceResistance(duringReady, 1_000);
     const duringRest = advanceResistance(atRestStart, 1_250);
-    expect(duringRest.state.duvetSafety).toBeCloseTo(atRestStart.state.duvetSafety);
+    expect(duringRest.state.resistanceSafety).toBeCloseTo(atRestStart.state.resistanceSafety);
     expect(duringRest.state.dramaticIntensity).toBeCloseTo(
       atRestStart.state.dramaticIntensity,
     );
-    expect(advanceResistance(duringRest, 1_500).state.duvetSafety)
-      .toBeCloseTo(atRestStart.state.duvetSafety);
+    expect(advanceResistance(duringRest, 1_500).state.resistanceSafety)
+      .toBeCloseTo(atRestStart.state.resistanceSafety);
     expect(duringRest.state.resistanceStrength).toBe(0.6);
   });
 
@@ -219,7 +219,7 @@ describe("resistance engine", () => {
       ...config,
       phases: config.phases.map((phase) => ({ ...phase, pressurePerSecond: 0 })),
     };
-    expect(advanceResistance(createResistance(safe), 4_000).state.outcome).toBe("victory");
+    expect(advanceResistance(createResistance(safe), 4_000).state.outcome).toBe("success");
   });
 
   it("fails at the precise time phase pressure removes safety", () => {
@@ -231,7 +231,7 @@ describe("resistance engine", () => {
       beatTimesMs: [],
     };
     const result = advanceResistance(createResistance(dangerous), 2_000);
-    expect(result.state.outcome).toBe("forced-verticalisation");
+    expect(result.state.outcome).toBe("failure");
     expect(result.state.elapsedMs).toBeCloseTo(1_000);
   });
 

@@ -120,7 +120,7 @@ describe("catalogued resistance composition", () => {
   it("makes The Alarm fail under inaction but winnable by following its score", () => {
     const config = game.entryEpisode.confrontation.resistance;
     const inactive = advanceResistance(createResistance(config), config.durationMs);
-    expect(inactive.state.outcome).toBe("forced-verticalisation");
+    expect(inactive.state.outcome).toBe("failure");
     expect(inactive.state.elapsedMs).toBeGreaterThan(17_000);
 
     let resisted = createResistance(config);
@@ -139,7 +139,7 @@ describe("catalogued resistance composition", () => {
       }
     }
     resisted = advanceResistance(resisted, config.durationMs);
-    expect(resisted.state.outcome).toBe("victory");
+    expect(resisted.state.outcome).toBe("success");
   });
 
   it("makes one-sided and indifferent play lose The Alarm", () => {
@@ -154,7 +154,7 @@ describe("catalogued resistance composition", () => {
       });
     }
     oneSided = advanceResistance(oneSided, config.durationMs);
-    expect(oneSided.state.outcome).toBe("forced-verticalisation");
+    expect(oneSided.state.outcome).toBe("failure");
 
     let indifferent = createResistance(config);
     for (const [index, cue] of config.cues.entries()) {
@@ -174,7 +174,7 @@ describe("catalogued resistance composition", () => {
       }
     }
     indifferent = advanceResistance(indifferent, config.durationMs);
-    expect(indifferent.state.outcome).toBe("forced-verticalisation");
+    expect(indifferent.state.outcome).toBe("failure");
   });
 
   it("still allows recovery from occasional missed cues", () => {
@@ -196,7 +196,7 @@ describe("catalogued resistance composition", () => {
       }
     }
     resisted = advanceResistance(resisted, config.durationMs);
-    expect(resisted.state.outcome).toBe("victory");
+    expect(resisted.state.outcome).toBe("success");
   });
 
   it("allows the opening episode to recover after several consecutive misses", () => {
@@ -218,7 +218,7 @@ describe("catalogued resistance composition", () => {
       }
     }
     resisted = advanceResistance(resisted, config.durationMs);
-    expect(resisted.state.outcome).toBe("victory");
+    expect(resisted.state.outcome).toBe("success");
   });
 
   it("lets an accurate final phrase recover a threatened player", () => {
@@ -233,7 +233,7 @@ describe("catalogued resistance composition", () => {
       ...initial,
       state: {
         ...initial.state,
-        duvetSafety: 0.18,
+        resistanceSafety: 0.18,
         resistanceStrength: 0.4,
         nextRhythmStep: firstCrisisStep,
         elapsedMs: crisis.startsAtMs,
@@ -248,8 +248,8 @@ describe("catalogued resistance composition", () => {
       });
     }
     resisted = advanceResistance(resisted, config.durationMs);
-    expect(resisted.state.outcome).toBe("victory");
-    expect(resisted.state.duvetSafety).toBeGreaterThan(0.18);
+    expect(resisted.state.outcome).toBe("success");
+    expect(resisted.state.resistanceSafety).toBeGreaterThan(0.18);
   });
 
   it("announces each demand ahead of it, scaled to the phase tempo", () => {

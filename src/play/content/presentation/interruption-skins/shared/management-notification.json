@@ -21,7 +21,7 @@
   },
   "choice": {
     "fill": "paperWhite",
-    "activeFill": "managementGold",
+    "activeFill": "authorityGold",
     "stroke": "inkCharcoal",
     "strokeWidth": 4,
     "activeLabelAlpha": 1,
@@ -31,7 +31,7 @@
     "fill": "paperWhite",
     "stroke": "inkCharcoal",
     "strokeWidth": 5,
-    "progressFill": "managementGold",
+    "progressFill": "authorityGold",
     "progressAlpha": 1
   },
   "states": {

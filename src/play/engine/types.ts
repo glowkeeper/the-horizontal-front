@@ -104,7 +104,7 @@ export type ResistanceConfig = {
   readonly downbeatTimesMs: readonly number[];
 };
 
-export type ResistanceOutcome = "active" | "victory" | "forced-verticalisation";
+export type ResistanceOutcome = "active" | "success" | "failure";
 
 export type RhythmJudgement =
   | {
@@ -131,7 +131,7 @@ export type ActiveHold = {
 };
 
 export type ResistanceState = {
-  readonly duvetSafety: number;
+  readonly resistanceSafety: number;
   readonly resistanceStrength: number;
   readonly nextRhythmStep: number;
   readonly activeHold: ActiveHold | null;

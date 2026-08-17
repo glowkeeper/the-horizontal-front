@@ -284,25 +284,25 @@ export function createEpisodeConfrontationLayout(
       }
     },
 
-    animateVictory(): void {
+    animateSuccess(): void {
       transitionToResistance(0);
       addTween(scene, resistanceContainer, {
         rotation: 0,
-        duration: motion.victory.durationMs,
-        ease: motion.victory.ease,
+        duration: motion.success.durationMs,
+        ease: motion.success.ease,
       });
       addTween(scene, workLight, {
         alpha: motion.rest.workLightAlpha,
-        duration: motion.victory.durationMs,
+        duration: motion.success.durationMs,
       });
     },
 
-    animateForcedVerticalisation(): void {
+    animateFailure(): void {
       transitionToResistance(resistanceVisual.states.length - 1);
       addTween(scene, resistanceContainer, {
         rotation: Phaser.Math.DegToRad(resistanceVisual.dangerAngleDegrees),
-        duration: motion.forcedVerticalisation.durationMs,
-        ease: motion.forcedVerticalisation.ease,
+        duration: motion.failure.durationMs,
+        ease: motion.failure.ease,
       });
     },
   };

@@ -50,6 +50,62 @@ const PERSON_REFERENCE_EXTENSIONS = new Set([
   ".md", ".json", ".ts", ".mjs", ".js", ".html", ".css",
 ]);
 
+/**
+ * Episode-agnosticism invariant.
+ *
+ * Content identity must not appear in code, and the check for literal IDs is
+ * only half of that. The subtler leak is vocabulary: a field called
+ * `duvetSafety` in the shared engine names one episode's bedding, and every
+ * later episode inherits a term that does not describe it. The rule is that
+ * reusable code names the general concept — the resistance, the opposing actor
+ * — while the specific fiction lives in content, where a duvet, a door or a
+ * chair is exactly the right word.
+ *
+ * Only identifiers are matched, not comments or prose, because explaining a
+ * generic mechanism by its concrete example is good writing rather than a leak.
+ *
+ * Content directories are exempt: naming a cue `bed-frame-creak` is the system
+ * working. So is `forced-verticalisation`, which is the game's own central
+ * outcome rather than any one episode's invention.
+ */
+const EPISODE_FICTION_TERMS = [
+  // One episode's objects and setting.
+  "duvet", "bedroom", "pillow", "mattress", "alarmClock",
+  // One episode's antagonist. The recurring role is Management today, but a
+  // later episode may set a CEO, a colleague or a department against the
+  // player, so reusable code says opposing actor and content says who.
+  "management",
+  // One episode's outcome. Being forced upright is how The Alarm loses; another
+  // episode loses differently. The engine knows success and failure.
+  "verticalis",
+];
+const EPISODE_FICTION_ROOTS = [
+  "src/play/engine",
+  "src/play/audio",
+  "src/play/input",
+  "src/play/content/schemas",
+];
+
+async function findEpisodeFictionInEngine() {
+  const findings = [];
+  for (const root of EPISODE_FICTION_ROOTS) {
+    for (const file of await listFiles(join(projectRoot, root))) {
+      if (extname(file) !== ".ts") continue;
+      const relativePath = relative(projectRoot, file).split("\\").join("/");
+      const source = await readFile(file, "utf8");
+      const code = source
+        .split("\n")
+        .filter((line) => !/^\s*(\/\/|\*|\/\*)/.test(line))
+        .join("\n");
+      for (const term of EPISODE_FICTION_TERMS) {
+        const pattern = new RegExp(`\\b${term}`, "i");
+        if (pattern.test(code)) findings.push(`${relativePath} (${term})`);
+      }
+    }
+  }
+  return findings;
+}
+
 async function findPersonReferences(directory) {
   const findings = [];
   for (const file of await listFiles(directory)) {
@@ -255,6 +311,7 @@ const discoveredCurveFiles = (await listFiles(join(mechanicRoot, "dramatic-curve
 const discoveredInterruptionFiles = (await listFiles(join(mechanicRoot, "interruptions")))
   .map((file) => relative(join(mechanicRoot, "interruptions"), file).split("\\").join("/"))
   .filter((file) => file.endsWith(".json"));
+const episodeFictionInEngine = await findEpisodeFictionInEngine();
 const embeddedPlayerCopy = await findEmbeddedPlayerCopy(
   join(projectRoot, "src/play"),
 );
@@ -277,6 +334,10 @@ const personReferences = [
   )).flat(),
 ];
 
+requirePolicy(
+  episodeFictionInEngine.length === 0,
+  `Reusable engine, audio, schema and adapter code must not name one episode's fiction. Rename to the general concept, or move the name into content: ${episodeFictionInEngine.join(", ")}`,
+);
 requirePolicy(
   embeddedPlayerCopy.length === 0,
   `Player-visible Phaser copy must come from validated content, not string literals: ${embeddedPlayerCopy.join(", ")}`,
@@ -794,11 +855,11 @@ requirePolicy(
 );
 requirePolicy(
   [
-    "--colour-duvet-cream",
+    "--colour-rest-cream",
     "--colour-ink-charcoal",
     "--colour-resistance-red",
     "--colour-work-light-blue",
-    "--colour-management-gold",
+    "--colour-authority-gold",
     "--colour-paper-white",
   ].every((role) => themeTokens.includes(role)) &&
     themeTokens.includes("--font-interface") &&

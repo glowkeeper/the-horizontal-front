@@ -2,7 +2,7 @@
 
 :root {
   color: var(--colour-ink-charcoal);
-  background: var(--colour-duvet-cream);
+  background: var(--colour-rest-cream);
   font-family: var(--font-interface);
   font-synthesis: none;
   line-height: 1.6;
@@ -335,7 +335,7 @@ h3 {
   padding: clamp(1.5rem, 5vw, 3.5rem);
   color: var(--colour-paper-white);
   background: var(--colour-ink-charcoal);
-  border-top: 0.5rem solid var(--colour-management-gold);
+  border-top: 0.5rem solid var(--colour-authority-gold);
 }
 
 .document-page {

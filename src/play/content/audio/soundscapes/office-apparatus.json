@@ -79,15 +79,15 @@
       "source": "shared",
       "id": "carriage-return"
     },
-    "management-bluster": {
+    "opposing-actor-voice": {
       "source": "shared",
       "id": "managerial-rumble"
     },
-    "victory": {
+    "outcome-success": {
       "source": "shared",
       "id": "clock-off"
     },
-    "forced-verticalisation": {
+    "outcome-failure": {
       "source": "shared",
       "id": "alarm-klaxon"
     },
@@ -128,7 +128,7 @@
       }
     ]
   },
-  "managementPresence": {
+  "opposingActorPresence": {
     "restGain": 0.03,
     "strainGain": 0.13,
     "responseMs": 2200,
@@ -225,7 +225,7 @@
       }
     ]
   },
-  "resistanceCreak": {
+  "resistanceStressBursts": {
     "cue": {
       "source": "shared",
       "id": "bed-frame-creak"
