@@ -52,6 +52,13 @@
   align-items: center;
   justify-content: center;
   padding: 0 1em;
+  /*
+   * WCAG 2.2 sets 24 by 24 CSS pixels as the minimum pointer target and 44 by
+   * 44 at its enhanced level. A control hit with a thumb, on a phone, while a
+   * rhythm is running, should clear the enhanced figure rather than scrape the
+   * minimum.
+   */
+  min-height: 44px;
   border: var(--button-border-width) solid var(--button-border);
   box-shadow: var(--button-shadow-offset) var(--button-shadow-offset) 0 var(--button-shadow);
   font: 800 var(--button-label-size) / 1.2 var(--font-game);
@@ -162,6 +169,9 @@ html,
   z-index: 1;
   top: 0.75rem;
   right: 0.75rem;
+  /* Sits over the canvas on a phone and is hit with a thumb, so it clears the
+     WCAG 2.2 enhanced 44px target rather than the 24px minimum. */
+  min-height: 44px;
   padding: 0.5rem 0.75rem;
   border: 2px solid var(--colour-ink-charcoal);
   color: var(--colour-ink-charcoal);
