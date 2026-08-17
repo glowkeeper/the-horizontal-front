@@ -98,8 +98,18 @@
   );
 }
 
+/*
+ * Focus is charcoal rather than red across the whole shell.
+ *
+ * Red is a meaning in this game: it strokes the outcome panel, fills the
+ * primary control and carries danger on the canvas. A red focus ring inside a
+ * red-stroked panel therefore read as a second border or a rendering fault
+ * rather than as the keyboard's position. Charcoal is the interface-furniture
+ * role, is unambiguous against both the panel and the cream field, and leaves
+ * red meaning only what it means everywhere else.
+ */
 .game-action:focus-visible {
-  outline: 3px solid var(--colour-resistance-red);
+  outline: 3px solid var(--colour-ink-charcoal);
   outline-offset: 3px;
 }
 
@@ -158,7 +168,7 @@ html,
 }
 
 .game-exit:focus-visible {
-  outline: 3px solid var(--colour-resistance-red);
+  outline: 3px solid var(--colour-ink-charcoal);
   outline-offset: 3px;
 }
 
@@ -186,7 +196,7 @@ html,
 }
 
 .game-audio-toggle:focus-visible {
-  outline: 3px solid var(--colour-resistance-red);
+  outline: 3px solid var(--colour-ink-charcoal);
   outline-offset: 3px;
 }
 

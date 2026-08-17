@@ -1,6 +1,8 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
+import { canvasBounds, canvasTargets } from "./helpers/canvasControls";
+
 /**
  * Machine-checkable accessibility for every screen a player passes through.
  *
@@ -242,6 +244,64 @@ test("keeps focus inside the game across every scene transition", async ({ page 
   await expect(page.locator("#game-status"))
     .toHaveText(/Press R or tap Try Again to retry/);
   expect(await focusedDescription(), "the outcome must take focus").not.toBe("body");
+});
+
+test("shows the focus ring to a keyboard player and not to a pointer player", async ({ page }) => {
+  // Focus is placed deliberately on the outcome so a keyboard player is not
+  // dropped to the document body when the screen they were on is destroyed.
+  // Showing that placement as a *visible* ring to someone who arrived by
+  // tapping gave them an indicator they never asked for, sitting inside a panel
+  // stroked in the same colour, which read as a rendering fault rather than as
+  // the keyboard's position. Both properties are asserted here because fixing
+  // one by sacrificing the other is the obvious wrong answer.
+  const focusState = () => page.evaluate(() => ({
+    insideGame: document.activeElement !== null
+      && document.activeElement !== document.body,
+    ringShown: document.querySelector(".game-action:focus-visible") !== null,
+  }));
+  const settleFrames = () => page.evaluate(() => new Promise<void>((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+  }));
+
+  // Reach the outcome without ever touching the keyboard.
+  await page.goto("/play/");
+  await expect(campaignCard(page)).toBeVisible();
+  await campaignCard(page).click();
+  await expect(gameStatus(page)).toHaveText(briefingStatus);
+  await page.getByRole("button", { name: /Play\.\s*The Alarm/i }).click();
+  await expect(gameStatus(page)).toHaveText(resistanceStatus);
+
+  const bounds = await canvasBounds(page);
+  expect(bounds).not.toBeNull();
+  if (bounds === null) return;
+  const wrongControl = {
+    x: bounds.x + bounds.width * canvasTargets.leftResistanceControl.x,
+    y: bounds.y + bounds.height * canvasTargets.leftResistanceControl.y,
+  };
+  await page.waitForTimeout(openingCountInSettlingMs);
+  for (let attempt = 0; attempt < unsuccessfulInputCount; attempt += 1) {
+    await page.mouse.click(wrongControl.x, wrongControl.y);
+  }
+  await expect(gameStatus(page)).toHaveText(resultStatus);
+  await settleFrames();
+
+  const pointerArrival = await focusState();
+  expect(
+    pointerArrival.insideGame,
+    "a pointer player's focus must still not be dropped to the document body",
+  ).toBe(true);
+  expect(
+    pointerArrival.ringShown,
+    "a pointer player must not be shown a focus ring they did not ask for",
+  ).toBe(false);
+
+  // The indicator returns the moment the player actually uses the keyboard.
+  await page.keyboard.press("Tab");
+  const afterTab = await focusState();
+  expect(
+    afterTab.ringShown,
+    "tabbing must show a clearly visible focus indicator",
+  ).toBe(true);
 });
 
 test("every page shares one content column", async ({ page }) => {

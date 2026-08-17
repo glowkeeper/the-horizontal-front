@@ -39,7 +39,7 @@
       "cueHitNow": "HIT NOW",
       "tap": "TAP — {side}",
       "hold": "HOLD — {side}",
-      "hit": "✓ HIT — {side}\nSOLIDARITY! ✊ 🛏️",
+      "hit": "✓ HIT — {side}\nSOLIDARITY!",
       "wrongSide": "✕ WRONG KEY — {side} NEEDED",
       "tooEarly": "✕ TOO EARLY — {side} ON NOW",
       "missed": "✕ MISSED — {side}",

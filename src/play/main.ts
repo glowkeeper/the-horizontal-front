@@ -7,6 +7,7 @@ import {
   setGlobalMuted,
 } from "./audio/soundscapePlayer";
 import { createGame } from "./phaser/createGame";
+import { beginInputModalityTracking } from "./phaser/sceneChrome";
 
 const gameContainer = document.querySelector<HTMLElement>("#game");
 
@@ -14,6 +15,9 @@ if (!gameContainer) {
   throw new Error('Could not find the game container with the id "game".');
 }
 
+// Registered before the game starts so the first key or tap of the session is
+// already counted when the first screen places its focus.
+beginInputModalityTracking();
 bindAudioToggle();
 createGame(gameContainer);
 
