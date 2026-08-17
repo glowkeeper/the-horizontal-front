@@ -17,6 +17,8 @@ is recorded in place rather than silently replaced.
 
 ## Published
 
+- [0.2.1](0.2.1.md) — maintenance. Two defects reported against the live
+  deployment, and a documentation-accuracy pass. No content or rule changes.
 - [0.2.0](0.2.0.md) — the first public release. One campaign, one episode,
   AI-generated artwork with its copyright standing disclosed, and the public
   release rather than the production one.
