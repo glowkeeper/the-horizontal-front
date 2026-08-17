@@ -103,7 +103,7 @@ canvas so they remain tied to the actual responsive canvas rather than one set
 of screen coordinates.
 
 Outcome coverage deliberately sends unsuccessful input through the ordinary
-player controls until the duvet is lost. The suite neither patches game
+player controls until safety is lost. The suite neither patches game
 configuration nor exposes a private fast path, so the forced-verticalisation
 and debrief checks preserve the production boundary without waiting for an
 entire unattended episode.
