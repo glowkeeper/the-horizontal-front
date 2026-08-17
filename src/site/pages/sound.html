@@ -50,6 +50,9 @@
         gap: 0.75rem;
         margin-top: 1rem;
       }
+      .sound-transport .sound-toggle {
+        min-width: 15rem;
+      }
       .sound-transport input[type="range"] {
         flex: 1 1 260px;
         accent-color: var(--colour-resistance-red);
@@ -91,14 +94,39 @@
         <p>Each episode draws its instrumentation from its own setting, so a different workplace sounds different without anyone writing new code.</p>
       </section>
 
+      <section aria-labelledby="scope-title" class="scope-note">
+        <h2 id="scope-title">What you are hearing</h2>
+        <p id="scope-detail"></p>
+      </section>
+
       <section aria-labelledby="ambience-title">
         <h2 id="ambience-title">The room, tightening</h2>
         <p>Underneath everything sits a bed that follows the drama. Drag the slider from rest to crisis: the hum climbs, the air-conditioning thickens, and the room closes in. In play this is driven by the episode's own dramatic curve.</p>
         <div class="sound-transport">
-          <button id="ambience-toggle" class="secondary-action" type="button" aria-pressed="false">Start the hum</button>
+          <button id="ambience-toggle" class="sound-toggle secondary-action" type="button" aria-pressed="false" data-start="Start the hum" data-stop="Stop the hum">Start the hum</button>
           <label for="intensity">Dramatic intensity</label>
           <input id="intensity" type="range" min="0" max="1" step="0.01" value="0" />
           <output id="intensity-readout" for="intensity">0.00</output>
+        </div>
+      </section>
+
+      <section aria-labelledby="presence-title">
+        <h2 id="presence-title">Management, present</h2>
+        <p>Management is audible throughout rather than only when they interrupt: a low grumble that thickens as the working day advances, whatever the player is doing. It follows the same dramatic curve as the room, because the clock is Management's weapon rather than the player's performance.</p>
+        <p>Management moves on the same curve as the room, so the dramatic-intensity control above drives this too. Start both and drag it to hear them thicken together.</p>
+        <div class="sound-transport">
+          <button id="presence-toggle" class="sound-toggle secondary-action" type="button" aria-pressed="false" data-start="Start the grumble" data-stop="Stop the grumble">Start the grumble</button>
+        </div>
+      </section>
+
+      <section aria-labelledby="creak-title">
+        <h2 id="creak-title">The structure, under load</h2>
+        <p>The bed answers the player rather than the clock. A structure under stress does not hum: it emits discrete bursts whose rate and loudness both climb as it nears failure, so this is a train of creaks rather than a held tone, silent while the duvet is held and quickening as ground is lost. The spacing is deliberately uneven, because stick-slip does not arrive on a beat. Underneath them sits a quiet sustained groan in the same register: transients separated by silence are heard as separate events, so without it the creaks read as a series of squeaks rather than as one structure being worked.</p>
+        <div class="sound-transport">
+          <button id="creak-toggle" class="sound-toggle secondary-action" type="button" aria-pressed="false" data-start="Start the creaking" data-stop="Stop the creaking">Start the creaking</button>
+          <label for="danger">Physical danger</label>
+          <input id="danger" type="range" min="0" max="1" step="0.01" value="0" />
+          <output id="danger-readout" for="danger">0.00</output>
         </div>
       </section>
 
@@ -106,8 +134,8 @@
         <h2 id="score-title">The whole score</h2>
         <p>Hear the compiled rhythm of <em id="score-episode"></em>: the count-in, the pulse underneath, and the sided demands that accent it — left and right differ in pitch as well as position, so the two can be told apart on any speaker.</p>
         <div class="sound-transport">
-          <button id="play-score" class="primary-action" type="button">Play the score</button>
-          <button id="stop-all" class="secondary-action" type="button">Stop</button>
+          <button id="play-score" class="sound-toggle secondary-action" type="button" aria-pressed="false" data-start="Play the score" data-stop="Stop the score">Play the score</button>
+          <button id="stop-all" class="sound-toggle secondary-action" type="button">Stop everything</button>
         </div>
         <p id="library-summary"></p>
       </section>

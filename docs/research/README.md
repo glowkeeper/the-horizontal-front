@@ -11,6 +11,14 @@ summary cannot silently turn a tentative finding into a universal claim.
   UI](interruption-mechanics-and-accessible-rhythm-ui.md) — phrase-boundary
   interruption timing, warning and recovery, input cancellation, multimodal
   rhythm cues and the resulting Quick Call and Urgent Email constraints.
+- [Audio-led rhythm cueing](audio-led-rhythm-cueing.md) — why synchronisation is
+  anticipatory rather than reactive, the auditory advantage over visual pacing,
+  blind-accessible double-cue practice, and the resulting approach-cue, downbeat
+  and mix decisions for the production soundscape.
+- [Synthesising strain and machinery
+  sound](strain-and-machinery-synthesis.md) — stick-slip acoustic emission, why
+  a structure under load bursts rather than hums, and the resulting creak-train,
+  beating-roughness and antagonist-presence decisions.
 - [Political satire and radical print art
   direction](political-satire-art-direction.md) — political-cartoon techniques,
   radical print traditions, five complementary reference practices, their

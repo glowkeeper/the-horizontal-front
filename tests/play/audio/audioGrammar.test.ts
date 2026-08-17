@@ -50,6 +50,7 @@ const toneLayer = {
   releaseMs: 40,
   gain: 0.5,
   pan: 0,
+  space: 0,
 };
 
 describe("audio grammar", () => {

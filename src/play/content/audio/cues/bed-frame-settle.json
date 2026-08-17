@@ -3,29 +3,72 @@
   "id": "bed-frame-settle",
   "layers": [
     {
-      "kind": "tone",
-      "wave": "triangle",
-      "startFrequencyHz": 120,
-      "endFrequencyHz": 74,
+      "kind": "noise",
+      "filter": "bandpass",
+      "startCutoffHz": 480,
+      "endCutoffHz": 140,
+      "resonance": 3.5,
       "delayMs": 0,
       "attackMs": 6,
-      "holdMs": 60,
-      "releaseMs": 240,
+      "holdMs": 260,
+      "releaseMs": 380,
+      "gain": 0.26,
+      "pan": 0.15,
+      "space": 0.6
+    },
+    {
+      "kind": "tone",
+      "wave": "sawtooth",
+      "startFrequencyHz": 291,
+      "endFrequencyHz": 151,
+      "delayMs": 0,
+      "attackMs": 10,
+      "holdMs": 290,
+      "releaseMs": 400,
       "gain": 0.18,
-      "pan": 0
+      "pan": 0,
+      "space": 0.6
+    },
+    {
+      "kind": "tone",
+      "wave": "sawtooth",
+      "startFrequencyHz": 244,
+      "endFrequencyHz": 127,
+      "delayMs": 0,
+      "attackMs": 10,
+      "holdMs": 290,
+      "releaseMs": 400,
+      "gain": 0.15,
+      "pan": -0.14,
+      "space": 0.6
     },
     {
       "kind": "noise",
-      "filter": "lowpass",
-      "startCutoffHz": 700,
-      "endCutoffHz": 260,
-      "resonance": 4,
-      "delayMs": 0,
-      "attackMs": 4,
-      "holdMs": 50,
-      "releaseMs": 200,
+      "filter": "bandpass",
+      "startCutoffHz": 1300,
+      "endCutoffHz": 520,
+      "resonance": 5,
+      "delayMs": 110,
+      "attackMs": 1,
+      "holdMs": 12,
+      "releaseMs": 70,
       "gain": 0.16,
-      "pan": 0
+      "pan": -0.24,
+      "space": 0.6
+    },
+    {
+      "kind": "noise",
+      "filter": "bandpass",
+      "startCutoffHz": 780,
+      "endCutoffHz": 330,
+      "resonance": 5,
+      "delayMs": 330,
+      "attackMs": 1,
+      "holdMs": 18,
+      "releaseMs": 95,
+      "gain": 0.13,
+      "pan": 0.2,
+      "space": 0.6
     }
   ]
 }

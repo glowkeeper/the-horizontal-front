@@ -54,8 +54,14 @@ or hold.
 ## Dramatic curves and phases
 
 A curve has `schemaVersion`, `id`, `startingSafety` from 0 to 1,
-`resolutionDurationMs`, and one or more uniquely named `phases`. Adjacent phases
-must join at the same presentation intensity.
+`resolutionDurationMs`, `approachLeadBeats`, and one or more uniquely named
+`phases`. Adjacent phases must join at the same presentation intensity.
+
+`approachLeadBeats` is how far ahead of each sided demand the apparatus
+announces it, measured in beats rather than milliseconds so it keeps its
+musical place as the tempo changes. A half-beat lead puts the announcement on
+the offbeat, between one strike and the next; a whole beat puts it on the
+preceding beat. It is what makes the score playable by ear.
 
 Each phase authors:
 
@@ -208,24 +214,39 @@ audio production rules in `AGENTS.md`.
 
 ### Roles
 
-A soundscape maps every one of the twenty semantic roles to a cue:
-`count-in`, `beat`, `cue-due-left`, `cue-due-right`, `tap-hit`, `tap-miss`,
+A soundscape maps every one of the twenty-three semantic roles to a cue:
+`count-in`, `beat`, `downbeat`, `cue-approach-left`, `cue-approach-right`,
+`cue-due-left`, `cue-due-right`, `tap-hit`, `tap-miss`,
 `resistance-strain`, `resistance-ease`, `hold-start`, `hold-release`,
 `hold-broken`, `interruption-warning`, `interruption-input`,
 `interruption-success`, `interruption-failure`, `interruption-return`,
 `management-bluster`, `victory`, `forced-verticalisation` and
 `interface-action`.
 
-All twenty are required. A moment meant to pass quietly is authored as a quiet
-cue rather than left out, so silence is always a decision on record. Adding a
-role is an engine change; deciding what a role sounds like is content.
+All twenty-three are required. A moment meant to pass quietly is authored as a
+quiet cue rather than left out, so silence is always a decision on record.
+Adding a role is an engine change; deciding what a role sounds like is content.
 
-Three roles carry the rhythm between them. `beat` sounds on every beat of the
+Six roles carry the rhythm between them. `beat` sounds on every beat of the
 compiled grid, so the apparatus keeps time whether or not the beat asks for
 anything — without it the score falls silent through rests and the player loses
-the pulse. `cue-due-left` and `cue-due-right` accent the beats that do ask,
+the pulse. `downbeat` replaces it on the first beat of each rhythm cycle: a
+pulse that is merely periodic gives the player tempo but not position, and they
+cannot predict where the next demand falls without knowing where they are in
+the bar. `cue-due-left` and `cue-due-right` accent the beats that do ask,
 replacing the plain tick, so a demand is heard as an accent on the pulse rather
 than a sound layered over it.
+
+`cue-approach-left` and `cue-approach-right` announce a demand before it lands.
+Synchronising to a rhythm is anticipatory rather than reactive — people place a
+movement by predicting the beat, not by responding to it — so a sided signal
+arriving at the instant of the demand cannot be answered in time by anyone.
+Without the approach, the score can only be read on screen and never heard. The
+dramatic curve authors `approachLeadBeats`, the distance ahead in beats, so the
+announcement keeps its musical place as the tempo changes rather than being a
+fixed millisecond constant. An approach that would fall on a strike is dropped
+rather than doubled. See
+[audio-led rhythm cueing](research/audio-led-rhythm-cueing.md).
 
 The demand is sided because the player has to know which hand to answer with.
 Two roles rather than one panned cue keeps that decision in content: the sides
@@ -253,6 +274,7 @@ A cue has `schemaVersion`, `id` and one to eight `layers`. Each layer is a
 | `attackMs`, `holdMs`, `releaseMs` | The envelope. Short attack and release read as an impact; longer ones as a hiss or a ring. |
 | `gain` | Layer level from 0 to 1, multiplied by the soundscape's `gain`. |
 | `pan` | Stereo position from -1 to 1. Reinforcement only; never the sole signal. |
+| `space` | How much of the layer is also sent to the room, 0 to 1. Optional, defaulting to none. |
 
 A `tone` adds `wave` (`sine`, `square`, `triangle` or `sawtooth`) with
 `startFrequencyHz` and `endFrequencyHz`; equal values hold a pitch, differing
@@ -260,12 +282,53 @@ values sweep. A `noise` adds `filter` (`lowpass`, `highpass` or `bandpass`),
 `startCutoffHz`, `endCutoffHz` and `resonance`. Pitched machinery comes from
 tone; impacts, paper and hiss come from noise. Most convincing cues use both.
 
+`space` places a sound at a distance without moving it in time: the dry signal
+is untouched and reflections are added alongside it, so a reverberant cue still
+lands exactly on its beat. Two sounds competing in the same frequency range stop
+fighting when one of them is plainly further away. Anything the player is
+expected to answer is authored dry, right in front of them.
+
+The room itself is synthesised — exponentially decaying noise, generated at
+runtime — rather than a recording of a real space, which would be a licensed
+third-party asset the project would have to carry provenance for.
+
 Every parameter is bounded and validated. A cue whose layers are all silent, or
 all zero-length, is rejected rather than shipped as an inaudible mystery.
 
-### Ambience
+### Beds and the creak train
 
-A soundscape also authors one continuously sounding bed:
+A soundscape authors three continuous layers and one train of events, each
+answering a different thing. Keeping them apart is what lets a player hear
+whether they are in trouble or merely late in the day.
+
+| Layer | Follows | What it is |
+| --- | --- | --- |
+| `ambience` | dramatic intensity | the room, tightening with the working day |
+| `managementPresence` | dramatic intensity | the antagonist, grumbling throughout rather than only when interrupting |
+| `resistanceStrain` | physical danger | the sustained body of the structure under load |
+| `resistanceCreak` | physical danger | discrete creaks, quickening and growing as ground is lost |
+
+The two clock-driven beds rise however well the player is doing, because the
+working day advances regardless. The two danger-driven layers answer the player
+alone, and are silent while the duvet is held.
+
+`resistanceCreak` is a train of cues rather than a bed, because a structure
+under stress emits discrete bursts rather than a tone — a sustained layer
+following danger sounds like a hum, not like timber being worked. It authors a
+`cue`, a `minimumDanger` below which the structure is silent, `restIntervalMs`
+and `strainIntervalMs` between which the creaking quickens, `restGain` and
+`strainGain` between which it grows, and an `intervalPattern` of uneven
+multipliers. The pattern is authored rather than random so an episode creaks the
+same way twice, and uneven because evenly spaced bursts read as machinery.
+Validation rejects a pattern whose values are all equal, and a strain interval
+no shorter than the rest interval.
+
+`resistanceStrain` exists only to bind the creaks together. Transients separated
+by silence are heard as separate events, so without a quiet sustained groan in
+the same register a run of creaks reads as a series of squeaks rather than as
+one object. It is authored well below them and is not a substitute for them.
+
+Each bed takes the same shape:
 
 ```text
 ambience:
@@ -281,8 +344,8 @@ the engine glides between them as dramatic intensity rises. That movement is
 what makes an episode feel like it is tightening: the office hum climbs in
 pitch, brightens and grows louder as Management gains ground.
 
-The bed only exists while the game is audible. Muted play builds no bed at all,
-and unmuting mid-episode brings it in on the next frame.
+The beds only exist while the game is audible. Muted play builds none of them,
+and unmuting mid-episode brings them in on the next frame.
 
 ### Ownership
 

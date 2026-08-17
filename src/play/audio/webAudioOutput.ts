@@ -23,6 +23,10 @@ export type AudioOutput = {
 };
 
 const NOISE_BUFFER_SECONDS = 1;
+// A small room, not a hall: enough reflection to put a sound at a distance from
+// the listener without smearing the timing the player is answering.
+const REVERB_SECONDS = 1.6;
+const REVERB_DECAY = 2.1;
 const MUTE_RAMP_SECONDS = 0.01;
 const SILENCE_GAIN = 0.0001;
 
@@ -46,6 +50,7 @@ export function createAudioOutput(): AudioOutput {
 
   let context: AudioContext | null = null;
   let master: GainNode | null = null;
+  let reverb: ConvolverNode | null = null;
   let noiseBuffer: AudioBuffer | null = null;
   let muted = false;
   let disposed = false;
@@ -55,9 +60,12 @@ export function createAudioOutput(): AudioOutput {
     if (disposed) return null;
     if (!context) {
       context = new Constructor!();
+      reverb = context.createConvolver();
+      reverb.buffer = createImpulseResponse(context);
       master = context.createGain();
       master.gain.setValueAtTime(muted ? 0 : 1, context.currentTime);
       master.connect(context.destination);
+      reverb.connect(master);
       noiseBuffer = createNoiseBuffer(context);
     }
     return context;
@@ -90,6 +98,15 @@ export function createAudioOutput(): AudioOutput {
         const voiceStart = startAt + voice.startAtMs / 1000;
         const envelope = ready.createGain();
         connectThroughPan(ready, envelope, master, voice.source.pan);
+        // A layer asking for space is also sent to the room. The dry path is
+        // untouched, so authoring space adds reflections rather than trading
+        // the direct sound away — timing stays exactly where it was.
+        if (voice.source.space > 0 && reverb) {
+          const send = ready.createGain();
+          send.gain.setValueAtTime(voice.source.space, voiceStart);
+          envelope.connect(send);
+          send.connect(reverb);
+        }
         applyEnvelope(envelope.gain, voiceStart, voice, ready);
 
         if (voice.source.kind === "tone") {
@@ -140,6 +157,12 @@ export function createAudioOutput(): AudioOutput {
         const level = ready.createGain();
         level.gain.setValueAtTime(layer.gain, ready.currentTime);
         connectThroughPan(ready, level, bed, layer.pan);
+        if (layer.space > 0 && reverb) {
+          const send = ready.createGain();
+          send.gain.setValueAtTime(layer.space, ready.currentTime);
+          level.connect(send);
+          send.connect(reverb);
+        }
 
         if (layer.kind === "tone") {
           const oscillator = ready.createOscillator();
@@ -356,4 +379,25 @@ function createSilentOutput(): AudioOutput {
     stopAll: () => undefined,
     dispose: () => undefined,
   };
+}
+
+/**
+ * A synthesised room.
+ *
+ * Reverb normally means a recording of a real space, which would be a licensed
+ * third-party asset. This is exponentially decaying noise instead: the same
+ * shape a small room's impulse response has, built from numbers like every
+ * other sound in the game, so the reverb carries no provenance of its own.
+ */
+function createImpulseResponse(context: AudioContext): AudioBuffer {
+  const length = Math.floor(context.sampleRate * REVERB_SECONDS);
+  const impulse = context.createBuffer(2, length, context.sampleRate);
+  for (let channel = 0; channel < 2; channel += 1) {
+    const samples = impulse.getChannelData(channel);
+    for (let index = 0; index < length; index += 1) {
+      const decay = (1 - index / length) ** REVERB_DECAY;
+      samples[index] = (Math.random() * 2 - 1) * decay;
+    }
+  }
+  return impulse;
 }

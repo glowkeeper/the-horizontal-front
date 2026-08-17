@@ -31,9 +31,9 @@ const config: ResistanceConfig = {
     },
   ],
   cues: [
-    { action: "tap", side: "left", atMs: 500, releaseAtMs: null, timingWindowMs: 100, phaseIndex: 0 },
-    { action: "tap", side: "right", atMs: 1_000, releaseAtMs: null, timingWindowMs: 100, phaseIndex: 0 },
-    { action: "hold", side: "left", atMs: 2_500, releaseAtMs: 3_000, timingWindowMs: 100, phaseIndex: 1 },
+    { action: "tap", side: "left", atMs: 500, releaseAtMs: null, timingWindowMs: 100, phaseIndex: 0, approachAtMs: 250 },
+    { action: "tap", side: "right", atMs: 1_000, releaseAtMs: null, timingWindowMs: 100, phaseIndex: 0, approachAtMs: 750 },
+    { action: "hold", side: "left", atMs: 2_500, releaseAtMs: 3_000, timingWindowMs: 100, phaseIndex: 1, approachAtMs: 2_250 },
   ],
   guideEvents: [
     { action: "tap", side: "left", atMs: 500, timingWindowMs: 100, endsAtMs: 600, phaseIndex: 0 },
@@ -41,6 +41,7 @@ const config: ResistanceConfig = {
     { action: "hold", side: "left", atMs: 2_500, timingWindowMs: 100, releaseAtMs: 3_000, endsAtMs: 3_100, phaseIndex: 1 },
   ],
   beatTimesMs: [],
+  downbeatTimesMs: [],
 };
 
 describe("resistance engine", () => {

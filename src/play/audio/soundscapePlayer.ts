@@ -1,5 +1,5 @@
 import type { CompiledSoundscape } from "../content/loadAudio";
-import type { AudioCueRole } from "../content/schemas/audioSchema";
+import type { AudioCueContent, AudioCueRole } from "../content/schemas/audioSchema";
 import { composeCue, type ScheduledVoice } from "./composeCue";
 import {
   createAudioOutput,
@@ -11,11 +11,29 @@ export type SoundscapePlayer = {
   play(role: AudioCueRole): void;
   schedule(role: AudioCueRole, inMs: number): void;
   /**
-   * Move the bed towards the current dramatic intensity, starting it if it is
-   * not yet sounding. Called every frame, so unmuting mid-episode brings the
-   * bed in on the next one.
+   * Move both clock-driven beds — the room and Management's presence — towards
+   * the current dramatic intensity, starting them if they are not yet sounding.
+   * Called every frame, so unmuting mid-episode brings them in on the next one.
    */
   setIntensity(intensity: number): void;
+  /**
+   * Play a composed cue at a fraction of its authored level.
+   *
+   * Composition is normally done once up front, because rebuilding voices
+   * during the rhythm would allocate at the worst possible moment. Creaks are
+   * sparse and off the timing-critical path, so paying that cost buys an
+   * amplitude that follows load — which is most of what makes a structure sound
+   * like it is being worked.
+   */
+  playScaled(cue: AudioCueContent, inMs: number, gainScale: number): void;
+  /**
+   * Move the structure's sustained groan towards the current physical danger.
+   *
+   * Separate from `setIntensity` because it answers the player rather than the
+   * clock, and separate from the creak train because it is the body those
+   * creaks belong to rather than an event of its own.
+   */
+  setDanger(danger: number): void;
   unlock(): Promise<void>;
   setMuted(muted: boolean): void;
   isMuted(): boolean;
@@ -79,6 +97,8 @@ export function createSoundscapePlayer(
   };
 
   let ambience: AmbienceHandle | null = null;
+  let managementPresence: AmbienceHandle | null = null;
+  let resistanceStrain: AmbienceHandle | null = null;
 
   return {
     play: (role) => emit(role, 0),
@@ -88,8 +108,27 @@ export function createSoundscapePlayer(
       // than running silently behind a zero gain.
       if (!ambience && !output.isMuted()) {
         ambience = output.startAmbience(soundscape.ambience, soundscape.gain);
+        // Management is present throughout rather than only when interrupting,
+        // and grumbles harder as the day advances whatever the player does.
+        managementPresence = output.startAmbience(
+          soundscape.managementPresence,
+          soundscape.gain,
+        );
       }
       ambience?.setIntensity(intensity);
+      managementPresence?.setIntensity(intensity);
+    },
+    setDanger(danger): void {
+      if (!resistanceStrain && !output.isMuted()) {
+        resistanceStrain = output.startAmbience(
+          soundscape.resistanceStrain,
+          soundscape.gain,
+        );
+      }
+      resistanceStrain?.setIntensity(danger);
+    },
+    playScaled(cue, inMs, gainScale): void {
+      output.play(composeCue(cue, soundscape.gain * clamp01(gainScale)), inMs);
     },
     unlock: () => output.unlock(),
     setMuted(muted): void {
@@ -102,10 +141,18 @@ export function createSoundscapePlayer(
     stopAmbience(): void {
       ambience?.stop();
       ambience = null;
+      managementPresence?.stop();
+      managementPresence = null;
+      resistanceStrain?.stop();
+      resistanceStrain = null;
     },
     stop(): void {
       ambience?.stop();
       ambience = null;
+      managementPresence?.stop();
+      managementPresence = null;
+      resistanceStrain?.stop();
+      resistanceStrain = null;
       output.stopAll();
     },
   };
@@ -126,4 +173,8 @@ function writeMutePreference(muted: boolean): void {
   } catch {
     // A preference we cannot persist is not a reason to fail playback.
   }
+}
+
+function clamp01(value: number): number {
+  return Math.min(1, Math.max(0, value));
 }

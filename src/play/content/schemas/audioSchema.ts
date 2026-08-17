@@ -17,11 +17,25 @@ export const audioCueRoles = [
   // anything. Without it the score falls silent through rests and the player
   // loses the pulse they are meant to be resisting.
   "beat",
+  // The beat that begins a rhythm cycle. A uniform tick tells the player the
+  // tempo but not where they are in it; accenting the cycle makes the grid
+  // countable, which is what lets them predict where the next demand falls.
+  "downbeat",
   // The demand is sided, because the player has to know which hand to answer
   // with. Two roles rather than one panned cue keeps that decision in content,
   // where it can differ in pitch and timbre as well as position.
   "cue-due-left",
   "cue-due-right",
+  // The apparatus winds up before it strikes, announcing which side it is about
+  // to demand while there is still time to answer.
+  //
+  // Synchronising to a rhythm is anticipatory rather than reactive, so a sided
+  // signal arriving at the instant of the demand cannot be answered on time by
+  // anyone: without these roles the score can only be read on screen, never
+  // heard. The approach carries the same information as the strike, earlier and
+  // quieter. See `docs/research/audio-led-rhythm-cueing.md`.
+  "cue-approach-left",
+  "cue-approach-right",
   "tap-hit",
   "tap-miss",
   // Resistance and bed movement: the frame itself, hauled up a notch or
@@ -46,6 +60,7 @@ export const audioCueRoles = [
 export const audioCueRoleSchema = z.enum(audioCueRoles);
 
 const gainSchema = z.number().min(0).max(1);
+const unitIntervalSchema = z.number().min(0).max(1);
 const envelopeMsSchema = z.number().nonnegative().max(4_000);
 const offsetMsSchema = z.number().nonnegative().max(4_000);
 const audibleFrequencySchema = z.number().min(20).max(16_000);
@@ -65,6 +80,14 @@ const layerBaseSchema = {
   // differ in pitch and timbre and the visual guide carries the same
   // information regardless.
   pan: panSchema,
+  // How much of this layer is also sent to the room, 0 to 1.
+  //
+  // Space is separation: two sounds in the same frequency range stop competing
+  // when one of them is plainly further away. The send is additive, so a layer
+  // with space keeps its dry timing intact and gains a tail. Defaults to none,
+  // because a cue the player is expected to answer should sit right in front of
+  // them.
+  space: gainSchema.default(0),
 };
 
 /**
@@ -125,6 +148,7 @@ export const ambienceLayerSchema = z.discriminatedUnion("kind", [
     strainFrequencyHz: audibleFrequencySchema,
     gain: gainSchema,
     pan: panSchema,
+    space: gainSchema.default(0),
   }).strict(),
   z.object({
     kind: z.literal("noise"),
@@ -134,6 +158,7 @@ export const ambienceLayerSchema = z.discriminatedUnion("kind", [
     resonance: z.number().min(0.1).max(30),
     gain: gainSchema,
     pan: panSchema,
+    space: gainSchema.default(0),
   }).strict(),
 ]);
 
@@ -150,6 +175,59 @@ export const audioSoundscapeSchema = z.object({
   id: contentIdSchema,
   gain: gainSchema,
   ambience: audioAmbienceSchema,
+  /**
+   * The antagonist, audible throughout rather than only when they interrupt.
+   *
+   * Follows the dramatic curve, so Management grumbles more as the working day
+   * advances however well the player is doing — the same signal their pose
+   * strain uses, and the same argument: the clock is Management's weapon.
+   * Authored low, because it is a presence rather than an event.
+   */
+  managementPresence: audioAmbienceSchema,
+  /**
+   * The sustained component of the structure under load, following danger.
+   *
+   * The creak train carries the information; this carries the body. Transients
+   * separated by silence are heard as separate events, so a run of creaks with
+   * nothing between them reads as a series of squeaks rather than as one object
+   * being worked. A quiet continuous groan in the same register binds them.
+   *
+   * It is not a substitute for the creaks and must stay well under them: on its
+   * own, a sustained layer following danger is just a hum.
+   */
+  resistanceStrain: audioAmbienceSchema,
+  /**
+   * The resistance complaining under load, following physical danger.
+   *
+   * Not a bed. A structure under stress emits discrete bursts whose rate and
+   * amplitude both climb as it approaches failure, so this authors a train of
+   * creaks rather than a sustained tone: a continuous oscillator following
+   * danger sounds like a hum, not like timber being worked.
+   */
+  resistanceCreak: z.object({
+    cue: ownedContentReferenceSchema,
+    minimumDanger: unitIntervalSchema,
+    restIntervalMs: z.number().int().positive().max(10_000),
+    strainIntervalMs: z.number().int().positive().max(10_000),
+    restGain: gainSchema,
+    strainGain: gainSchema,
+    intervalPattern: z.array(z.number().positive().max(4)).min(2).max(12),
+  }).strict().superRefine((creak, context) => {
+    if (creak.strainIntervalMs >= creak.restIntervalMs) {
+      context.addIssue({
+        code: "custom",
+        message: "creaking must quicken under load, so strainIntervalMs must be shorter than restIntervalMs",
+        path: ["strainIntervalMs"],
+      });
+    }
+    if (creak.intervalPattern.every((value) => value === creak.intervalPattern[0])) {
+      context.addIssue({
+        code: "custom",
+        message: "an even interval pattern reads as machinery rather than stick-slip; vary it",
+        path: ["intervalPattern"],
+      });
+    }
+  }),
   cues: z.object(
     Object.fromEntries(
       audioCueRoles.map((role) => [role, ownedContentReferenceSchema]),

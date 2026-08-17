@@ -11,6 +11,19 @@ type ScoredRhythmCueBase = {
   readonly atMs: number;
   readonly timingWindowMs: number;
   readonly phaseIndex: number;
+  /**
+   * When the apparatus announces this demand, ahead of the moment it falls due.
+   *
+   * Synchronising to a rhythm is anticipatory: people place a movement by
+   * predicting the beat, not by responding to it, so a signal arriving at the
+   * instant of the demand cannot be answered in time by anyone. Announcing the
+   * side in advance is what makes the score playable by ear rather than only
+   * readable on screen. Derived from the curve's authored lead in beats, so it
+   * scales with tempo instead of being a fixed millisecond constant.
+   *
+   * See `docs/research/audio-led-rhythm-cueing.md`.
+   */
+  readonly approachAtMs: number;
 };
 
 export type ScoredRhythmCue =
@@ -80,6 +93,15 @@ export type ResistanceConfig = {
    * rebuild it from phase tempos.
    */
   readonly beatTimesMs: readonly number[];
+  /**
+   * The beats that begin a rhythm cycle.
+   *
+   * A pulse that is merely periodic gives the player tempo but not position:
+   * they can hear that beats are passing without knowing where in the bar the
+   * next demand falls. Marking the cycle lets presentation accent it, so the
+   * grid becomes countable rather than uniform.
+   */
+  readonly downbeatTimesMs: readonly number[];
 };
 
 export type ResistanceOutcome = "active" | "victory" | "forced-verticalisation";

@@ -124,6 +124,7 @@ export function compileResistanceConfig(
   const cues: ScoredRhythmCue[] = [];
   const guideEvents: RhythmGuideEvent[] = [];
   const beatTimesMs: number[] = [];
+  const downbeatTimesMs: number[] = [];
   const phases = curve.phases.map((phase, phaseIndex) => {
     const rhythm = resolveOwnedDefinition(
       "rhythm",
@@ -139,6 +140,8 @@ export function compileResistanceConfig(
       startsAtMs,
       cues,
       guideEvents,
+      downbeatTimesMs,
+      curve.approachLeadBeats,
     );
     for (
       let beatAtMs = startsAtMs;
@@ -173,6 +176,7 @@ export function compileResistanceConfig(
     cues,
     guideEvents: alignedGuideEvents,
     beatTimesMs,
+    downbeatTimesMs,
   };
 }
 
@@ -441,6 +445,8 @@ function compilePhaseCues(
   phaseStartMs: number,
   target: ScoredRhythmCue[],
   guideTarget: RhythmGuideEvent[],
+  downbeatTarget: number[],
+  approachLeadBeats: number,
 ): void {
   const phaseEndMs = phaseStartMs + phase.durationMs;
   const cycleMs = rhythm.cycleBeats * phase.beatIntervalMs;
@@ -462,7 +468,9 @@ function compilePhaseCues(
     if (target.length > before) return;
     throw new Error(`phase ${phase.id} has room for a rhythm cycle at ${Math.round(cycleStartMs - phaseStartMs)}ms that yields no playable cue; adjust its duration, tempo or lead-in`);
   };
+  const approachLeadMs = approachLeadBeats * phase.beatIntervalMs;
   for (let cycleStartMs = firstCycleMs; cycleStartMs < phaseEndMs; cycleStartMs += cycleMs) {
+    downbeatTarget.push(cycleStartMs);
     const cuesBeforeCycle = target.length;
     for (const event of rhythm.events) {
       const atMs = cycleStartMs + event.atBeat * phase.beatIntervalMs;
@@ -479,6 +487,10 @@ function compilePhaseCues(
         atMs,
         timingWindowMs: phase.timingWindowMs,
         phaseIndex,
+        // Never before the episode begins: an announcement the player cannot
+        // have heard is not an announcement. A demand close enough to the start
+        // to lose its lead sounds its approach at the opening instant instead.
+        approachAtMs: Math.max(0, atMs - approachLeadMs),
       };
       if (event.action === "tap") {
         target.push({ ...base, action: "tap", releaseAtMs: null });

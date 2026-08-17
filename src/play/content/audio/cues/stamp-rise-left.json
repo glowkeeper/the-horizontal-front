@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "stamp-rise-left",
+  "layers": [
+    {
+      "kind": "noise",
+      "filter": "highpass",
+      "startCutoffHz": 700,
+      "endCutoffHz": 2200,
+      "resonance": 1,
+      "delayMs": 0,
+      "attackMs": 12,
+      "holdMs": 30,
+      "releaseMs": 70,
+      "gain": 0.18,
+      "pan": -0.6
+    },
+    {
+      "kind": "tone",
+      "wave": "sine",
+      "startFrequencyHz": 220,
+      "endFrequencyHz": 300,
+      "delayMs": 0,
+      "attackMs": 10,
+      "holdMs": 35,
+      "releaseMs": 70,
+      "gain": 0.2,
+      "pan": -0.5
+    }
+  ]
+}

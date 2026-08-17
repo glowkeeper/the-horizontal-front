@@ -140,6 +140,13 @@ function createDramaticCurveSchema<T extends z.ZodType>(phases: T) {
     id: contentIdSchema,
     startingSafety: z.number().min(0).max(1),
     resolutionDurationMs: z.number().int().nonnegative(),
+    // How far ahead the apparatus announces each sided demand, in beats.
+    //
+    // Expressed against the score's own grid rather than in milliseconds, so it
+    // stays musically placed as the tempo changes between phases. A half-beat
+    // lead puts the announcement on the offbeat, between one strike and the
+    // next; a whole beat puts it on the preceding beat.
+    approachLeadBeats: z.number().positive().max(4),
     phases: z.array(phases).min(1),
   }).strict().superRefine((curve, context) => {
   const curvePhases = curve.phases as readonly {

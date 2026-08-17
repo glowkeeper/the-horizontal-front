@@ -252,6 +252,93 @@ describe("catalogued resistance composition", () => {
     expect(resisted.state.duvetSafety).toBeGreaterThan(0.18);
   });
 
+  it("announces each demand ahead of it, scaled to the phase tempo", () => {
+    const curve = dramaticCurveSchema.parse({
+      schemaVersion: 1,
+      id: "approach-test",
+      startingSafety: 1,
+      resolutionDurationMs: 0,
+      approachLeadBeats: 0.5,
+      phases: [
+        {
+          ...phase("steady", 0, 0.5),
+          durationMs: 4_000,
+          rhythm: { source: "shared", id: "straight-alternation" },
+          beatIntervalMs: 800, leadInBeats: 0, timingWindowMs: 200,
+        },
+        {
+          ...phase("quick", 0.5, 1),
+          durationMs: 4_000,
+          rhythm: { source: "shared", id: "straight-alternation" },
+          beatIntervalMs: 400, leadInBeats: 0, timingWindowMs: 100,
+        },
+      ],
+    });
+    const scope = createEpisodeMechanicScope("approach-episode", {
+      rhythms: [], dramaticCurves: [curve],
+    }, mechanics);
+    const config = compileResistanceConfig(
+      { source: "episode", id: "approach-test" },
+      scope,
+    );
+
+    // A half-beat lead is musical, not a millisecond constant: the same
+    // authored value yields 400ms at the slow tempo and 200ms at the fast one,
+    // so the announcement keeps its place in the bar as the episode tightens.
+    const slow = config.cues.filter((cue) => cue.phaseIndex === 0);
+    const quick = config.cues.filter((cue) => cue.phaseIndex === 1);
+    expect(slow.length).toBeGreaterThan(1);
+    expect(quick.length).toBeGreaterThan(1);
+    for (const cue of slow.slice(1)) {
+      expect(cue.atMs - cue.approachAtMs).toBe(400);
+    }
+    for (const cue of quick) {
+      expect(cue.atMs - cue.approachAtMs).toBe(200);
+    }
+
+    // Every announcement precedes its demand. One starting at the very first
+    // instant has nowhere earlier to go, and is the only cue allowed to share
+    // its moment.
+    for (const cue of config.cues) {
+      expect(cue.approachAtMs).toBeGreaterThanOrEqual(0);
+      if (cue.atMs > 0) expect(cue.approachAtMs).toBeLessThan(cue.atMs);
+    }
+    expect(config.cues[0]).toMatchObject({ atMs: 0, approachAtMs: 0 });
+  });
+
+  it("marks the first beat of every rhythm cycle so the grid can be counted", () => {
+    const curve = dramaticCurveSchema.parse({
+      schemaVersion: 1,
+      id: "downbeat-test",
+      startingSafety: 1,
+      resolutionDurationMs: 0,
+      approachLeadBeats: 1,
+      phases: [{
+        ...phase("counted", 0, 1),
+        durationMs: 4_800,
+        // Four beats to the cycle, so a downbeat every fourth beat.
+        rhythm: { source: "shared", id: "three-and-rest" },
+        beatIntervalMs: 400, leadInBeats: 0, timingWindowMs: 100,
+      }],
+    });
+    const scope = createEpisodeMechanicScope("downbeat-episode", {
+      rhythms: [], dramaticCurves: [curve],
+    }, mechanics);
+    const config = compileResistanceConfig(
+      { source: "episode", id: "downbeat-test" },
+      scope,
+    );
+
+    // Four beats of 400ms is a 1600ms cycle, so three cycles fit the phase.
+    expect(config.downbeatTimesMs).toEqual([0, 1_600, 3_200]);
+    // Downbeats are a subset of the pulse, not a parallel grid of their own.
+    for (const atMs of config.downbeatTimesMs) {
+      expect(config.beatTimesMs).toContain(atMs);
+    }
+    // Every cycle is marked exactly once.
+    expect(new Set(config.downbeatTimesMs).size).toBe(config.downbeatTimesMs.length);
+  });
+
   it("compiles genuine press-and-release holds from the same finite vocabulary", () => {
     const definitions = {
       rhythms: [],
@@ -259,7 +346,7 @@ describe("catalogued resistance composition", () => {
         schemaVersion: 1,
         id: "hold-test",
         startingSafety: 1,
-        resolutionDurationMs: 0,
+        resolutionDurationMs: 0, approachLeadBeats: 0.5,
         phases: [{
           id: "grip", durationMs: 4_000,
           rhythm: { source: "shared", id: "sustained-grip" },
@@ -295,7 +382,7 @@ describe("catalogued resistance composition", () => {
       schemaVersion: 1,
       id: "private-curve",
       startingSafety: 1,
-      resolutionDurationMs: 0,
+      resolutionDurationMs: 0, approachLeadBeats: 0.5,
       phases: [{
         ...phase("private-phase", 0, 1),
         rhythm: { source: "episode", id: "private-signal" },
@@ -355,7 +442,7 @@ describe("catalogued resistance composition", () => {
       schemaVersion: 1,
       id: "foreign-curve",
       startingSafety: 1,
-      resolutionDurationMs: 0,
+      resolutionDurationMs: 0, approachLeadBeats: 0.5,
       phases: [phase("foreign-phase", 0, 1)],
     });
     const owner = createEpisodeMechanicScope("owner", {
@@ -378,7 +465,7 @@ describe("catalogued resistance composition", () => {
       schemaVersion: 1,
       id: "invalid-shared-curve",
       startingSafety: 1,
-      resolutionDurationMs: 0,
+      resolutionDurationMs: 0, approachLeadBeats: 0.5,
       phases: [{
         ...phase("invalid-phase", 0, 1),
         rhythm: { source: "episode", id: "private-signal" },
@@ -444,7 +531,7 @@ describe("catalogued resistance composition", () => {
 
   it("rejects discontinuous presentation phases", () => {
     expect(() => dramaticCurveSchema.parse({
-      schemaVersion: 1, id: "jump-cut", startingSafety: 1, resolutionDurationMs: 0,
+      schemaVersion: 1, id: "jump-cut", startingSafety: 1, resolutionDurationMs: 0, approachLeadBeats: 0.5,
       phases: [
         phase("one", 0, 0.2),
         phase("two", 0.4, 1),

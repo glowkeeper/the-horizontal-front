@@ -12,6 +12,7 @@
         "id": "alarm-escalation",
         "startingSafety": 1,
         "resolutionDurationMs": 3000,
+        "approachLeadBeats": 0.5,
         "phases": [
           {
             "id": "orientation",

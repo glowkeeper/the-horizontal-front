@@ -30,6 +30,13 @@ export function assertValidResistanceConfig(config: ResistanceConfig): void {
     }
     if (!config.phases[cue.phaseIndex]) throw new Error(`cues[${index}] has an invalid phaseIndex`);
     assertNonNegative(`cues[${index}].timingWindowMs`, cue.timingWindowMs);
+    // An announcement at or after the demand it announces is useless: the point
+    // of it is that the player hears which side is coming while there is still
+    // time to move. Only a cue starting at zero may share its moment.
+    if (cue.approachAtMs > cue.atMs || (cue.approachAtMs === cue.atMs && cue.atMs > 0)) {
+      throw new Error(`cues[${index}].approachAtMs must precede its atMs`);
+    }
+    assertNonNegative(`cues[${index}].approachAtMs`, cue.approachAtMs);
     if (cue.action === "hold" && cue.releaseAtMs <= cue.atMs) {
       throw new Error(`cues[${index}] hold must have a later releaseAtMs`);
     }

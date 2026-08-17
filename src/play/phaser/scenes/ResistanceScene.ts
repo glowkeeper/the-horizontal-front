@@ -1,6 +1,11 @@
 import Phaser from "phaser";
 
 import {
+  collectDueCreaks,
+  createCreakState,
+  type CreakState,
+} from "../../audio/creakScheduler";
+import {
   collectDueCues,
   createCueScheduler,
   type CueSchedulerState,
@@ -116,10 +121,16 @@ export class ResistanceScene extends Phaser.Scene {
   private cueScheduler: CueSchedulerState = createCueScheduler();
   private countInScheduler: CueSchedulerState = createCueScheduler();
   private beatScheduler: CueSchedulerState = createCueScheduler();
+  private creakState: CreakState = createCreakState();
+  private downbeatScheduler: CueSchedulerState = createCueScheduler();
+  private approachScheduler: CueSchedulerState = createCueScheduler();
   private scoredCueTimesMs: readonly number[] = [];
   private scoredCueSides: readonly ResistanceSide[] = [];
+  private approachTimesMs: readonly number[] = [];
+  private approachSides: readonly ResistanceSide[] = [];
   private countInTimesMs: readonly number[] = [];
   private unaccentedBeatTimesMs: readonly number[] = [];
+  private downbeatTimesMs: readonly number[] = [];
   private holdSounding = false;
 
   private leftCue!: Phaser.GameObjects.Rectangle;
@@ -177,6 +188,9 @@ export class ResistanceScene extends Phaser.Scene {
     this.cueScheduler = createCueScheduler();
     this.countInScheduler = createCueScheduler();
     this.beatScheduler = createCueScheduler();
+    this.creakState = createCreakState();
+    this.downbeatScheduler = createCueScheduler();
+    this.approachScheduler = createCueScheduler();
     this.holdSounding = false;
     // The apparatus strikes on every scored cue: that beat is what the player
     // is answering, so it comes from the compiled score rather than a metronome
@@ -187,11 +201,29 @@ export class ResistanceScene extends Phaser.Scene {
     this.countInTimesMs = resistanceConfig.guideEvents
       .filter((event) => event.action === "count-in")
       .map(({ atMs }) => atMs);
+    // Each demand is announced before it lands, so the player can hear which
+    // side is coming while there is still time to answer it. An approach that
+    // would fall on a strike is dropped rather than doubled, for the same
+    // reason the pulse yields to a demand: the louder event owns the moment.
+    const accented = new Set(this.scoredCueTimesMs);
+    const approaches = resistanceConfig.cues
+      .map((cue) => ({ atMs: cue.approachAtMs, side: cue.side }))
+      .filter(({ atMs }) => !accented.has(atMs))
+      .sort((left, right) => left.atMs - right.atMs);
+    this.approachTimesMs = approaches.map(({ atMs }) => atMs);
+    this.approachSides = approaches.map(({ side }) => side);
     // The apparatus keeps time underneath, but a beat that already carries a
     // sided demand is not doubled: the demand is the accent on that beat.
-    const accented = new Set(this.scoredCueTimesMs);
+    //
+    // The cycle marker is the exception, and sounds even under a demand. Most
+    // rhythms begin their cycle by asking for something, so a marker that
+    // yielded would fall silent precisely when the bar turns over — which is
+    // the one moment it exists to mark. It is centred and low against the sided
+    // strikes, so the two read as one event rather than a flam.
+    const downbeats = new Set(resistanceConfig.downbeatTimesMs);
+    this.downbeatTimesMs = resistanceConfig.downbeatTimesMs;
     this.unaccentedBeatTimesMs = resistanceConfig.beatTimesMs
-      .filter((atMs) => !accented.has(atMs));
+      .filter((atMs) => !accented.has(atMs) && !downbeats.has(atMs));
     // Browsers keep audio suspended until a gesture. Arriving here always
     // followed one, but the resume is asynchronous, so ask on entry.
     void this.audio.unlock();
@@ -271,6 +303,31 @@ export class ResistanceScene extends Phaser.Scene {
       );
     }
 
+    const approaching = collectDueCues(
+      this.approachScheduler,
+      this.approachTimesMs,
+      elapsedMs,
+      MAXIMUM_FRAME_DELTA_MS,
+    );
+    this.approachScheduler = approaching.next;
+    for (const cue of approaching.due) {
+      this.audio.schedule(
+        this.approachSides[cue.index] === "left"
+          ? "cue-approach-left"
+          : "cue-approach-right",
+        cue.inMs,
+      );
+    }
+
+    const cycle = collectDueCues(
+      this.downbeatScheduler,
+      this.downbeatTimesMs,
+      elapsedMs,
+      MAXIMUM_FRAME_DELTA_MS,
+    );
+    this.downbeatScheduler = cycle.next;
+    for (const beat of cycle.due) this.audio.schedule("downbeat", beat.inMs);
+
     const pulse = collectDueCues(
       this.beatScheduler,
       this.unaccentedBeatTimesMs,
@@ -281,6 +338,26 @@ export class ResistanceScene extends Phaser.Scene {
     for (const beat of pulse.due) this.audio.schedule("beat", beat.inMs);
 
     this.audio.setIntensity(this.resistance.state.dramaticIntensity);
+    // The structure complains under load: discrete creaks whose rate and
+    // amplitude both climb with the same physical danger the bed is drawn from,
+    // so what the player sees lifting and what they hear working are one
+    // signal rather than two presentations that can disagree.
+    const danger = 1 - this.resistance.state.duvetSafety;
+    this.audio.setDanger(danger);
+    const creak = collectDueCreaks(
+      this.creakState,
+      danger,
+      elapsedMs,
+      this.episode.audio.resistanceCreak,
+    );
+    this.creakState = creak.next;
+    for (const burst of creak.due) {
+      this.audio.playScaled(
+        this.episode.audio.resistanceCreak.cue,
+        burst.inMs,
+        burst.gainScale,
+      );
+    }
 
     // A hold begins on the press, which produces no judgement of its own.
     const holding = this.resistance.state.activeHold !== null;

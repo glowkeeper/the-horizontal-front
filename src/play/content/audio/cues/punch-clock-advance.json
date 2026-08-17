@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "punch-clock-advance",
+  "layers": [
+    {
+      "kind": "tone",
+      "wave": "triangle",
+      "startFrequencyHz": 110,
+      "endFrequencyHz": 58,
+      "delayMs": 0,
+      "attackMs": 8,
+      "holdMs": 30,
+      "releaseMs": 260,
+      "gain": 0.32,
+      "pan": 0
+    },
+    {
+      "kind": "noise",
+      "filter": "lowpass",
+      "startCutoffHz": 1000,
+      "endCutoffHz": 180,
+      "resonance": 1,
+      "delayMs": 0,
+      "attackMs": 6,
+      "holdMs": 20,
+      "releaseMs": 200,
+      "gain": 0.3,
+      "pan": 0
+    }
+  ]
+}

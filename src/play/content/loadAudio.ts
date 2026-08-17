@@ -27,6 +27,17 @@ export type CompiledSoundscape = {
   readonly id: string;
   readonly gain: number;
   readonly ambience: AudioAmbienceContent;
+  readonly managementPresence: AudioAmbienceContent;
+  readonly resistanceStrain: AudioAmbienceContent;
+  readonly resistanceCreak: {
+    readonly cue: AudioCueContent;
+    readonly minimumDanger: number;
+    readonly restIntervalMs: number;
+    readonly strainIntervalMs: number;
+    readonly restGain: number;
+    readonly strainGain: number;
+    readonly intervalPattern: readonly number[];
+  };
   readonly cues: ReadonlyMap<AudioCueRole, AudioCueContent>;
 };
 
@@ -102,8 +113,30 @@ export function compileSoundscape(
     id: soundscape.id,
     gain: soundscape.gain,
     ambience: soundscape.ambience,
+    managementPresence: soundscape.managementPresence,
+    resistanceStrain: soundscape.resistanceStrain,
+    resistanceCreak: {
+      ...soundscape.resistanceCreak,
+      cue: resolveNamedCue(soundscape, soundscape.resistanceCreak.cue, scope),
+    },
     cues,
   };
+}
+
+function resolveNamedCue(
+  soundscape: AudioSoundscapeContent,
+  reference: AudioSoundscapeContent["resistanceCreak"]["cue"],
+  scope: EpisodeAudioScope,
+): AudioCueContent {
+  const cue = reference.source === "shared"
+    ? scope.shared.cues.get(reference.id)
+    : scope.cues.get(reference.id);
+  if (!cue) {
+    throw new Error(
+      `${scope.episodeId} soundscape ${soundscape.id} references unknown ${reference.source} audio cue ${reference.id}`,
+    );
+  }
+  return cue;
 }
 
 function resolveAudioCue(

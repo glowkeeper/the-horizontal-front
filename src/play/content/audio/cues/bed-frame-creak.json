@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "id": "bed-frame-creak",
+  "layers": [
+    {
+      "kind": "noise",
+      "filter": "bandpass",
+      "startCutoffHz": 320,
+      "endCutoffHz": 680,
+      "resonance": 8,
+      "delayMs": 0,
+      "attackMs": 3,
+      "holdMs": 20,
+      "releaseMs": 120,
+      "gain": 0.3,
+      "pan": -0.12,
+      "space": 0.7
+    },
+    {
+      "kind": "noise",
+      "filter": "bandpass",
+      "startCutoffHz": 560,
+      "endCutoffHz": 1050,
+      "resonance": 10,
+      "delayMs": 6,
+      "attackMs": 2,
+      "holdMs": 14,
+      "releaseMs": 95,
+      "gain": 0.24,
+      "pan": 0.16,
+      "space": 0.7
+    },
+    {
+      "kind": "noise",
+      "filter": "bandpass",
+      "startCutoffHz": 900,
+      "endCutoffHz": 1450,
+      "resonance": 8,
+      "delayMs": 16,
+      "attackMs": 1,
+      "holdMs": 9,
+      "releaseMs": 60,
+      "gain": 0.13,
+      "pan": -0.2,
+      "space": 0.7
+    },
+    {
+      "kind": "tone",
+      "wave": "triangle",
+      "startFrequencyHz": 104,
+      "endFrequencyHz": 142,
+      "delayMs": 0,
+      "attackMs": 6,
+      "holdMs": 30,
+      "releaseMs": 110,
+      "gain": 0.13,
+      "pan": 0,
+      "space": 0.5
+    }
+  ]
+}

@@ -6,6 +6,10 @@
       "file": "alarm-klaxon.json"
     },
     {
+      "id": "bed-frame-creak",
+      "file": "bed-frame-creak.json"
+    },
+    {
       "id": "bed-frame-settle",
       "file": "bed-frame-settle.json"
     },
@@ -34,10 +38,6 @@
       "file": "key-press.json"
     },
     {
-      "id": "machine-tick",
-      "file": "machine-tick.json"
-    },
-    {
       "id": "managerial-rumble",
       "file": "managerial-rumble.json"
     },
@@ -52,6 +52,10 @@
     {
       "id": "pneumatic-release",
       "file": "pneumatic-release.json"
+    },
+    {
+      "id": "punch-clock-advance",
+      "file": "punch-clock-advance.json"
     },
     {
       "id": "punch-clock-tick",
@@ -74,8 +78,20 @@
       "file": "stamp-right.json"
     },
     {
+      "id": "stamp-rise-left",
+      "file": "stamp-rise-left.json"
+    },
+    {
+      "id": "stamp-rise-right",
+      "file": "stamp-rise-right.json"
+    },
+    {
       "id": "tube-collapse",
       "file": "tube-collapse.json"
+    },
+    {
+      "id": "tube-pulse",
+      "file": "tube-pulse.json"
     },
     {
       "id": "typewriter-strike",
