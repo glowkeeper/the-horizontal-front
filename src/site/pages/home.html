@@ -4,8 +4,9 @@
     <meta charset="UTF-8" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="description" content="A free, open-source game about collective power, mutual aid and resistance to hierarchical systems." />
+    <meta name="description" content="A satirical rhythm game about working extremely hard to remain in bed, while Management tries to force you into work. Free, open source and built as a digital commons." />
     <meta name="theme-color" content="#f3e8d0" />
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <title>The Horizontal Front</title>
   </head>
@@ -14,8 +15,10 @@
     <header class="site-header">
       <a class="site-name" href="/">The Horizontal Front</a>
       <nav aria-label="Primary navigation">
+        <a href="/" aria-current="page">Home</a>
         <a href="/play/">Play</a>
         <a href="/commons/">The Commons</a>
+        <a href="/sound/">Sound</a>
         <a class="repository-link" href="https://github.com/glowkeeper/the-horizontal-front" aria-label="The Horizontal Front repository on GitHub"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3.3-.4 6.8-1.6 6.8-7A5.4 5.4 0 0 0 19.4 4 5 5 0 0 0 19.3.5S18.2.1 15 1.8a13.4 13.4 0 0 0-7 0C4.8.1 3.7.5 3.7.5A5 5 0 0 0 3.6 4a5.4 5.4 0 0 0-1.4 3.7c0 5.4 3.5 6.6 6.8 7A4.8 4.8 0 0 0 8 18v4"/><path d="M8 19c-3 .9-3-1.5-4-2"/></svg><span>GitHub</span></a>
       </nav>
     </header>
@@ -23,15 +26,50 @@
       <section class="hero" aria-labelledby="page-title">
         <p class="eyebrow">Seize the Means of Relaxation.</p>
         <h1 id="page-title">The Horizontal Front</h1>
-        <p class="brief">A free, open-source game about collective power, mutual aid and resistance to hierarchical systems.</p>
-        <p class="lede">Fight to remain in bed while an authoritarian Orange Fella tries to force you into work. The contradiction is the game: exhausting, repetitive labour in defence of doing absolutely nothing.</p>
+        <p class="brief">A satirical rhythm game about working extremely hard to do absolutely nothing.</p>
+        <p class="lede">Management wants you vertical. You want to stay exactly where you are. Hold the line to a rhythm of rubber stamps, typewriters and pneumatic tubes while a grotesque embodiment of capitalism hauls on a brass lever bolted to the head of your bed. Under this arrangement, even lying down is labour.</p>
         <div class="actions">
           <a class="primary-action" href="/play/">Hold the line</a>
-          <a href="/commons/">How the commons works</a>
+          <a class="secondary-action" href="/commons/">How the commons works</a>
         </div>
       </section>
-      <section aria-labelledby="accountable-to-players">
-        <h2 id="accountable-to-players">Accountable to players, not investors</h2>
+
+      <figure class="hero-illustration">
+        <img src="/assets/briefing.webp" width="1200" height="1000"
+          alt="A dark-haired figure lies in bed, gripping the duvet with both fists and glaring upward. Leaning over them is Management: a heavy besuited grotesque in pinstripes and wire-rimmed glasses, mouth open mid-shout, one finger jabbing down at the bed. Behind him a mass of brass machinery spills printed paperwork across the room." />
+        <figcaption>The Monday Uprising. Management has declared the working week open.</figcaption>
+      </figure>
+
+      <section class="statement" aria-labelledby="the-demand">
+        <h2 id="the-demand">Let me remain in bed</h2>
+        <p>This is political satire about compulsory productivity: the working day&rsquo;s habit of treating your rest as an unclaimed resource, your attention as inventory, and your Monday morning as something it is owed.</p>
+        <p>So the game makes the joke literal. Staying horizontal is gruelling, skilled, rhythmic work. You will sweat to achieve nothing whatsoever. That contradiction is the argument: a system that can turn lying down into a full-time job can turn anything into one.</p>
+        <p>Losing is called <strong>forced verticalisation</strong>. It is funny, and then it is not.</p>
+      </section>
+
+      <section aria-labelledby="management">
+        <h2 id="management">Management will be in touch</h2>
+        <p>Management is not a person. Management is a role &mdash; a fictional grotesque in a pinstripe suit, straining at the lever, never a caricature of any particular politician, executive or other real human being. The target is the arrangement, not the individual.</p>
+        <p>In <strong>The Alarm</strong>, the opening episode, their methods will be familiar:</p>
+        <ul class="commitment-grid">
+          <li><strong>Just a Quick Call</strong><span>Complete three excuses in the correct order. Wrong excuse and the call connects.</span></li>
+          <li><strong>Urgent Email</strong><span>Mark it unread before it opens. Let go too early and it opens.</span></li>
+          <li><strong>The working day itself</strong><span>Pressure that rises however well you play, because the clock is Management&rsquo;s weapon rather than your performance.</span></li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="more-workplaces">
+        <h2 id="more-workplaces">One bedroom. Then everywhere else.</h2>
+        <p><strong>The Monday Uprising</strong> is the first campaign, and The Alarm is its first episode: one bedroom, one duvet, one man with a lever. It is a worked example rather than the whole argument.</p>
+        <p>Every workplace has its own apparatus and its own absurdities. A call centre, a warehouse aisle, a ward at four in the morning, a classroom, an app that pays by the drop &mdash; each with different machinery, different euphemisms, and its own way of explaining that this is simply how things are. None of them would look or sound like a bedroom: an episode draws its instrumentation from its own setting, so the score is played on whatever equipment is doing the coercing.</p>
+        <p>The game is built to accept them. An episode contains <strong>no code at all</strong>. It is structured data, writing, artwork and audio, assembled from a small documented vocabulary &mdash; so a new episode is authored rather than programmed, and can be authored by someone who does not program.</p>
+        <p>That is what makes this a commons rather than merely open source. You can read the code, but more to the point, you can add to the game.</p>
+        <p><strong>Honest about where we are:</strong> authoring an episode today means writing JSON by hand against the <a href="https://github.com/glowkeeper/the-horizontal-front/blob/main/docs/episode-grammar-reference.md">episode grammar reference</a>. That is genuinely possible and completely documented, and it is not yet pleasant. The Propaganda Department &mdash; an authoring tool for people who would rather write and draw than count brackets &mdash; is planned and not built. This is an invitation with work still behind it.</p>
+      </section>
+
+      <section aria-labelledby="never-allowed">
+        <h2 id="never-allowed">Everything Management would veto</h2>
+        <p>Each of these would be struck down in a board meeting within the hour. They are binding commitments rather than good intentions, and they are written into the <a href="/charter/">project charter</a>.</p>
         <ul class="commitment-grid">
           <li><strong>Free to play</strong><span>No price, advertising, purchases or paid advantages.</span></li>
           <li><strong>No surveillance</strong><span>No tracking, analytics or transmission of player data.</span></li>
@@ -42,14 +80,15 @@
         </ul>
       </section>
       <section class="statement" aria-labelledby="commons-statement">
-        <h2 id="commons-statement">Developed as a digital commons</h2>
-        <p>The Horizontal Front is freely accessible, community-supported and governed by a public charter. Its software, writing, documentation and original cultural materials may be studied, shared and adapted under reciprocal licences.</p>
-        <p>Development, proposals and decisions are public in the <a href="https://github.com/glowkeeper/the-horizontal-front">GitHub repository</a>.</p>
+        <h2 id="commons-statement">The same argument, told straight</h2>
+        <p>A game about resisting extraction would be a poor joke if the game itself were extractive. A free, open-source game about collective power, mutual aid and resistance to hierarchical systems ought to be governed like one, so The Horizontal Front is built as a digital commons: freely accessible, community-supported, and held to a public charter that is deliberately difficult to overturn.</p>
+        <p>No advertising, because your attention is not ours to sell back to you. No analytics, because your Monday morning is not data. Copyleft code and share-alike cultural work, so that nobody &mdash; including us &mdash; can fence it off later.</p>
+        <p>And a commons that only one person can write to is not much of a commons, which is why the episode format is a published grammar rather than a private one. Development, proposals and decisions are public in the <a href="https://github.com/glowkeeper/the-horizontal-front">GitHub repository</a>.</p>
         <p><a href="/charter/">Read the project charter</a> or <a href="/contribute/">take part in the project</a>.</p>
       </section>
     </main>
     <footer class="site-footer">
-      <p>Free to play. No ads. No tracking. No purchases ✊ 🛏️</p>
+      <p class="footer-mark">Free to play. No ads. No tracking. No purchases<img src="/assets/mark.svg" alt="" width="20" height="20" /></p>
       <nav aria-label="Project information">
         <a href="/charter/">Charter</a>
         <a href="/governance/">Governance</a>

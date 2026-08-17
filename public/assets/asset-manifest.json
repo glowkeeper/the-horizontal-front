@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "assets": [
+    {
+      "id": "raised-fist-favicon",
+      "file": "favicon.svg",
+      "origin": "human-created",
+      "status": "production-approved",
+      "creator": "The project maintainer, working in SVG with AI drafting assistance (Claude).",
+      "edits": [
+        "Replaced the prototype, which set the \u270a Unicode character in an SVG text element and therefore rendered whichever emoji glyph the viewer's operating system supplied, or none. That glyph was third-party artwork the project could not license.",
+        "Redrew the raised fist as original geometry using only primitive rounded rectangles: a white field, four fingers, a palm, a folded thumb and a forearm. No font is involved, so the icon renders identically everywhere.",
+        "The charcoal linework is drawn as a second copy of each shape, 1.5 units larger, sitting behind the red. Overlaps hide it and the gaps between the fingers do not, so one set of numbers produces both the outline and the separations without any shape being drawn twice by hand.",
+        "The hand is a right hand seen palm-on, which puts the thumb on the viewer's right and makes the leftmost finger the little one. The fingers are rotated progressively \u2014 about -16, -9, -3 and +2 degrees \u2014 so the little and ring curl furthest across the palm, and each is drawn over the palm so its rounded end stays visible rather than being absorbed.",
+        "Composition set and accepted by the maintainer across successive reviews at 128, 64, 32 and 16 pixels. Measured rather than eyeballed: the artwork sits 6.88 from the left, 7.38 from the right, 9.50 from the top and 5.50 from the bottom of the 64-unit field."
+      ],
+      "licence": "CC-BY-SA-4.0",
+      "replacementStatus": "Production-approved on 17 August 2026 on the maintainer's perceptual acceptance at 128, 64, 32 and 16 pixels. Original project geometry in the project palette, with no third-party or font-supplied artwork. Recorded as human-created because the shipped composition is the maintainer's throughout, with the palm-out orientation, the finger curl and the colour reversal all directed by them; the AI drafting assistance behind the geometry is disclosed above rather than omitted. The drawing is fifteen primitive rectangles and remains editable by hand."
+    },
+    {
+      "id": "application-icons",
+      "file": "icon-192.png, icon-512.png, icon-maskable-512.png, mark.svg",
+      "origin": "human-created",
+      "status": "production-approved",
+      "creator": "Derived mechanically from raised-fist-favicon; see that entry for authorship.",
+      "edits": [
+        "Rendered from favicon.svg by scripts/generate-icons.mjs using the repository's own Chromium, so the application icons cannot drift from the authored favicon. Re-run the script after editing favicon.svg.",
+        "The maskable variant is drawn at 90 per cent on a full-bleed field of the same colour as the artwork's own, so its rounded corners merge into the backdrop and Android's own mask cannot clip the hand. That colour is a constant in the script and must be changed with the field.",
+        "mark.svg is the same drawing with its field rectangle removed, for placing the mark on the site's own background \u2014 in a footer the rounded field reads as a sticker stuck over the page. Derived by the same script, so the hand is never drawn twice and cannot drift from the icon."
+      ],
+      "licence": "CC-BY-SA-4.0",
+      "replacementStatus": "Production-approved on 16 August 2026, deriving from the accepted favicon. Regenerating them requires no separate approval because they are a mechanical derivation rather than independent artwork."
+    },
+    {
+      "id": "home-briefing-illustration",
+      "file": "briefing.webp",
+      "origin": "ai-generated",
+      "status": "production-approved",
+      "creator": "Derived mechanically from the catalogued campaign illustration monday-uprising-briefing; see src/play/content/presentation/asset-catalog.json for its authorship and provenance.",
+      "edits": [
+        "Resampled from the 1374x1145 original to 1200px wide and encoded as WebP by scripts/generate-site-images.mjs, using the repository's own Chromium. The artwork is otherwise unaltered: no cropping, retouching or recolouring.",
+        "Derived because the authored original is roughly 3MB. A landing page carrying that would be slow to arrive and would be written into every visitor's offline cache, which matters here because the release is meant to keep working once cached."
+      ],
+      "licence": "CC-BY-SA-4.0",
+      "replacementStatus": "Production-approved on 17 August 2026 as a mechanical derivation of an already accepted illustration. Regenerating it after a change to the source requires no separate approval; replacing the source does."
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "id": "clock-off",
+  "layers": [
+    {
+      "kind": "tone",
+      "wave": "sine",
+      "startFrequencyHz": 660,
+      "endFrequencyHz": 660,
+      "delayMs": 0,
+      "attackMs": 4,
+      "holdMs": 90,
+      "releaseMs": 260,
+      "gain": 0.28,
+      "pan": 0
+    },
+    {
+      "kind": "tone",
+      "wave": "sine",
+      "startFrequencyHz": 880,
+      "endFrequencyHz": 880,
+      "delayMs": 110,
+      "attackMs": 4,
+      "holdMs": 90,
+      "releaseMs": 300,
+      "gain": 0.26,
+      "pan": 0
+    },
+    {
+      "kind": "tone",
+      "wave": "sine",
+      "startFrequencyHz": 1320,
+      "endFrequencyHz": 1320,
+      "delayMs": 230,
+      "attackMs": 4,
+      "holdMs": 110,
+      "releaseMs": 420,
+      "gain": 0.24,
+      "pan": 0
+    },
+    {
+      "kind": "noise",
+      "filter": "bandpass",
+      "startCutoffHz": 2600,
+      "endCutoffHz": 2000,
+      "resonance": 8,
+      "delayMs": 0,
+      "attackMs": 3,
+      "holdMs": 40,
+      "releaseMs": 120,
+      "gain": 0.08,
+      "pan": 0
+    }
+  ]
+}

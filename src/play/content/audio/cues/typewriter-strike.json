@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "id": "typewriter-strike",
+  "layers": [
+    {
+      "kind": "noise",
+      "filter": "bandpass",
+      "startCutoffHz": 3200,
+      "endCutoffHz": 2300,
+      "resonance": 7,
+      "delayMs": 0,
+      "attackMs": 0,
+      "holdMs": 3,
+      "releaseMs": 38,
+      "gain": 0.42,
+      "pan": 0
+    },
+    {
+      "kind": "tone",
+      "wave": "square",
+      "startFrequencyHz": 2000,
+      "endFrequencyHz": 1600,
+      "delayMs": 2,
+      "attackMs": 0,
+      "holdMs": 2,
+      "releaseMs": 28,
+      "gain": 0.1,
+      "pan": 0
+    },
+    {
+      "kind": "tone",
+      "wave": "triangle",
+      "startFrequencyHz": 300,
+      "endFrequencyHz": 230,
+      "delayMs": 0,
+      "attackMs": 0,
+      "holdMs": 5,
+      "releaseMs": 70,
+      "gain": 0.26,
+      "pan": 0
+    }
+  ]
+}

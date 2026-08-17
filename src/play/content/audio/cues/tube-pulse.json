@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "tube-pulse",
+  "layers": [
+    {
+      "kind": "tone",
+      "wave": "sine",
+      "startFrequencyHz": 58,
+      "endFrequencyHz": 46,
+      "delayMs": 0,
+      "attackMs": 8,
+      "holdMs": 40,
+      "releaseMs": 170,
+      "gain": 0.24,
+      "pan": 0
+    },
+    {
+      "kind": "noise",
+      "filter": "lowpass",
+      "startCutoffHz": 420,
+      "endCutoffHz": 150,
+      "resonance": 1,
+      "delayMs": 0,
+      "attackMs": 6,
+      "holdMs": 25,
+      "releaseMs": 140,
+      "gain": 0.2,
+      "pan": 0
+    }
+  ]
+}

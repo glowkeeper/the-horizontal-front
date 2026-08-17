@@ -1,0 +1,249 @@
+{
+  "schemaVersion": 1,
+  "id": "office-apparatus",
+  "gain": 0.8,
+  "cues": {
+    "count-in": {
+      "source": "shared",
+      "id": "punch-clock-tick"
+    },
+    "beat": {
+      "source": "shared",
+      "id": "tube-pulse"
+    },
+    "downbeat": {
+      "source": "shared",
+      "id": "punch-clock-advance"
+    },
+    "cue-approach-left": {
+      "source": "shared",
+      "id": "stamp-rise-left"
+    },
+    "cue-approach-right": {
+      "source": "shared",
+      "id": "stamp-rise-right"
+    },
+    "cue-due-left": {
+      "source": "shared",
+      "id": "stamp-left"
+    },
+    "cue-due-right": {
+      "source": "shared",
+      "id": "stamp-right"
+    },
+    "tap-hit": {
+      "source": "shared",
+      "id": "typewriter-strike"
+    },
+    "tap-miss": {
+      "source": "shared",
+      "id": "jammed-key"
+    },
+    "resistance-strain": {
+      "source": "shared",
+      "id": "bed-frame-strain"
+    },
+    "resistance-ease": {
+      "source": "shared",
+      "id": "bed-frame-settle"
+    },
+    "hold-start": {
+      "source": "shared",
+      "id": "pneumatic-charge"
+    },
+    "hold-release": {
+      "source": "shared",
+      "id": "pneumatic-release"
+    },
+    "hold-broken": {
+      "source": "shared",
+      "id": "tube-collapse"
+    },
+    "interruption-warning": {
+      "source": "shared",
+      "id": "desk-phone-ring"
+    },
+    "interruption-input": {
+      "source": "shared",
+      "id": "key-press"
+    },
+    "interruption-success": {
+      "source": "shared",
+      "id": "stamp-approved"
+    },
+    "interruption-failure": {
+      "source": "shared",
+      "id": "stamp-rejected"
+    },
+    "interruption-return": {
+      "source": "shared",
+      "id": "carriage-return"
+    },
+    "opposing-actor-voice": {
+      "source": "shared",
+      "id": "managerial-rumble"
+    },
+    "outcome-success": {
+      "source": "shared",
+      "id": "clock-off"
+    },
+    "outcome-failure": {
+      "source": "shared",
+      "id": "alarm-klaxon"
+    },
+    "interface-action": {
+      "source": "shared",
+      "id": "paper-shuffle"
+    }
+  },
+  "ambience": {
+    "restGain": 0.05,
+    "strainGain": 0.16,
+    "responseMs": 900,
+    "layers": [
+      {
+        "kind": "tone",
+        "wave": "sine",
+        "restFrequencyHz": 44,
+        "strainFrequencyHz": 56,
+        "gain": 0.34,
+        "pan": 0
+      },
+      {
+        "kind": "tone",
+        "wave": "triangle",
+        "restFrequencyHz": 100,
+        "strainFrequencyHz": 126,
+        "gain": 0.08,
+        "pan": 0
+      },
+      {
+        "kind": "noise",
+        "filter": "bandpass",
+        "restCutoffHz": 120,
+        "strainCutoffHz": 300,
+        "resonance": 1.2,
+        "gain": 0.2,
+        "pan": 0
+      }
+    ]
+  },
+  "opposingActorPresence": {
+    "restGain": 0.03,
+    "strainGain": 0.13,
+    "responseMs": 2200,
+    "layers": [
+      {
+        "kind": "tone",
+        "wave": "sawtooth",
+        "restFrequencyHz": 46,
+        "strainFrequencyHz": 58,
+        "gain": 0.36,
+        "pan": -0.1,
+        "space": 0
+      },
+      {
+        "kind": "tone",
+        "wave": "sawtooth",
+        "restFrequencyHz": 47.4,
+        "strainFrequencyHz": 59.8,
+        "gain": 0.32,
+        "pan": 0.1,
+        "space": 0
+      },
+      {
+        "kind": "tone",
+        "wave": "sawtooth",
+        "restFrequencyHz": 61,
+        "strainFrequencyHz": 77,
+        "gain": 0.24,
+        "pan": 0.14,
+        "space": 0
+      },
+      {
+        "kind": "tone",
+        "wave": "sawtooth",
+        "restFrequencyHz": 63.7,
+        "strainFrequencyHz": 80.4,
+        "gain": 0.2,
+        "pan": -0.14,
+        "space": 0
+      },
+      {
+        "kind": "tone",
+        "wave": "square",
+        "restFrequencyHz": 32,
+        "strainFrequencyHz": 40,
+        "gain": 0.2,
+        "pan": 0,
+        "space": 0
+      },
+      {
+        "kind": "noise",
+        "filter": "lowpass",
+        "restCutoffHz": 210,
+        "strainCutoffHz": 360,
+        "resonance": 4,
+        "gain": 0.16,
+        "pan": 0,
+        "space": 0
+      }
+    ]
+  },
+  "resistanceStrain": {
+    "restGain": 0,
+    "strainGain": 0.1,
+    "responseMs": 1200,
+    "layers": [
+      {
+        "kind": "tone",
+        "wave": "sawtooth",
+        "restFrequencyHz": 132,
+        "strainFrequencyHz": 198,
+        "gain": 0.34,
+        "pan": -0.1,
+        "space": 0
+      },
+      {
+        "kind": "tone",
+        "wave": "sawtooth",
+        "restFrequencyHz": 139,
+        "strainFrequencyHz": 209,
+        "gain": 0.28,
+        "pan": 0.12,
+        "space": 0
+      },
+      {
+        "kind": "noise",
+        "filter": "bandpass",
+        "restCutoffHz": 380,
+        "strainCutoffHz": 1150,
+        "resonance": 5,
+        "gain": 0.3,
+        "pan": 0,
+        "space": 0
+      }
+    ]
+  },
+  "resistanceStressBursts": {
+    "cue": {
+      "source": "shared",
+      "id": "bed-frame-creak"
+    },
+    "minimumDanger": 0.06,
+    "restIntervalMs": 1500,
+    "strainIntervalMs": 210,
+    "restGain": 0.22,
+    "strainGain": 1,
+    "intervalPattern": [
+      1,
+      0.58,
+      1.44,
+      0.79,
+      1.23,
+      0.71,
+      1.11,
+      0.87
+    ]
+  }
+}

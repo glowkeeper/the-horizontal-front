@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="The Horizontal Front raised fist">
+  <title>The Horizontal Front raised fist</title>
+  <rect width="64" height="64" rx="14" fill="#ffffff" />
+  <g fill="#201c19">
+    <rect x="20.5" y="38.5" width="23.0" height="20.0" rx="4.5" />
+    <rect x="8.0" y="18.5" width="48.0" height="27.0" rx="12.5" />
+  </g>
+  <g fill="#b8322a">
+    <rect x="22.0" y="40.0" width="20.0" height="17.0" rx="3.0" />
+    <rect x="9.5" y="20.0" width="45.0" height="24.0" rx="11.0" />
+  </g>
+  <g fill="#201c19">
+    <rect x="8.5" y="14.0" width="12.5" height="24.0" rx="6.25" transform="rotate(-16 14.75 26)" />
+    <rect x="19.5" y="11.0" width="12.5" height="27.0" rx="6.25" transform="rotate(-9 25.75 24.5)" />
+    <rect x="31.0" y="9.5" width="12.5" height="28.5" rx="6.25" transform="rotate(-3 37.25 23.75)" />
+    <rect x="42.5" y="11.0" width="12.5" height="26.5" rx="6.25" transform="rotate(2 48.75 24.25)" />
+  </g>
+  <g fill="#b8322a">
+    <rect x="10.0" y="15.5" width="9.5" height="21.0" rx="4.75" transform="rotate(-16 14.75 26)" />
+    <rect x="21.0" y="12.5" width="9.5" height="24.0" rx="4.75" transform="rotate(-9 25.75 24.5)" />
+    <rect x="32.5" y="11.0" width="9.5" height="25.5" rx="4.75" transform="rotate(-3 37.25 23.75)" />
+    <rect x="44.0" y="12.5" width="9.5" height="23.5" rx="4.75" transform="rotate(2 48.75 24.25)" />
+  </g>
+  <g fill="#201c19">
+    <rect x="24.5" y="26.5" width="32.2" height="15.5" rx="7.75" transform="rotate(11 41 34)" />
+  </g>
+  <g fill="#b8322a">
+    <rect x="26.0" y="28.0" width="29.2" height="12.5" rx="6.25" transform="rotate(11 41 34)" />
+  </g>
+</svg>

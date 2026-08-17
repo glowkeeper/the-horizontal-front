@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "punch-clock-tick",
+  "layers": [
+    {
+      "kind": "noise",
+      "filter": "bandpass",
+      "startCutoffHz": 3200,
+      "endCutoffHz": 2600,
+      "resonance": 6,
+      "delayMs": 0,
+      "attackMs": 0,
+      "holdMs": 4,
+      "releaseMs": 40,
+      "gain": 0.32,
+      "pan": 0
+    },
+    {
+      "kind": "tone",
+      "wave": "square",
+      "startFrequencyHz": 1800,
+      "endFrequencyHz": 1600,
+      "delayMs": 0,
+      "attackMs": 0,
+      "holdMs": 3,
+      "releaseMs": 25,
+      "gain": 0.1,
+      "pan": 0
+    }
+  ]
+}

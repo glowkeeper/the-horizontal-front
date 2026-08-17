@@ -1,20 +1,26 @@
 {
   "name": "the-horizontal-front",
-  "version": "1.0.0",
+  "version": "0.2.0",
   "description": "**Seize the Means of Relaxation.**",
   "main": "index.js",
   "directories": {
     "doc": "docs"
   },
   "scripts": {
+    "browser:install": "playwright install --with-deps chromium",
+    "build": "npm run generate:site && npm run check:policy && npm run check:docs && npm run validate:content && tsc --noEmit && vite build && node scripts/finalize-static-build.mjs && npm run check:static",
+    "check:docs": "node scripts/check-documentation.mjs",
     "check:policy": "node scripts/check-project-policy.mjs",
     "check:static": "node scripts/check-static-build.mjs",
-    "generate:site": "node scripts/generate-site-pages.mjs",
-    "test": "vitest run",
     "dev": "npm run generate:site && vite",
+    "generate:site": "node scripts/generate-site-pages.mjs",
     "preview": "vite preview",
-    "build": "npm run generate:site && npm run check:policy && tsc --noEmit && vite build && node scripts/finalize-static-build.mjs && npm run check:static",
-    "test:watch": "vitest"
+    "preview:device": "npm run build && vite preview --host --port 4173",
+    "test": "vitest run",
+    "test:browser": "playwright test",
+    "test:offline": "playwright test --config playwright.offline.config.ts",
+    "test:watch": "vitest",
+    "validate:content": "node scripts/validate-content.mjs"
   },
   "repository": {
     "type": "git",
@@ -37,9 +43,15 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@playwright/mcp": "0.0.78",
+    "@playwright/test": "1.62.0-alpha-1783623505000",
     "marked": "^16.4.2",
     "typescript": "^7.0.2",
     "vite": "^8.2.1",
     "vitest": "^4.1.10"
+  },
+  "overrides": {
+    "playwright-core": "1.62.0-alpha-1783623505000"
   }
 }

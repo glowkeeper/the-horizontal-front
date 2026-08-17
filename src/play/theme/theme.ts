@@ -1,11 +1,11 @@
 import type Phaser from "phaser";
 
 const cssColourRoles = {
-  duvetCream: "--colour-duvet-cream",
+  restCream: "--colour-rest-cream",
   inkCharcoal: "--colour-ink-charcoal",
   resistanceRed: "--colour-resistance-red",
   workLightBlue: "--colour-work-light-blue",
-  managementGold: "--colour-management-gold",
+  authorityGold: "--colour-authority-gold",
   paperWhite: "--colour-paper-white",
 } as const;
 
@@ -19,13 +19,19 @@ export function getThemeColour(role: ColourRole): string {
   return getCssToken(cssColourRoles[role]);
 }
 
+/**
+ * Interface-chrome controls are DOM buttons styled by
+ * `src/play/styles/game.css`, so only the variant name crosses into TypeScript.
+ */
+export type ButtonVariant = "primary" | "secondary";
+
 function getCssToken(token: string): string {
   const value = getComputedStyle(document.documentElement)
     .getPropertyValue(token)
     .trim();
 
   if (!value) {
-    throw new Error(`Missing shared theme token: ${token}`);
+    throw new Error(`Missing theme token: ${token}`);
   }
 
   return value;

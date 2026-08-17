@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "id": "desk-phone-ring",
+  "layers": [
+    {
+      "kind": "tone",
+      "wave": "triangle",
+      "startFrequencyHz": 1100,
+      "endFrequencyHz": 1100,
+      "delayMs": 0,
+      "attackMs": 4,
+      "holdMs": 90,
+      "releaseMs": 40,
+      "gain": 0.26,
+      "pan": 0
+    },
+    {
+      "kind": "tone",
+      "wave": "triangle",
+      "startFrequencyHz": 1380,
+      "endFrequencyHz": 1380,
+      "delayMs": 8,
+      "attackMs": 4,
+      "holdMs": 86,
+      "releaseMs": 40,
+      "gain": 0.22,
+      "pan": 0
+    },
+    {
+      "kind": "noise",
+      "filter": "bandpass",
+      "startCutoffHz": 2000,
+      "endCutoffHz": 1600,
+      "resonance": 10,
+      "delayMs": 0,
+      "attackMs": 3,
+      "holdMs": 90,
+      "releaseMs": 50,
+      "gain": 0.08,
+      "pan": 0
+    }
+  ]
+}

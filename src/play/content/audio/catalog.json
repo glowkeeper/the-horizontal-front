@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "cues": [
+    {
+      "id": "alarm-klaxon",
+      "file": "alarm-klaxon.json"
+    },
+    {
+      "id": "bed-frame-creak",
+      "file": "bed-frame-creak.json"
+    },
+    {
+      "id": "bed-frame-settle",
+      "file": "bed-frame-settle.json"
+    },
+    {
+      "id": "bed-frame-strain",
+      "file": "bed-frame-strain.json"
+    },
+    {
+      "id": "carriage-return",
+      "file": "carriage-return.json"
+    },
+    {
+      "id": "clock-off",
+      "file": "clock-off.json"
+    },
+    {
+      "id": "desk-phone-ring",
+      "file": "desk-phone-ring.json"
+    },
+    {
+      "id": "jammed-key",
+      "file": "jammed-key.json"
+    },
+    {
+      "id": "key-press",
+      "file": "key-press.json"
+    },
+    {
+      "id": "managerial-rumble",
+      "file": "managerial-rumble.json"
+    },
+    {
+      "id": "paper-shuffle",
+      "file": "paper-shuffle.json"
+    },
+    {
+      "id": "pneumatic-charge",
+      "file": "pneumatic-charge.json"
+    },
+    {
+      "id": "pneumatic-release",
+      "file": "pneumatic-release.json"
+    },
+    {
+      "id": "punch-clock-advance",
+      "file": "punch-clock-advance.json"
+    },
+    {
+      "id": "punch-clock-tick",
+      "file": "punch-clock-tick.json"
+    },
+    {
+      "id": "stamp-approved",
+      "file": "stamp-approved.json"
+    },
+    {
+      "id": "stamp-left",
+      "file": "stamp-left.json"
+    },
+    {
+      "id": "stamp-rejected",
+      "file": "stamp-rejected.json"
+    },
+    {
+      "id": "stamp-right",
+      "file": "stamp-right.json"
+    },
+    {
+      "id": "stamp-rise-left",
+      "file": "stamp-rise-left.json"
+    },
+    {
+      "id": "stamp-rise-right",
+      "file": "stamp-rise-right.json"
+    },
+    {
+      "id": "tube-collapse",
+      "file": "tube-collapse.json"
+    },
+    {
+      "id": "tube-pulse",
+      "file": "tube-pulse.json"
+    },
+    {
+      "id": "typewriter-strike",
+      "file": "typewriter-strike.json"
+    }
+  ],
+  "soundscapes": [
+    {
+      "id": "office-apparatus",
+      "file": "office-apparatus.json"
+    }
+  ]
+}

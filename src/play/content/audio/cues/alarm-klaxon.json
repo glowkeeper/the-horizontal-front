@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "id": "alarm-klaxon",
+  "layers": [
+    {
+      "kind": "tone",
+      "wave": "sawtooth",
+      "startFrequencyHz": 420,
+      "endFrequencyHz": 180,
+      "delayMs": 0,
+      "attackMs": 10,
+      "holdMs": 260,
+      "releaseMs": 260,
+      "gain": 0.3,
+      "pan": 0
+    },
+    {
+      "kind": "tone",
+      "wave": "square",
+      "startFrequencyHz": 210,
+      "endFrequencyHz": 92,
+      "delayMs": 0,
+      "attackMs": 12,
+      "holdMs": 260,
+      "releaseMs": 300,
+      "gain": 0.22,
+      "pan": 0
+    },
+    {
+      "kind": "noise",
+      "filter": "lowpass",
+      "startCutoffHz": 1400,
+      "endCutoffHz": 300,
+      "resonance": 3,
+      "delayMs": 0,
+      "attackMs": 10,
+      "holdMs": 250,
+      "releaseMs": 280,
+      "gain": 0.16,
+      "pan": 0
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "id": "carriage-return",
+  "layers": [
+    {
+      "kind": "noise",
+      "filter": "highpass",
+      "startCutoffHz": 1200,
+      "endCutoffHz": 3600,
+      "resonance": 1,
+      "delayMs": 0,
+      "attackMs": 8,
+      "holdMs": 70,
+      "releaseMs": 60,
+      "gain": 0.2,
+      "pan": 0
+    },
+    {
+      "kind": "tone",
+      "wave": "sine",
+      "startFrequencyHz": 1760,
+      "endFrequencyHz": 1760,
+      "delayMs": 90,
+      "attackMs": 2,
+      "holdMs": 40,
+      "releaseMs": 260,
+      "gain": 0.26,
+      "pan": 0
+    },
+    {
+      "kind": "tone",
+      "wave": "sine",
+      "startFrequencyHz": 2640,
+      "endFrequencyHz": 2640,
+      "delayMs": 90,
+      "attackMs": 2,
+      "holdMs": 36,
+      "releaseMs": 220,
+      "gain": 0.1,
+      "pan": 0
+    }
+  ]
+}

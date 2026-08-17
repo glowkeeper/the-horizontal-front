@@ -1,49 +1,70 @@
 import type { ResistanceConfig } from "./types";
 
-export function assertValidResistanceConfig(
-  config: ResistanceConfig,
-): void {
+export function assertValidResistanceConfig(config: ResistanceConfig): void {
   assertPositive("durationMs", config.durationMs);
+  assertNonNegative("resolutionDurationMs", config.resolutionDurationMs);
   assertUnitInterval("startingSafety", config.startingSafety);
-  assertNonNegative("pressurePerSecond", config.pressurePerSecond);
-  assertNonNegative("recoveryPerBeat", config.recoveryPerBeat);
-  assertUnitInterval("momentumGain", config.momentumGain);
-  assertUnitInterval("momentumLoss", config.momentumLoss);
-  assertNonNegative(
-    "momentumRecoveryBonus",
-    config.momentumRecoveryBonus,
-  );
-  assertPositive("rhythm.beatIntervalMs", config.rhythm.beatIntervalMs);
-  assertNonNegative(
-    "rhythm.timingWindowMs",
-    config.rhythm.timingWindowMs,
-  );
+  if (config.phases.length === 0) throw new Error("phases must not be empty");
 
-  if (config.rhythm.steps.length === 0) {
-    throw new Error("rhythm.steps must contain at least one step");
+  let boundary = 0;
+  for (const [index, phase] of config.phases.entries()) {
+    if (phase.startsAtMs !== boundary || phase.endsAtMs <= phase.startsAtMs) {
+      throw new Error(`phases[${index}] must form a contiguous positive timeline`);
+    }
+    assertNonNegative(`phases[${index}].pressurePerSecond`, phase.pressurePerSecond);
+    assertNonNegative(`phases[${index}].recoveryPerAction`, phase.recoveryPerAction);
+    assertNonNegative(`phases[${index}].safetyPenaltyPerMiss`, phase.safetyPenaltyPerMiss);
+    assertUnitInterval(`phases[${index}].resistanceGainPerHit`, phase.resistanceGainPerHit);
+    assertUnitInterval(`phases[${index}].resistanceLossPerMiss`, phase.resistanceLossPerMiss);
+    assertNonNegative(`phases[${index}].resistanceRecoveryBonus`, phase.resistanceRecoveryBonus);
+    assertUnitInterval(`phases[${index}].presentationIntensity.from`, phase.presentationIntensity.from);
+    assertUnitInterval(`phases[${index}].presentationIntensity.to`, phase.presentationIntensity.to);
+    boundary = phase.endsAtMs;
   }
+  if (boundary !== config.durationMs) throw new Error("phases must exactly fill durationMs");
 
-  if (config.rhythm.timingWindowMs * 2 >= config.rhythm.beatIntervalMs) {
-    throw new Error(
-      "rhythm.timingWindowMs must be less than half rhythm.beatIntervalMs",
-    );
+  let previousAt = -1;
+  for (const [index, cue] of config.cues.entries()) {
+    if (cue.atMs < previousAt || cue.atMs >= config.durationMs) {
+      throw new Error(`cues[${index}] must be ordered inside durationMs`);
+    }
+    if (!config.phases[cue.phaseIndex]) throw new Error(`cues[${index}] has an invalid phaseIndex`);
+    assertNonNegative(`cues[${index}].timingWindowMs`, cue.timingWindowMs);
+    // An announcement at or after the demand it announces is useless: the point
+    // of it is that the player hears which side is coming while there is still
+    // time to move. Only a cue starting at zero may share its moment.
+    if (cue.approachAtMs > cue.atMs || (cue.approachAtMs === cue.atMs && cue.atMs > 0)) {
+      throw new Error(`cues[${index}].approachAtMs must precede its atMs`);
+    }
+    assertNonNegative(`cues[${index}].approachAtMs`, cue.approachAtMs);
+    if (cue.action === "hold" && cue.releaseAtMs <= cue.atMs) {
+      throw new Error(`cues[${index}] hold must have a later releaseAtMs`);
+    }
+    previousAt = cue.atMs;
+  }
+  for (const [index, event] of config.guideEvents.entries()) {
+    if (event.atMs < 0 || event.endsAtMs <= event.atMs
+      || event.endsAtMs > config.durationMs) {
+      throw new Error(`guideEvents[${index}] must fit inside durationMs`);
+    }
+    if (!config.phases[event.phaseIndex]) {
+      throw new Error(`guideEvents[${index}] has an invalid phaseIndex`);
+    }
+    if (
+      event.action === "hold"
+      && (event.releaseAtMs <= event.atMs || event.releaseAtMs > event.endsAtMs)
+    ) {
+      throw new Error(`guideEvents[${index}] hold must contain its releaseAtMs`);
+    }
   }
 }
 
 function assertPositive(name: string, value: number): void {
-  if (!Number.isFinite(value) || value <= 0) {
-    throw new Error(`${name} must be a finite positive number`);
-  }
+  if (!Number.isFinite(value) || value <= 0) throw new Error(`${name} must be a finite positive number`);
 }
-
 function assertNonNegative(name: string, value: number): void {
-  if (!Number.isFinite(value) || value < 0) {
-    throw new Error(`${name} must be a finite non-negative number`);
-  }
+  if (!Number.isFinite(value) || value < 0) throw new Error(`${name} must be a finite non-negative number`);
 }
-
 function assertUnitInterval(name: string, value: number): void {
-  if (!Number.isFinite(value) || value < 0 || value > 1) {
-    throw new Error(`${name} must be between 0 and 1`);
-  }
+  if (!Number.isFinite(value) || value < 0 || value > 1) throw new Error(`${name} must be between 0 and 1`);
 }

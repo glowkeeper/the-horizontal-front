@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "three-and-rest",
+  "cycleBeats": 4,
+  "events": [
+    { "action": "tap", "side": "left", "atBeat": 0 },
+    { "action": "tap", "side": "right", "atBeat": 1 },
+    { "action": "tap", "side": "left", "atBeat": 2 },
+    { "action": "rest", "atBeat": 3, "durationBeats": 1 }
+  ]
+}

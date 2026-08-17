@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "id": "the-horizontal-front",
+  "title": "The Horizontal Front",
+  "interface": {
+    "pageTitle": "Play — The Horizontal Front",
+    "pageDescription": "Play The Horizontal Front.",
+    "exitLabel": "Return to the Front",
+    "muteAudio": "Mute sound",
+    "unmuteAudio": "Unmute sound",
+    "audioMutedStatus": "Sound muted. Every cue remains on screen.",
+    "audioAudibleStatus": "Sound on.",
+    "gameAriaLabel": "The Horizontal Front",
+    "loadingStatus": "Loading campaigns.",
+    "campaignsHeading": "CAMPAIGNS",
+    "campaignsInstructions": "ARROWS: CHOOSE     ENTER: BEGIN",
+    "briefingInstructions": "PRESS ENTER OR TAP TO HOLD THE LINE",
+    "beginEpisode": "PLAY",
+    "briefingStatus": "{title}. {headline} {body} Press Enter or tap to begin.",
+    "retryEpisode": "TRY AGAIN",
+    "acceptOutcome": "ACCEPT OUTCOME",
+    "resultStatus": "{outcome}. {feedback} Press R or tap Try Again to retry, or Enter or tap Accept Outcome to continue.",
+    "resolutionStatus": "{outcome}. {feedback}",
+    "replayCampaign": "PLAY CAMPAIGN AGAIN",
+    "returnToCampaigns": "CAMPAIGNS",
+    "debriefingStatus": "{headline}. {body} {scoreLabel}: {score}. Press R or Enter to play again, or Escape to return to Campaigns."
+  },
+  "mechanics": {
+    "resistance": {
+      "leftControl": "LEFT\nA / ←",
+      "rightControl": "RIGHT\nL / →",
+      "secondsRemaining": "{seconds} SECONDS",
+      "cueTap": "{side}",
+      "cueHold": "HOLD {side}",
+      "cueHolding": "HOLD",
+      "cueReleaseNow": "RELEASE NOW",
+      "cueRest": "REST",
+      "cueCountIn": "READY",
+      "cueHitNow": "HIT NOW",
+      "tap": "TAP — {side}",
+      "hold": "HOLD — {side}",
+      "hit": "✓ HIT — {side}\nSOLIDARITY! ✊ 🛏️",
+      "wrongSide": "✕ WRONG KEY — {side} NEEDED",
+      "tooEarly": "✕ TOO EARLY — {side} ON NOW",
+      "missed": "✕ MISSED — {side}",
+      "releasedEarly": "✕ RELEASED TOO EARLY — {side}"
+    },
+    "interruptions": {
+      "sequenceProgress": "{instruction} — {current} OF {total}",
+      "holdReady": "PRESS AND HOLD\nSPACE OR BUTTON",
+      "holdHolding": "HOLDING — KEEP HOLDING",
+      "holdRelease": "RELEASE NOW"
+    }
+  },
+  "campaigns": [
+    {
+      "id": "the-monday-uprising",
+      "file": "the-monday-uprising.json"
+    }
+  ]
+}

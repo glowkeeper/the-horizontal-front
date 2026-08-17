@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "id": "managerial-waltz",
+  "cycleBeats": 3,
+  "events": [
+    { "action": "tap", "side": "left", "atBeat": 0 },
+    { "action": "tap", "side": "right", "atBeat": 1 },
+    { "action": "tap", "side": "right", "atBeat": 2 }
+  ]
+}

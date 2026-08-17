@@ -9,6 +9,7 @@ const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const sourceEntryPages = [
   { source: "src/site/pages/home.html", output: "index.html" },
   { source: "src/site/pages/commons.html", output: "commons/index.html" },
+  { source: "src/site/pages/sound.html", output: "sound/index.html" },
   { source: "src/play/index.html", output: "play/index.html" },
 ];
 
@@ -75,12 +76,38 @@ function escapeHtml(value) {
     .replaceAll('"', "&quot;");
 }
 
+const repositoryBlobBase =
+  "https://github.com/glowkeeper/the-horizontal-front/blob/main/";
+
+/**
+ * Point every repository link somewhere that resolves.
+ *
+ * The seven governing documents are published as site pages, so links between
+ * them become site paths and a reader never leaves. Everything else in the
+ * repository — the architecture notes, the grammar reference, the research —
+ * is contributor documentation that deliberately stays on GitHub, where it sits
+ * beside the source it describes.
+ *
+ * Those links must become absolute. A repository-relative path survives being
+ * rendered into HTML and then resolves against the page it landed on, so
+ * `docs/game-concept.md` linked from the contribute page became
+ * `/contribute/docs/game-concept.md` and pointed at nothing. Worse, a static
+ * host with an HTML fallback answers that with a page rather than an error, so
+ * the reader gets something that is neither the document nor a visible failure.
+ */
 function rewriteInternalLinks(markdown) {
   let rewritten = markdown;
 
   for (const [source, publicPath] of internalLinks) {
     rewritten = rewritten.replaceAll(`](${source})`, `](${publicPath})`);
   }
+
+  // Anything still pointing at a repository path is documentation that lives on
+  // GitHub. Absolute URLs and in-page anchors are left alone.
+  rewritten = rewritten.replaceAll(
+    /\]\((?!https?:|\/|#)([^)\s]+)\)/g,
+    (match, target) => `](${repositoryBlobBase}${target})`,
+  );
 
   return rewritten;
 }
@@ -98,6 +125,7 @@ function pageTemplate({ title, description, content, documentPage = false }) {
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="description" content="${escapeHtml(description)}" />
     <meta name="theme-color" content="#f3e8d0" />
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <title>${escapeHtml(title)} — The Horizontal Front</title>
   </head>
@@ -106,8 +134,10 @@ function pageTemplate({ title, description, content, documentPage = false }) {
     <header class="site-header">
       <a class="site-name" href="/">The Horizontal Front</a>
       <nav aria-label="Primary navigation">
+        <a href="/">Home</a>
         <a href="/play/">Play</a>
         <a href="/commons/">The Commons</a>
+        <a href="/sound/">Sound</a>
         ${repositoryLink}
       </nav>
     </header>
@@ -118,7 +148,7 @@ function pageTemplate({ title, description, content, documentPage = false }) {
       </aside>
     </main>
     <footer class="site-footer">
-      <p>Free to play. No ads. No tracking. No purchases ✊ 🛏️</p>
+      <p class="footer-mark">Free to play. No ads. No tracking. No purchases<img src="/assets/mark.svg" alt="" width="20" height="20" /></p>
       <nav aria-label="Project information">
         <a href="/charter/">Charter</a>
         <a href="/governance/">Governance</a>

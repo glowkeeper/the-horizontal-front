@@ -14,12 +14,21 @@ These instructions apply to every AI coding assistant working in this repository
 - Do not replace understandable code with clever abstractions without discussing the benefit first.
 - Surface decisions that would constrain later design instead of hiding them in scaffolding.
 - Distinguish clearly between provisional bootstrap values and intentional product decisions.
+- Every prototype must exercise the intended production architecture. Provisional content, tuning and artwork are acceptable; disposable architectural shortcuts, episode-specific wiring and deferred boundaries are not. If a reusable boundary—such as catalogues, validation, ownership or composition—is part of the agreed design being tested, implement it now rather than describing it as later work.
 - Preserve the maintainer's existing naming, layout and stylistic preferences.
 - Ask before making a material product or architectural decision that has not already been settled in the documentation.
 
+## Research-informed decisions
+
+- Base consequential decisions about game mechanics, interaction design, accessibility and player experience on relevant evidence where practical, rather than convention or intuition alone.
+- Prefer primary research, standards and authoritative platform guidance. Distinguish what a source demonstrates from a design inference made for this game; do not present an analogy or convention as settled evidence.
+- Record research that materially constrains the product under `docs/research/`, including sources, findings, limitations and the resulting project decisions, so contributors can inspect and challenge the reasoning.
+- Apply research proportionately. A small reversible tuning change does not require a literature review, while a new reusable mechanic, input model or accessibility convention deserves deliberate investigation before its grammar is fixed.
+- Treat published evidence as an input to playtesting, not a substitute for it. Verify research-informed mechanics with representative players and revise them when observed play conflicts with the design assumptions.
+
 ## Product intent
 
-The Horizontal Front is a satirical, rhythm-based 2D web and mobile game about working extremely hard to remain in bed while an authoritarian Orange Fella tries to force the player into work.
+The Horizontal Front is a satirical, rhythm-based 2D web and mobile game about working extremely hard to remain in bed while Management, a grotesque embodiment of capitalism at its worst, tries to force the player into work.
 
 It is a free, open-source game about collective power, mutual aid and resistance to hierarchical systems. Develop it as a digital commons: freely accessible, community-supported and accountable to its players rather than investors or advertisers.
 
@@ -30,9 +39,14 @@ The game is political satire about capitalism, exploitative work culture, compul
 Read the relevant documents before changing product behaviour:
 
 - `docs/game-concept.md`
-- `docs/expanded-design-direction.md`
-- `docs/data-driven-episode-architecture.md`
+- `docs/design-decisions.md`
+- `docs/content-architecture.md`
+- `docs/episode-grammar-reference.md`
 - `docs/technical-architecture.md`
+- `docs/art-direction.md` when a change touches artwork or visual composition
+- `docs/release-process.md` when a change touches production readiness,
+  versioning, support claims, deployment or release publication
+- `docs/research/` when a change touches a researched interaction or accessibility decision
 
 Do not dilute the satire into a generic sleep, wellness or productivity game.
 
@@ -110,14 +124,30 @@ Avoid class hierarchies, service containers, unnecessary design patterns and pre
 
 ## Content and presentation
 
+- Apply the same two-level ownership model to every content family that supports reuse: `shared` definitions are globally reusable and may reference shared definitions only; `episode` definitions are private to their owning episode and may reference shared definitions or definitions owned by that same episode. References must state their source explicitly, local IDs must not shadow shared IDs, and content must never reach into another episode's private namespace. A content family that intentionally supports only one level must say so in its schema and documentation.
 - Canvas presentation belongs in shared semantic theme roles rather than ad hoc scene values.
 - Do not invent fonts, colours or visual branding while performing neutral scaffolding.
 - Reuse responsive cartoon layouts and semantic slots.
 - Episode data may select mechanics, skins, parameters, layouts, assets and documented outcomes.
+- Store authored composition values in validated content rather than embedding them in Phaser code. Layout data owns design-space anchors, pivots, slots and motion parameters; skin or asset data owns visual-part geometry and semantic asset references. TypeScript interprets this finite vocabulary and must not become an episode-specific drawing specification.
+- **Presentation genericity is a project invariant, enforced by `npm run check:policy`.** No module under `src/play/phaser/` may contain an authored presentation value: not a size, depth, opacity or stroke width written inline, and not a semantic colour role chosen by a code literal such as `getThemeColour("managementGold")`. Every such value is resolved from validated layout, skin or panel data. The single exemption is `src/play/phaser/design.ts`, which names the interface-chrome constants for buttons, menus and the canvas ground — engine furniture no episode restyles. Choosing an appearance in an adapter rather than in content is the violation, even when the chosen value is already a shared theme role.
+- **Content identity must not appear in code.** No episode, campaign, rhythm, curve, mechanic, skin, layout or asset ID may be written as a literal in TypeScript. Selections resolve generically from validated data by filename-matching ID, so adding a layout, skin, rhythm or asset that reuses the existing vocabulary is a content change with no TypeScript edit. Genuinely new visual or mechanical structure is an engine expansion, designed and documented as a reusable capability.
+- Resolve artwork through a validated asset catalogue of stable semantic IDs. Episodes and skins must not contain repository file paths, and adding a catalogued asset or selecting it in a skin must not require new TypeScript wiring.
+- Namespace both skins and artwork by ownership. Shared skins may use only shared assets; episode-owned skins may use shared assets and assets owned by the same episode. An episode may select only a shared skin or one it owns. Enforce these rules generically rather than branching on episode IDs.
+- Organise authored play content as one game containing ordered campaigns containing ordered episodes. Use descriptive lowercase kebab-case IDs, require JSON filenames to match their IDs exactly, keep episode IDs globally unique, and reject numeric sequence segments. Durable IDs name the finished creative work rather than the implementation stage that produced it; identifying an implementation stand-in such as `one-scene` or `resistance-test` ultimately requires human judgement.
+- Every campaign has one authored briefing, one or more ordered playable episodes, and one authored debriefing. The engine computes episodes held and attempted from accepted outcomes; campaign JSON supplies wording, never scores or executable progression criteria. Retrying does not record an outcome, while accepting either victory or forced verticalisation advances the campaign.
+- Make the game hierarchy player-facing: bootstrap presents all validated campaigns, campaign selection opens its briefing, and debriefing offers replay or return to campaigns. Navigation scenes consume validated content and must not discover files or branch on authored campaign IDs.
+- Keep all player-visible copy in validated content, never embedded in TypeScript or Phaser scenes. Partition it deliberately: game JSON owns global interface and reusable-mechanic vocabulary, campaign JSON owns campaign prose, episode JSON owns episode-specific confrontation and outcome prose, presentation layouts/skins own their visual-role captions, and the engine supplies only computed values inserted into finite validated templates. Preserve meaningful static HTML identity by injecting page-shell copy from game data at build time.
 - Prefer limited cut-out cartoon animation over assuming expensive frame-by-frame animation.
 - Keep the recurring boss fictional and visually original.
 - Failure should remain funny, dramatic and sad rather than becoming empty slapstick.
 - Do not introduce a conventional currency, grind, upgrade economy, daily streak or retention machinery without explicit discussion; their absence is part of the satire.
+
+## Characters are roles, not people
+
+Characters represent roles within a corporate-capitalist hierarchy. The recurring antagonist is **Management**: a fictional, broadly recognisable grotesque embodiment of capitalism at its worst, never a depiction, caricature or coded stand-in for a particular politician, celebrity or other real person. Person-coded naming — including colour-coded nicknames alluding to a real figure's appearance — is not acceptable in the game, the website, project documentation, artwork briefs or generation prompts.
+
+**This is a project invariant, enforced by `npm run check:policy`.** The check fails the build if a superseded person-coded phrase reappears. It matches multi-word phrases deliberately: a bare word such as "orange" would reject the art-direction sheets that legitimately instruct "no politician or celebrity likeness, no orange skin". `docs/history/` is exempt because it is marked superseded rather than current, and its editorial note preserves the retired name so the reason for the change survives; the policy script itself is exempt because the rule cannot name banned phrases without containing them. Extend the phrase list when a new person-coded name is retired.
 
 ## Artwork production
 
@@ -126,7 +156,7 @@ AI-generated artwork may be used for prototypes and may be considered for produc
 Follow this production-conscious workflow:
 
 1. Start from an original project art brief. Do not request imitation of a living artist or named entertainment property.
-2. Keep the Orange Fella a fictional political and corporate archetype rather than reproducing a real person's face.
+2. Keep Management a broadly recognisable grotesque embodiment of capitalism rather than reproducing or evoking a particular politician or other real person.
 3. Review every generated asset for recognisable characters, logos, branding, signatures, watermarks and suspiciously specific similarities.
 4. Apply meaningful human art direction through selection, iteration, editing, repainting, compositing and adaptation to the project's visual system.
 5. Preserve provenance: prompts, source generations, generation date and tool, edits, licences, contributors and replacement status.
@@ -143,13 +173,14 @@ The maintainer owns output as between the maintainer and the generation service 
 Procedural synthesis is the default direction for prototype audio and may remain the production direction when the results are good enough.
 
 - Generate sound effects mathematically in project-owned code rather than relying on samples where practical.
+- Build the rhythmic and musical bed from the apparatus of the setting being satirised — stamps, typewriters, pneumatic tubes, punch clocks, telephones, machine hum — rather than from conventional instruments. The machinery enforcing the working day supplies the beat the player resists, so the score is part of the argument rather than decoration over it. Each episode takes its instrumentation from its own setting. Conventional melodic instrumentation is a deliberate exception requiring justification, not the default.
 - Initial targets include duvet pulls, rhythm ticks, notification chirps, warning alarms, victory and failure stings, and fluorescent office hum.
 - Keep synthesis parameters explicit and reproducible so sounds can be tuned alongside gameplay.
 - Do not incorporate unlicensed samples, recordings, melodies or other third-party audio into procedural output.
 - Treat any externally sourced sound as a licensed asset and record its creator, source, licence, attribution requirements and permitted uses in the asset manifest.
 - Avoid imitating a named musician, performer, politician or other identifiable person's voice or musical style.
 
-The Orange Fella should communicate through an original, unintelligible synthesised rumble or bluster. Speech bubbles carry the actual words. His vocal sound may convey timing, mood, interruption and comic emphasis, but it must not clone or closely reproduce a real person's voice.
+Management should communicate through an original, unintelligible synthesised rumble or bluster. Speech bubbles carry the actual words. The vocal sound may convey timing, mood, interruption and comic emphasis, but it must not clone or closely reproduce a real person's voice.
 
 This approach is both an aesthetic choice and a provenance choice: the boss becomes a noisy embodiment of managerial power rather than a voiced impersonation, while all politically important dialogue remains readable and accessible.
 
@@ -179,7 +210,23 @@ For code changes, run the smallest relevant checks and report the result:
 - Type checking and production build for application integration.
 - Focused unit tests for engine rules.
 - Content-schema validation for episode changes.
+- Structural and semantic validation for layout, skin and composition data. Tests must cover coordinate bounds, positive dimensions, unique and required semantic parts, compatible layout/skin references, meaningful pivots and motion direction—not merely successful JSON parsing.
 - Browser or device testing only when relevant to the requested change.
+
+When acceptance depends on player-facing browser behaviour, follow
+`docs/browser-verification.md`. AI reviewers must use the repository's isolated,
+credential-free browser configuration rather than a maintainer's personal
+profile or authenticated tabs.
+
+Every verification report must use the exact evidence levels defined in
+`docs/verification-evidence.md`: **Automated/source verified**,
+**Browser-flow verified** and **Human perceptually accepted**. State all three
+levels as **Claimed** with their required evidence or **Not claimed** with the
+reason. Never upgrade one level into another. In particular, an AI
+assistant may record a person's explicit acceptance but must never claim or
+infer human perceptual acceptance from source inspection, automated checks,
+screenshots or browser automation. Require only the levels proportionate to the
+change and preserve the authority document's limitations in the hand-off.
 
 Do not claim a change works without running an appropriate check. Do not turn every small edit into an expansive testing or tooling exercise.
 

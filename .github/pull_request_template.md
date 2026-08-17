@@ -6,6 +6,17 @@ Describe the change and why it is needed.
 
 List the checks you ran and their results.
 
+## Verification evidence
+
+Use the definitions and required evidence in
+[`docs/verification-evidence.md`](https://github.com/glowkeeper/the-horizontal-front/blob/main/docs/verification-evidence.md). Replace
+each placeholder with **Claimed** and its evidence or **Not claimed** and the
+reason. Do not infer a higher level from a lower one.
+
+- **Automated/source verified:** Claimed / Not claimed —
+- **Browser-flow verified:** Claimed / Not claimed —
+- **Human perceptually accepted:** Claimed / Not claimed —
+
 ## Charter check
 
 - [ ] I have read `PROJECT_CHARTER.md` and `CONTRIBUTING.md`.

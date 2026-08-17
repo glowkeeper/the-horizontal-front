@@ -1,9 +1,9 @@
 :root {
-  --colour-duvet-cream: #f3e8d0;
+  --colour-rest-cream: #f3e8d0;
   --colour-ink-charcoal: #201c19;
   --colour-resistance-red: #b8322a;
   --colour-work-light-blue: #3e6f8f;
-  --colour-management-gold: #c8952e;
+  --colour-authority-gold: #c8952e;
   --colour-paper-white: #fffdf7;
   --font-interface: system-ui, sans-serif;
   --font-game: system-ui, sans-serif;
@@ -15,3 +15,14 @@
   --space-2xl: 3rem;
   --space-3xl: 4rem;
 }
+
+/*
+ * This file holds only genuinely shared presentation values: the semantic
+ * colour roles, typography and spacing that carry the project's identity
+ * across the public site and the game. Those must not drift between surfaces.
+ *
+ * Component styling is deliberately not here. The site and the game are
+ * different things and are expected to diverge, so each owns its own button
+ * contract — `--button-*` in src/site/styles/site.css and in
+ * src/play/styles/game.css — with both referencing the colour roles above.
+ */

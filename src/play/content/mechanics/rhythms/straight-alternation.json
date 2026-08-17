@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "id": "straight-alternation",
+  "cycleBeats": 2,
+  "events": [
+    { "action": "tap", "side": "left", "atBeat": 0 },
+    { "action": "tap", "side": "right", "atBeat": 1 }
+  ]
+}

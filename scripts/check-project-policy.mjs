@@ -1,6 +1,12 @@
 import { readFile, readdir } from "node:fs/promises";
 import { dirname, extname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  assetFilePattern,
+  contentIdPattern,
+  findPlaceholderIdSegment,
+  maximumCampaignsWithoutPaging,
+} from "../src/play/content/contentRules.mjs";
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const failures = [];
@@ -11,8 +17,224 @@ function requirePolicy(condition, message) {
   }
 }
 
+/**
+ * Character-agnosticism invariant.
+ *
+ * The recurring antagonist is Management: a role within a corporate-capitalist
+ * hierarchy, not a depiction or coded stand-in for any particular politician or
+ * other real person. This check fails the build if a superseded person-coded
+ * name reappears in project text.
+ *
+ * Multi-word phrases are matched deliberately. A bare word such as "orange" is
+ * unusable as a rule: the art-direction and concept sheets legitimately instruct
+ * "no politician or celebrity likeness, no orange skin", and a naive word match
+ * would reject the very instructions that enforce this policy.
+ *
+ * Two paths are exempt. `docs/history/` is explicitly marked as superseded
+ * rather than current specification, and its editorial note preserves the
+ * retired name so the reason for the change is not erased from the record.
+ * This file is exempt because the rule cannot state which phrases are banned
+ * without containing them.
+ */
+const PERSON_REFERENCE_PHRASES = [
+  "orange fella",
+  "orange-fella",
+  "trumpesque",
+  "trumpian",
+];
+const PERSON_REFERENCE_EXEMPT_PREFIXES = [
+  "docs/history/",
+  "scripts/check-project-policy.mjs",
+];
+const PERSON_REFERENCE_EXTENSIONS = new Set([
+  ".md", ".json", ".ts", ".mjs", ".js", ".html", ".css",
+]);
+
+/**
+ * Episode-agnosticism invariant.
+ *
+ * Content identity must not appear in code, and the check for literal IDs is
+ * only half of that. The subtler leak is vocabulary: a field called
+ * `duvetSafety` in the shared engine names one episode's bedding, and every
+ * later episode inherits a term that does not describe it. The rule is that
+ * reusable code names the general concept — the resistance, the opposing actor
+ * — while the specific fiction lives in content, where a duvet, a door or a
+ * chair is exactly the right word.
+ *
+ * Only identifiers are matched, not comments or prose, because explaining a
+ * generic mechanism by its concrete example is good writing rather than a leak.
+ *
+ * Content directories are exempt: naming a cue `bed-frame-creak` is the system
+ * working. So is `forced-verticalisation`, which is the game's own central
+ * outcome rather than any one episode's invention.
+ */
+const EPISODE_FICTION_TERMS = [
+  // One episode's objects and setting.
+  "duvet", "bedroom", "pillow", "mattress", "alarmClock",
+  // One episode's antagonist. The recurring role is Management today, but a
+  // later episode may set a CEO, a colleague or a department against the
+  // player, so reusable code says opposing actor and content says who.
+  "management",
+  // One episode's outcome. Being forced upright is how The Alarm loses; another
+  // episode loses differently. The engine knows success and failure.
+  "verticalis",
+];
+const EPISODE_FICTION_ROOTS = [
+  "src/play/engine",
+  "src/play/audio",
+  "src/play/input",
+  "src/play/content/schemas",
+];
+
+async function findEpisodeFictionInEngine() {
+  const findings = [];
+  for (const root of EPISODE_FICTION_ROOTS) {
+    for (const file of await listFiles(join(projectRoot, root))) {
+      if (extname(file) !== ".ts") continue;
+      const relativePath = relative(projectRoot, file).split("\\").join("/");
+      const source = await readFile(file, "utf8");
+      const code = source
+        .split("\n")
+        .filter((line) => !/^\s*(\/\/|\*|\/\*)/.test(line))
+        .join("\n");
+      for (const term of EPISODE_FICTION_TERMS) {
+        const pattern = new RegExp(`\\b${term}`, "i");
+        if (pattern.test(code)) findings.push(`${relativePath} (${term})`);
+      }
+    }
+  }
+  return findings;
+}
+
+async function findPersonReferences(directory) {
+  const findings = [];
+  for (const file of await listFiles(directory)) {
+    const relativePath = relative(projectRoot, file).split("\\").join("/");
+    if (!PERSON_REFERENCE_EXTENSIONS.has(extname(file))) continue;
+    if (PERSON_REFERENCE_EXEMPT_PREFIXES.some(
+      (prefix) => relativePath.startsWith(prefix),
+    )) continue;
+    const lines = (await readFile(file, "utf8")).split("\n");
+    for (const [index, line] of lines.entries()) {
+      const lowered = line.toLowerCase();
+      for (const phrase of PERSON_REFERENCE_PHRASES) {
+        if (lowered.includes(phrase)) {
+          findings.push(`${relativePath}:${index + 1} ("${phrase}")`);
+        }
+      }
+    }
+  }
+  return findings;
+}
+
+/**
+ * The game's canvas cannot use a stylesheet, so its theme adapter reads the
+ * game's own CSS custom properties at runtime. A token the adapter reads but
+ * the stylesheet no longer defines would fail only when a player loaded the
+ * game, so the mismatch is rejected here instead.
+ *
+ * The public site owns a separate button contract in its own stylesheet. The
+ * two surfaces are expected to diverge in value; this only checks that the
+ * game defines everything the game reads.
+ */
+async function findMissingGameThemeTokens() {
+  const adapter = await readFile(
+    join(projectRoot, "src/play/theme/theme.ts"),
+    "utf8",
+  );
+  const stylesheet = await readFile(
+    join(projectRoot, "src/play/styles/game.css"),
+    "utf8",
+  );
+  const required = [...new Set(
+    [...adapter.matchAll(/"(--[a-z0-9-]+)"/g)].map((match) => match[1]),
+  )];
+  return required.filter((token) => !new RegExp(`${token}\\s*:`).test(stylesheet)
+    && !new RegExp(`${token}\\s*:`).test(sharedThemeTokens));
+}
+
+const sharedThemeTokens = await readFile(
+  join(projectRoot, "src/shared/theme/tokens.css"),
+  "utf8",
+);
+
+async function findEmbeddedPlayerCopy(directory) {
+  // This is a deliberately small regression tripwire for direct literals at
+  // presentation call sites, not a semantic proof. Schemas, TypeScript and
+  // review remain the authoritative copy boundary; indirect values require
+  // ordinary code review until an AST-based policy becomes worthwhile.
+  const findings = [];
+  const files = (await listFiles(directory)).filter((file) => file.endsWith(".ts"));
+  for (const file of files) {
+    const source = await readFile(file, "utf8");
+    const literalCopyPatterns = [
+      /\.text\((?:[^,]+,){2}\s*["'`][^"'`\s]/g,
+      /\.setText\(\s*["'`][^"'`\s]/g,
+      /\bannounce\(\s*["'`][^"'`\s]/g,
+      /\bcreateButton\((?:[^,]+,){4}\s*["'`][^"'`\s]/g,
+    ];
+    for (const pattern of literalCopyPatterns) {
+      for (const match of source.matchAll(pattern)) {
+        const line = source.slice(0, match.index).split("\n").length;
+        findings.push(`${relative(projectRoot, file)}:${line}`);
+      }
+    }
+  }
+  return findings;
+}
+
+/**
+ * Presentation genericity invariant.
+ *
+ * Every Phaser module must resolve its appearance from validated content or
+ * from the named interface-chrome constants in `src/play/phaser/design.ts`.
+ * Two things are therefore rejected anywhere else under `src/play/phaser/`:
+ *
+ * - authored numbers written inline (sizes, depths, opacity, stroke widths);
+ * - authored semantic theme roles chosen by a code literal, which decides
+ *   appearance in the adapter instead of in layout, skin or chrome data.
+ *
+ * `design.ts` is the single exemption because interface chrome — buttons,
+ * menus and the canvas ground — is engine furniture rather than authored world
+ * composition. Naming those values in one inspectable module keeps the rule
+ * absolute everywhere else.
+ */
+const PRESENTATION_VALUE_EXEMPT_FILES = new Set(["src/play/phaser/design.ts"]);
+
+async function findHardCodedPresentationValues(directory) {
+  const findings = [];
+  const files = directory.endsWith(".ts")
+    ? [directory]
+    : (await listFiles(directory)).filter((file) => file.endsWith(".ts"));
+  const authoredValuePatterns = [
+    /fontSize\s*:\s*["'`]\d/g,
+    /\.setDepth\(\s*-?\d/g,
+    /\.setAlpha\(\s*0?\.\d/g,
+    /\.setStrokeStyle\(\s*\d/g,
+    /(?:getThemeColour|toColour|colour)\(\s*["'`][a-zA-Z]/g,
+  ];
+  for (const file of files) {
+    const relativePath = relative(projectRoot, file).split("\\").join("/");
+    if (PRESENTATION_VALUE_EXEMPT_FILES.has(relativePath)) continue;
+    const source = await readFile(file, "utf8");
+    for (const pattern of authoredValuePatterns) {
+      for (const match of source.matchAll(pattern)) {
+        const line = source.slice(0, match.index).split("\n").length;
+        findings.push(`${relativePath}:${line}`);
+      }
+    }
+  }
+  return findings;
+}
+
 async function listFiles(directory) {
-  const entries = await readdir(directory, { withFileTypes: true });
+  let entries;
+  try {
+    entries = await readdir(directory, { withFileTypes: true });
+  } catch (error) {
+    if (error?.code === "ENOENT") return [];
+    throw error;
+  }
   const files = [];
 
   for (const entry of entries) {
@@ -31,6 +253,340 @@ async function listFiles(directory) {
 const packageJson = JSON.parse(
   await readFile(join(projectRoot, "package.json"), "utf8"),
 );
+const packageLock = JSON.parse(
+  await readFile(join(projectRoot, "package-lock.json"), "utf8"),
+);
+const mcpConfig = JSON.parse(
+  await readFile(join(projectRoot, ".mcp.json"), "utf8"),
+);
+const gitignore = await readFile(join(projectRoot, ".gitignore"), "utf8");
+const browserReviewServer =
+  mcpConfig.mcpServers?.["playwright-browser-review"];
+const browserReviewArgs = browserReviewServer?.args ?? [];
+const browserReviewFlagValue = (flag) => {
+  const index = browserReviewArgs.indexOf(flag);
+  return index === -1 ? undefined : browserReviewArgs[index + 1];
+};
+
+const gamePath = join(projectRoot, "src/play/content/game.json");
+const mechanicCataloguePath = join(
+  projectRoot,
+  "src/play/content/mechanics/catalog.json",
+);
+const assetCatalogPath = join(
+  projectRoot,
+  "src/play/content/presentation/asset-catalog.json",
+);
+const assetRoot = join(projectRoot, "src/play/content/presentation/assets");
+const gameData = JSON.parse(await readFile(gamePath, "utf8"));
+const mechanicCatalogueData = JSON.parse(
+  await readFile(mechanicCataloguePath, "utf8"),
+);
+const campaignData = await Promise.all(gameData.campaigns.map(async ({ file }) =>
+  JSON.parse(await readFile(
+    join(projectRoot, "src/play/content/campaigns", file),
+    "utf8",
+  ))));
+const episodeReferences = campaignData.flatMap(({ episodes }) => episodes);
+const assetCatalogData = JSON.parse(await readFile(assetCatalogPath, "utf8"));
+const campaignIds = new Set(gameData.campaigns.map(({ id }) => id));
+const episodeIds = new Set(
+  episodeReferences.map(({ id }) => id),
+);
+const referencesMatchIds = (references) => references.every(({ id, file }) =>
+  contentIdPattern.test(id) && file === `${id}.json`);
+const campaignRoot = join(projectRoot, "src/play/content/campaigns");
+const episodeRoot = join(projectRoot, "src/play/content/episodes");
+const discoveredCampaignFiles = (await listFiles(campaignRoot)).map((file) =>
+  relative(campaignRoot, file).split("\\").join("/"));
+const discoveredEpisodeFiles = (await listFiles(episodeRoot)).map((file) =>
+  relative(episodeRoot, file).split("\\").join("/"));
+const mechanicRoot = join(projectRoot, "src/play/content/mechanics");
+const discoveredRhythmFiles = (await listFiles(join(mechanicRoot, "rhythms")))
+  .map((file) => relative(join(mechanicRoot, "rhythms"), file).split("\\").join("/"))
+  .filter((file) => file.endsWith(".json"));
+const discoveredCurveFiles = (await listFiles(join(mechanicRoot, "dramatic-curves")))
+  .map((file) => relative(join(mechanicRoot, "dramatic-curves"), file).split("\\").join("/"))
+  .filter((file) => file.endsWith(".json"));
+const discoveredInterruptionFiles = (await listFiles(join(mechanicRoot, "interruptions")))
+  .map((file) => relative(join(mechanicRoot, "interruptions"), file).split("\\").join("/"))
+  .filter((file) => file.endsWith(".json"));
+const episodeFictionInEngine = await findEpisodeFictionInEngine();
+const embeddedPlayerCopy = await findEmbeddedPlayerCopy(
+  join(projectRoot, "src/play"),
+);
+const hardCodedPresentationValues = await findHardCodedPresentationValues(
+  join(projectRoot, "src/play/phaser"),
+);
+const personReferences = [
+  ...await findPersonReferences(join(projectRoot, "src")),
+  ...await findPersonReferences(join(projectRoot, "docs")),
+  ...await findPersonReferences(join(projectRoot, "scripts")),
+  ...(await Promise.all(
+    ["AGENTS.md", "README.md", "CONTRIBUTING.md", "PROJECT_CHARTER.md",
+      "GOVERNANCE.md", "IDENTITY.md", "LICENSE.md", "CLAUDE.md"]
+      .map(async (file) => {
+        const lines = (await readFile(join(projectRoot, file), "utf8")).split("\n");
+        return lines.flatMap((line, index) => PERSON_REFERENCE_PHRASES
+          .filter((phrase) => line.toLowerCase().includes(phrase))
+          .map((phrase) => `${file}:${index + 1} ("${phrase}")`));
+      }),
+  )).flat(),
+];
+
+requirePolicy(
+  episodeFictionInEngine.length === 0,
+  `Reusable engine, audio, schema and adapter code must not name one episode's fiction. Rename to the general concept, or move the name into content: ${episodeFictionInEngine.join(", ")}`,
+);
+requirePolicy(
+  embeddedPlayerCopy.length === 0,
+  `Player-visible Phaser copy must come from validated content, not string literals: ${embeddedPlayerCopy.join(", ")}`,
+);
+const missingGameThemeTokens = await findMissingGameThemeTokens();
+requirePolicy(
+  missingGameThemeTokens.length === 0,
+  `The game canvas reads these theme tokens at runtime, but neither src/play/styles/game.css nor the shared tokens define them: ${missingGameThemeTokens.join(", ")}`,
+);
+requirePolicy(
+  personReferences.length === 0,
+  `The recurring antagonist is Management, a role within a corporate-capitalist hierarchy rather than any particular real person. Remove the superseded person-coded name: ${personReferences.join(", ")}`,
+);
+requirePolicy(
+  hardCodedPresentationValues.length === 0,
+  `Phaser modules must resolve every authored size, depth, opacity, stroke and semantic colour role from validated layout, skin or panel data, or from the named interface-chrome constants in src/play/phaser/design.ts: ${hardCodedPresentationValues.join(", ")}`,
+);
+
+requirePolicy(
+  contentIdPattern.test(gameData.id) && referencesMatchIds(gameData.campaigns),
+  "Game and campaign references must use durable kebab-case IDs with exactly matching filenames.",
+);
+requirePolicy(
+  campaignData.every((campaign) =>
+    contentIdPattern.test(campaign.id) && referencesMatchIds(campaign.episodes)),
+  "Campaign and episode references must use durable kebab-case IDs with exactly matching filenames.",
+);
+requirePolicy(
+  discoveredCampaignFiles.length === gameData.campaigns.length &&
+    discoveredCampaignFiles.every((file) =>
+      gameData.campaigns.some((entry) => entry.file === file)),
+  "Every campaign file must be listed exactly once by game.json.",
+);
+requirePolicy(
+  gameData.campaigns.length <= maximumCampaignsWithoutPaging,
+  `The campaign catalogue supports at most ${maximumCampaignsWithoutPaging} campaigns before paging is implemented.`,
+);
+requirePolicy(
+  discoveredEpisodeFiles.length === episodeReferences.length &&
+    discoveredEpisodeFiles.every((file) =>
+      episodeReferences.some((entry) => entry.file === file)),
+  "Every episode file must be listed exactly once across game campaigns.",
+);
+requirePolicy(
+  episodeIds.size === episodeReferences.length,
+  "Episode IDs must be globally unique across campaigns.",
+);
+requirePolicy(
+  referencesMatchIds(mechanicCatalogueData.rhythms)
+    && discoveredRhythmFiles.length === mechanicCatalogueData.rhythms.length
+    && discoveredRhythmFiles.every((file) =>
+      mechanicCatalogueData.rhythms.some((entry) => entry.file === file)),
+  "Every rhythm file must be listed exactly once with a matching durable ID in the mechanic catalogue.",
+);
+requirePolicy(
+  referencesMatchIds(mechanicCatalogueData.dramaticCurves)
+    && discoveredCurveFiles.length === mechanicCatalogueData.dramaticCurves.length
+    && discoveredCurveFiles.every((file) =>
+      mechanicCatalogueData.dramaticCurves.some((entry) => entry.file === file)),
+  "Every dramatic-curve file must be listed exactly once with a matching durable ID in the mechanic catalogue.",
+);
+requirePolicy(
+  referencesMatchIds(mechanicCatalogueData.interruptions)
+    && discoveredInterruptionFiles.length === mechanicCatalogueData.interruptions.length
+    && discoveredInterruptionFiles.every((file) =>
+      mechanicCatalogueData.interruptions.some((entry) => entry.file === file)),
+  "Every interruption file must be listed exactly once with a matching durable ID in the mechanic catalogue.",
+);
+for (const id of [
+  gameData.id,
+  ...gameData.campaigns.map(({ id }) => id),
+  ...episodeReferences.map(({ id }) => id),
+]) {
+  const placeholder = findPlaceholderIdSegment(id);
+  requirePolicy(
+    placeholder === undefined,
+    `Content ID "${id}" contains placeholder segment "${placeholder}"; use the durable creative name.`,
+  );
+}
+const listedAssetFiles = new Set(
+  assetCatalogData.assets.map(({ file }) => file),
+);
+const discoveredAssetFiles = (await listFiles(assetRoot))
+  .map((file) => relative(assetRoot, file).split("\\").join("/"))
+  .filter((file) => file !== "README.md");
+
+requirePolicy(
+  assetCatalogData.assets.every(({ file }) => assetFilePattern.test(file)),
+  "Every presentation asset catalogue path must be a PNG or WebP safely namespaced under shared/, campaigns/<campaign-id>/ or episodes/<episode-id>/.",
+);
+requirePolicy(
+  assetCatalogData.assets.every(({ file }) => {
+    const match = /^campaigns\/([^/]+)\//.exec(file);
+    return match === null || campaignIds.has(match[1]);
+  }),
+  "Every campaign-owned presentation asset must name a game campaign.",
+);
+requirePolicy(
+  assetCatalogData.assets.every(({ file }) => {
+    const match = /^episodes\/([^/]+)\//.exec(file);
+    return match === null || episodeIds.has(match[1]);
+  }),
+  "Every episode-owned presentation asset must name an episode in a game campaign.",
+);
+requirePolicy(
+  discoveredAssetFiles.every((file) => assetFilePattern.test(file)),
+  "The presentation asset tree may contain only namespaced PNG or WebP files and its README.",
+);
+requirePolicy(
+  [...listedAssetFiles].every((file) => discoveredAssetFiles.includes(file)),
+  "Every catalogued presentation asset must exist in the asset tree.",
+);
+requirePolicy(
+  discoveredAssetFiles.every((file) => listedAssetFiles.has(file)),
+  "Every presentation asset file must have a provenance-bearing catalogue entry.",
+);
+
+const skinRoot = join(projectRoot, "src/play/content/presentation/skins");
+const skinFiles = await listFiles(skinRoot);
+const assetsById = new Map(
+  assetCatalogData.assets.map((asset) => [asset.id, asset]),
+);
+const skinRecords = await Promise.all(skinFiles.map(async (file) => {
+  const path = relative(skinRoot, file).split("\\").join("/");
+  const content = JSON.parse(await readFile(file, "utf8"));
+  const match = /^(shared|episodes\/([a-z0-9]+(?:-[a-z0-9]+)*))\/([a-z0-9]+(?:-[a-z0-9]+)*)\.json$/.exec(path);
+  requirePolicy(match !== null, `Presentation skin has an invalid ownership path: ${path}`);
+  if (match === null) return { path, content, owner: undefined };
+
+  const owner = match[1] === "shared" ? "shared" : match[2];
+  requirePolicy(
+    content.id === match[3],
+    `Presentation skin ID must match its filename: ${path}`,
+  );
+  requirePolicy(
+    owner === "shared" || episodeIds.has(owner),
+    `Episode-owned presentation skin names an unknown episode: ${path}`,
+  );
+
+  const parts = [
+    ...content.confrontation.environment.baseParts,
+    ...content.confrontation.environment.intensityParts.map(({ part }) => part),
+    ...content.confrontation.opposingActor.parts,
+  ];
+  const references = [
+    ...parts.filter(({ shape }) => shape === "image").map(({ asset }) => asset),
+    ...content.confrontation.resistance.states.map(({ asset }) => asset),
+    ...content.confrontation.opposingActor.states.flatMap(({ assets }) =>
+      assets.map(({ asset }) => asset)),
+  ];
+  for (const reference of references) {
+    const asset = assetsById.get(reference.id);
+    requirePolicy(
+      asset !== undefined,
+      `Presentation skin ${content.id} references unknown asset ${reference.id}.`,
+    );
+    if (asset === undefined) continue;
+    const sharedAsset = asset.file.startsWith("shared/");
+    requirePolicy(
+      sharedAsset || (owner !== "shared" && asset.file.startsWith(`episodes/${owner}/`)),
+      `Presentation skin ${content.id} references an asset outside its ownership boundary.`,
+    );
+    requirePolicy(
+      reference.source === (sharedAsset ? "shared" : "episode"),
+      `Presentation skin ${content.id} asset ${reference.id} must explicitly name its ownership source.`,
+    );
+  }
+  return { path, content, owner };
+}));
+
+const interruptionSkinRoot = join(
+  projectRoot,
+  "src/play/content/presentation/interruption-skins",
+);
+const interruptionSkinFiles = await listFiles(interruptionSkinRoot);
+const interruptionSkinRecords = await Promise.all(
+  interruptionSkinFiles.map(async (file) => {
+    const path = relative(interruptionSkinRoot, file).split("\\").join("/");
+    const content = JSON.parse(await readFile(file, "utf8"));
+    const match = /^(shared|episodes\/([a-z0-9]+(?:-[a-z0-9]+)*))\/([a-z0-9]+(?:-[a-z0-9]+)*)\.json$/.exec(path);
+    requirePolicy(match !== null, `Interruption skin has an invalid ownership path: ${path}`);
+    if (match === null) return { path, content, owner: undefined };
+    const owner = match[1] === "shared" ? "shared" : match[2];
+    requirePolicy(
+      content.id === match[3],
+      `Interruption skin ID must match its filename: ${path}`,
+    );
+    requirePolicy(
+      owner === "shared" || episodeIds.has(owner),
+      `Episode-owned interruption skin names an unknown episode: ${path}`,
+    );
+    return { path, content, owner };
+  }),
+);
+const sharedInterruptionSkinIds = new Set(
+  interruptionSkinRecords
+    .filter(({ owner }) => owner === "shared")
+    .map(({ content }) => content.id),
+);
+for (const record of interruptionSkinRecords) {
+  requirePolicy(
+    record.owner === "shared" || !sharedInterruptionSkinIds.has(record.content.id),
+    `Episode-owned interruption skin ${record.content.id} must not shadow a shared skin.`,
+  );
+}
+
+for (const { id, file } of episodeReferences) {
+  const episode = JSON.parse(
+    await readFile(join(projectRoot, "src/play/content/episodes", file), "utf8"),
+  );
+  requirePolicy(
+    episode.id === id,
+    `Episode file ${file} must contain the ID ${id}.`,
+  );
+  const skinReference = episode.confrontation.presentation.skin;
+  const skinId = skinReference.id;
+  const matchingSkins = skinRecords.filter(({ content, owner }) =>
+    content.id === skinId && owner === (
+      skinReference.source === "shared" ? "shared" : id
+    ));
+  requirePolicy(
+    matchingSkins.length === 1,
+    `Episode ${id} must select exactly one shared or episode-owned skin named ${skinId}.`,
+  );
+  for (const interruption of episode.confrontation.interruptions ?? []) {
+    const reference = interruption.presentation.skin;
+    const matchingInterruptionSkins = interruptionSkinRecords.filter(
+      ({ content, owner }) => content.id === reference.id && owner === (
+        reference.source === "shared" ? "shared" : id
+      ),
+    );
+    requirePolicy(
+      matchingInterruptionSkins.length === 1,
+      `Episode ${id} interruption ${interruption.id} must select exactly one owned interruption skin named ${reference.id}.`,
+    );
+    requirePolicy(
+      matchingInterruptionSkins.length !== 1
+        || matchingInterruptionSkins[0].content.supports.includes(interruption.kind),
+      `Episode ${id} interruption ${interruption.id} selects an incompatible interruption skin.`,
+    );
+  }
+}
+
+for (const [index, campaign] of campaignData.entries()) {
+  requirePolicy(
+    campaign.id === gameData.campaigns[index].id,
+    `Campaign file ${gameData.campaigns[index].file} must contain the ID ${gameData.campaigns[index].id}.`,
+  );
+}
 
 requirePolicy(
   packageJson.private === true,
@@ -39,6 +595,53 @@ requirePolicy(
 requirePolicy(
   packageJson.license === "AGPL-3.0-or-later",
   'package.json must retain the selected "AGPL-3.0-or-later" software licence.',
+);
+requirePolicy(
+  packageJson.dependencies?.["@playwright/mcp"] === undefined &&
+    /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(
+      packageJson.devDependencies?.["@playwright/mcp"] ?? "",
+    ),
+  "Playwright MCP must remain an exactly pinned development dependency, never a runtime dependency or floating range.",
+);
+const playwrightTestVersion = packageJson.devDependencies?.["@playwright/test"];
+const mcpPlaywrightVersion =
+  packageLock.packages?.["node_modules/@playwright/mcp"]?.dependencies?.playwright;
+requirePolicy(
+  packageJson.dependencies?.["@playwright/test"] === undefined &&
+    /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(playwrightTestVersion ?? "") &&
+    playwrightTestVersion === mcpPlaywrightVersion,
+  "Playwright Test must be an exact development dependency matching the Playwright revision required by Playwright MCP.",
+);
+requirePolicy(
+  browserReviewServer?.type === "stdio" &&
+    browserReviewServer.command === "node" &&
+    browserReviewArgs[0] ===
+      "${CLAUDE_PROJECT_DIR:-.}/node_modules/@playwright/mcp/cli.js",
+  "The shared browser-review MCP server must execute the lockfile-installed project package through Node.",
+);
+requirePolicy(
+  browserReviewArgs.includes("--isolated") &&
+    browserReviewArgs.includes("--headless") &&
+    browserReviewFlagValue("--caps") === "vision" &&
+    browserReviewFlagValue("--viewport-size") === "1280x720",
+  "Browser review must use an isolated headless profile with canvas pointer capability and a stable landscape viewport.",
+);
+requirePolicy(
+  browserReviewFlagValue("--output-dir") ===
+      "${CLAUDE_PROJECT_DIR:-.}/.artifacts/browser-review" &&
+    browserReviewFlagValue("--output-max-size") === "52428800" &&
+    gitignore.split("\n").includes(".artifacts/"),
+  "Browser-review output must be bounded and stored under the ignored .artifacts directory.",
+);
+requirePolicy(
+  [
+    "--allow-unrestricted-file-access",
+    "--extension",
+    "--storage-state",
+    "--user-data-dir",
+  ].every((flag) => !browserReviewArgs.includes(flag)) &&
+    browserReviewArgs.every((argument) => !argument.includes("@latest")),
+  "Browser review must not use personal or persisted browser state, unrestricted file access or floating executable versions.",
 );
 
 const [agplText, creativeCommonsText, licensingGuide, identityPolicy] =
@@ -166,20 +769,82 @@ const bootScene = await readFile(
   join(projectRoot, "src/play/phaser/scenes/BootScene.ts"),
   "utf8",
 );
+const resistanceScene = await readFile(
+  join(projectRoot, "src/play/phaser/scenes/ResistanceScene.ts"),
+  "utf8",
+);
+const gameSource = await readFile(
+  join(projectRoot, "src/play/content/game.ts"),
+  "utf8",
+);
+const gameContent = await readFile(
+  join(projectRoot, "src/play/content/game.json"),
+  "utf8",
+);
+const gameLoader = await readFile(
+  join(projectRoot, "src/play/content/loadGame.ts"),
+  "utf8",
+);
+const presentationLoader = await readFile(
+  join(projectRoot, "src/play/content/loadPresentation.ts"),
+  "utf8",
+);
+const episodeConfrontationLayout = await readFile(
+  join(projectRoot, "src/play/phaser/layouts/episodeConfrontationLayout.ts"),
+  "utf8",
+);
+const presentationSchemaSource = await readFile(
+  join(projectRoot, "src/play/content/schemas/presentationSchema.ts"),
+  "utf8",
+);
+const episodeConfrontationContent = await readFile(
+  join(projectRoot, "src/play/content/presentation/layouts/episode-confrontation.json"),
+  "utf8",
+);
 
 requirePolicy(
   indexHtml.includes('rel="manifest" href="/manifest.webmanifest"'),
   "index.html must link the offline web-app manifest.",
 );
 requirePolicy(
+  playHtml.includes('aria-live="polite"') &&
+    playHtml.includes('aria-atomic="true"') &&
+    playHtml.includes("{{GAME_PAGE_TITLE}}") &&
+    playHtml.includes("{{GAME_LOADING_STATUS}}") &&
+    !mainSource.includes("game.interface"),
+  "The game page shell must use build-time data placeholders and the live region must remain active.",
+);
+requirePolicy(
+  presentationLoader.includes('import.meta.glob("./presentation/layouts/*.json"') &&
+    presentationLoader.includes('"./presentation/skins/{shared,episodes/*}/*.json"') &&
+    presentationLoader.includes("assertSensiblePresentation") &&
+    episodeConfrontationLayout.includes("loadPresentation") &&
+    !/\b(?:bed|duvet|sleeper|headboard|the-alarm|tableau)\b|primaryTableau|pressureScene|pressure-tableau/i.test(
+      episodeConfrontationLayout + presentationSchemaSource + episodeConfrontationContent,
+    ),
+  "Presentation layouts and skins must be discovered, validated and interpreted as data rather than embedded composition constants.",
+);
+requirePolicy(
   indexHtml.includes("Content-Security-Policy"),
   "index.html must retain its restrictive Content Security Policy.",
 );
+/*
+ * The landing page leads with the satire and states the commons.
+ *
+ * It previously led with the commons brief, which described the project
+ * accurately but left a game about capitalism reading as a governance document
+ * with a game attached. The satire now comes first and the commons sentence
+ * follows it, so both survive: a reader learns what the game is arguing before
+ * being told how the project is run, and neither can be quietly dropped.
+ */
 requirePolicy(
-  indexHtml.includes("A free, open-source game about collective power") &&
+  indexHtml.includes("satirical rhythm game") &&
+    indexHtml.includes("A free, open-source game about collective power") &&
+    indexHtml.indexOf("satirical rhythm game")
+      < indexHtml.indexOf("A free, open-source game about collective power") &&
     indexHtml.includes('href="/commons/"') &&
     indexHtml.match(/github\.com\/glowkeeper\/the-horizontal-front/g)?.length >= 3,
-  "The public landing page must lead with the strong brief and link to The Commons and public repository from its header, body and footer.",
+  "The public landing page must lead with the satire, still state the commons brief, and link to The Commons and public repository from its header, body and footer.",
 );
 requirePolicy(
   commonsHtml.match(/github\.com\/glowkeeper\/the-horizontal-front/g)?.length >= 3,
@@ -202,11 +867,11 @@ requirePolicy(
 );
 requirePolicy(
   [
-    "--colour-duvet-cream",
+    "--colour-rest-cream",
     "--colour-ink-charcoal",
     "--colour-resistance-red",
     "--colour-work-light-blue",
-    "--colour-management-gold",
+    "--colour-authority-gold",
     "--colour-paper-white",
   ].every((role) => themeTokens.includes(role)) &&
     themeTokens.includes("--font-interface") &&
@@ -221,10 +886,19 @@ requirePolicy(
   "The public site and game must use duvet cream for browser theme chrome.",
 );
 requirePolicy(
-  bootScene.includes("THE MONDAY UPRISING") &&
-    bootScene.includes("Management has been notified of absolutely nothing.") &&
-    bootScene.includes("The Horizontal Front is coming soon ✊ 🛏️"),
-  "The pre-release Phaser scene must retain the approved coming-soon notice.",
+  bootScene.includes('this.scene.start("CampaignsScene")'),
+  "The game bootstrap must present the validated campaign catalogue.",
+);
+requirePolicy(
+  gameSource.includes('import.meta.glob("./campaigns/*.json"') &&
+    gameSource.includes('import.meta.glob("./episodes/*.json"') &&
+    gameSource.includes("loadGame") &&
+    gameContent.includes('"campaigns"') &&
+    gameLoader.includes("gameSchema.parse") &&
+    gameLoader.includes("campaignSchema.parse") &&
+    !resistanceScene.includes("content/episodes/") &&
+    !resistanceScene.includes("the-alarm"),
+  "ResistanceScene must receive validated content through the game and campaign hierarchy rather than importing or branching on a particular episode.",
 );
 requirePolicy(
   mainSource.includes('import "../shared/registerServiceWorker"'),

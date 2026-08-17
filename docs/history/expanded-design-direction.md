@@ -1,5 +1,12 @@
 # Expanded design direction
 
+> **Editorial note.** This archived discussion originally called the recurring
+> boss "the Orange Fella", a superseded name whose colour coding evoked a
+> particular real person. The project now names the antagonist **Management**:
+> a role within a corporate-capitalist hierarchy rather than any individual.
+> The name has been substituted below; the design reasoning is unchanged. See
+> [Game concept](../game-concept.md) for the current character direction.
+
 Yes—this sharpens the concept considerably. The game should resist importing capitalist reward structures while using them as the object of ridicule.
 
 ## Danger through the duvet
@@ -37,7 +44,9 @@ On desktop:
 - Clicking the left and right sides remains available.
 - The same authored pattern is presented through keyboard, pointer, and touch controls.
 
-Later confrontations may use accents, rests, strong and weak beats, syncopation, changing patterns, or rhythms framed as absurd corporate initiatives. A synthetic musical piece may teach and enforce the rhythm when its beat clock is shared with the game rules. Visual pulses, animation, and optional haptics should express the same timing so music is never the sole critical cue.
+The reusable rhythm catalogue expresses accents through timing and side composition, explicit rests, sustained holds, waltz groupings, syncopation, changing patterns and rhythms framed as absurd corporate initiatives. Confrontations select these capabilities through their catalogued dramatic curves. A synthetic musical piece may teach and enforce the rhythm when its beat clock is shared with the game rules. Control-local timing targets, animation, and optional haptics should express the same timing so music is never the sole critical cue.
+
+The first episode teaches straight left-right taps, introduces alternating sustained grips, develops into three taps followed by one explicit breath, then removes the internal rest for a continuous alternating final phrase. Holds are introduced during establishment, where timing is generous and pressure remains moderate, so their head/body/tail grammar is rehearsed before the crisis. The curve changes action type and density without introducing syncopation or an unsafe jump in speed. More complex catalogue rhythms belong in episodes whose composition visibly introduces and rehearses them.
 
 This creates something that can feel demanding while still requiring coordination. Difficulty can increase through:
 
@@ -49,9 +58,9 @@ This creates something that can feel demanding while still requiring coordinatio
 - Longer attack combinations.
 - Shorter recovery windows.
 
-Difficulty should not primarily become a race toward higher input rates. Complex patterns should usually exchange speed for listening, anticipation, memory, or coordination. This preserves variety, reinforces the rhythm-and-resistance identity, and reduces the risk of repetitive strain. Missing a beat should weaken resistance rather than provoke an unsafe burst of frantic recovery.
+Difficulty should not primarily become a race toward higher input rates. Complex patterns should usually exchange speed for listening, anticipation, memory, or coordination. This preserves variety, reinforces the rhythm-and-resistance identity, and reduces the risk of repetitive strain. Missing a beat should weaken resistance rather than provoke an unsafe burst of frantic recovery. Accurate rhythm builds resistance that persists between beats and suppresses the corresponding fraction of management pressure. A slow authored beat must therefore remain as mechanically viable as a fast one; difficulty comes from performing the phrase, not from being denied recovery opportunities while unavoidable damage accumulates.
 
-Each confrontation can have an authored pressure and rhythm curve, so overcoming a hard level feels meaningful without relying on adaptive difficulty or relentless acceleration.
+Each confrontation can have an authored pressure and rhythm curve, so overcoming a hard level feels meaningful without relying on adaptive difficulty or relentless acceleration. Presentation intensity is separate: atmosphere may become more alarming while bed angle, duvet loss and sleeper displacement continue to report actual safety. Correct final-phrase play can therefore visibly arrest or reverse the lift even during the most dramatic presentation.
 
 ## Rewards without productivity ideology
 
@@ -79,7 +88,7 @@ These could be presented like grand achievement rewards without becoming currenc
 
 Cosmetic bedding could exist, but even that risks pulling the game toward grinding and acquisition. I would begin with no progression economy at all.
 
-## Repeated confrontations with the Orange Fella
+## Repeated confrontations with Management
 
 One recurring boss is stronger than a sequence of disposable managers. He becomes the player’s nemesis and the embodiment of capital: impossible to permanently defeat, endlessly rebranding the same demands.
 
@@ -135,7 +144,7 @@ I agree. The mechanic is strong enough for a small arcade game, but the cartoon 
 
 I’d structure it as short illustrated sequences around the action:
 
-1. **Pre-level cartoon:** the Orange Fella announces the latest policy.
+1. **Pre-level cartoon:** Management announces the latest policy.
 2. **Thirty-second confrontation:** gameplay.
 3. **Post-level punchline:** victory or failure cartoon.
 4. **Occasional longer scene:** introduces a new absurdity or attack.
@@ -176,4 +185,4 @@ Then:
 
 That sadness matters. If failure is only slapstick, the political point becomes weightless. It should briefly remind the player that the absurdity has consequences—lost time, lost autonomy and an exhausted human being—before inviting them to resist again.
 
-The emerging identity feels very coherent: **a rhythm-based arcade struggle wrapped in an episodic animated political cartoon, with no conventional economy and no permanent victory—only more time reclaimed from the Orange Fella.**
+The emerging identity feels very coherent: **a rhythm-based arcade struggle wrapped in an episodic animated political cartoon, with no conventional economy and no permanent victory—only more time reclaimed from Management.**

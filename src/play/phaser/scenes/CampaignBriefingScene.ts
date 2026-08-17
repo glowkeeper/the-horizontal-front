@@ -1,0 +1,91 @@
+import Phaser from "phaser";
+
+import type { Campaign } from "../../content/loadGame";
+import { formatCopy } from "../../content/formatCopy";
+import { game } from "../../content/game";
+import { resolveIllustrationAsset } from "../../content/presentationAssets";
+import { createCampaignRun } from "../../engine/campaign";
+import { createTextStyles, getThemeColour } from "../../theme/theme";
+import { getMenuAction } from "../../input/menuInput";
+import { CHROME_PANEL, GAME_CENTRE_X } from "../design";
+import {
+  announce,
+  createButton,
+  focusOnEntry,
+  chromeControlHandlesKey,
+} from "../sceneChrome";
+import { createIllustratedSemanticPanel } from "../presentation/illustratedSemanticPanel";
+
+type CampaignBriefingData = { readonly campaign: Campaign };
+
+export class CampaignBriefingScene extends Phaser.Scene {
+  private campaign!: Campaign;
+  private transitioning = false;
+
+  public constructor() {
+    super({ key: "CampaignBriefingScene" });
+  }
+
+  public init(data: CampaignBriefingData): void {
+    this.campaign = data.campaign;
+  }
+
+  public create(): void {
+    this.transitioning = false;
+    const { briefing, episodes, title } = this.campaign;
+    let panelLayout: ReturnType<typeof createIllustratedSemanticPanel> | null = null;
+    if (briefing.illustration) {
+      const asset = resolveIllustrationAsset(briefing.illustration, this.campaign.id);
+      panelLayout = createIllustratedSemanticPanel(this, {
+        assetId: asset.id,
+        kicker: title.toUpperCase(),
+        headline: briefing.headline,
+        body: briefing.body,
+      });
+    } else {
+      this.cameras.main.setBackgroundColor(getThemeColour(CHROME_PANEL.background));
+      this.add.text(GAME_CENTRE_X, 95, title.toUpperCase(), createTextStyles().notice).setOrigin(0.5);
+      this.add.text(GAME_CENTRE_X, 225, briefing.headline, createTextStyles().title).setOrigin(0.5);
+      this.add.text(GAME_CENTRE_X, 390, briefing.body, {
+        ...createTextStyles().body, wordWrap: { width: 900 }, lineSpacing: 9,
+      }).setOrigin(0.5);
+    }
+
+    const begin = () => {
+      if (this.transitioning) return;
+      this.transitioning = true;
+      this.scene.start("ResistanceScene", {
+        campaign: this.campaign,
+        episode: episodes[0],
+        run: createCampaignRun(episodes.length),
+      });
+    };
+    if (panelLayout) {
+      focusOnEntry(createButton(
+        this,
+        panelLayout.anchors.primaryAction.x,
+        panelLayout.anchors.primaryAction.y,
+        panelLayout.actions.width,
+        game.interface.beginEpisode,
+        begin,
+        panelLayout.actions.height,
+        "primary",
+        episodes[0].title,
+      ));
+    } else {
+      focusOnEntry(createButton(
+        this, GAME_CENTRE_X, 615, 420, game.interface.beginEpisode, begin,
+        undefined, "primary", episodes[0].title,
+      ));
+    }
+    this.input.keyboard?.on("keydown", (event: KeyboardEvent) => {
+      if (chromeControlHandlesKey(event)) return;
+      if (getMenuAction(event) === "select") begin();
+    });
+    announce(formatCopy(game.interface.briefingStatus, {
+      title,
+      headline: briefing.headline,
+      body: briefing.body,
+    }));
+  }
+}

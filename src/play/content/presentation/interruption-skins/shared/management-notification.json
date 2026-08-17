@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "management-notification",
+  "supports": ["sequence", "hold"],
+  "layerDepth": 25,
+  "panel": {
+    "fill": "paperWhite",
+    "fillAlpha": 0.96,
+    "stroke": "resistanceRed",
+    "strokeWidth": 5
+  },
+  "typography": {
+    "headlineRole": "notice",
+    "instructionRole": "status",
+    "actionRole": "notice",
+    "headlineSizePx": 23,
+    "instructionSizePx": 16,
+    "actionSizePx": 13,
+    "instructionColour": "inkCharcoal",
+    "actionColour": "inkCharcoal"
+  },
+  "choice": {
+    "fill": "paperWhite",
+    "activeFill": "authorityGold",
+    "stroke": "inkCharcoal",
+    "strokeWidth": 4,
+    "activeLabelAlpha": 1,
+    "inactiveLabelAlpha": 0.55
+  },
+  "hold": {
+    "fill": "paperWhite",
+    "stroke": "inkCharcoal",
+    "strokeWidth": 5,
+    "progressFill": "authorityGold",
+    "progressAlpha": 1
+  },
+  "states": {
+    "warning": { "headlineColour": "resistanceRed", "panelVisible": false, "contentVisible": true },
+    "active": { "headlineColour": "resistanceRed", "panelVisible": true, "contentVisible": true },
+    "success": { "headlineColour": "workLightBlue", "panelVisible": true, "contentVisible": true },
+    "failure": { "headlineColour": "resistanceRed", "panelVisible": true, "contentVisible": true },
+    "cancelled": { "headlineColour": "inkCharcoal", "panelVisible": true, "contentVisible": true },
+    "returning": { "headlineColour": "inkCharcoal", "panelVisible": false, "contentVisible": false }
+  }
+}

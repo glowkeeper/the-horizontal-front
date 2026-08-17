@@ -39,14 +39,32 @@ self.addEventListener("fetch", (event) => {
 
   event.respondWith(
     fetch(request).catch(async () => {
-      const cached = await caches.match(request, { ignoreSearch: true });
+      /*
+       * `ignoreVary` matters more than it looks.
+       *
+       * Cache matching honours a cached response's `Vary` header by default,
+       * and static hosts routinely attach one — `Vary: Origin` locally, and
+       * commonly `Vary: Accept-Encoding` in production. A script request from
+       * the page does not carry the same headers as the request that filled
+       * the cache, so the match silently fails and the app shell returns
+       * `Response.error()` for its own JavaScript.
+       *
+       * The effect is worse than an obvious failure: pages still load from
+       * cache, so the site looks offline-capable while the game never starts.
+       * Nothing here genuinely varies by request header — it is one origin
+       * serving fixed files — so the header is ignored deliberately.
+       */
+      const cached = await caches.match(request, {
+        ignoreSearch: true,
+        ignoreVary: true,
+      });
 
       if (cached) {
         return cached;
       }
 
       if (request.mode === "navigate") {
-        return caches.match("/");
+        return caches.match("/", { ignoreVary: true });
       }
 
       return Response.error();

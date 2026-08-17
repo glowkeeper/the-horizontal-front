@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "id": "urgent-email",
+  "kind": "hold",
+  "pressWindowBeats": 2,
+  "holdBeats": 2
+}

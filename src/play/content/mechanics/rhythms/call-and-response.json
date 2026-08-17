@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "id": "call-and-response",
+  "cycleBeats": 8,
+  "events": [
+    { "action": "tap", "side": "left", "atBeat": 0 },
+    { "action": "tap", "side": "left", "atBeat": 1 },
+    { "action": "tap", "side": "right", "atBeat": 2 },
+    { "action": "rest", "atBeat": 3, "durationBeats": 1 },
+    { "action": "tap", "side": "right", "atBeat": 4 },
+    { "action": "tap", "side": "right", "atBeat": 5 },
+    { "action": "tap", "side": "left", "atBeat": 6 },
+    { "action": "rest", "atBeat": 7, "durationBeats": 1 }
+  ]
+}

@@ -2,10 +2,32 @@
 
 :root {
   color: var(--colour-ink-charcoal);
-  background: var(--colour-duvet-cream);
+  background: var(--colour-rest-cream);
   font-family: var(--font-interface);
   font-synthesis: none;
   line-height: 1.6;
+
+  /*
+   * The site's button contract. The game owns its own equivalent in
+   * src/play/styles/game.css; both reference the shared colour roles, so the
+   * two surfaces start identical and may diverge deliberately.
+   *
+   * Lengths are rem here because this is a document surface: the offsets
+   * should scale with the reader's root font size along with the padding and
+   * type they sit against.
+   */
+  --button-border-width: 2px;
+  --button-shadow-offset: 0.25rem;
+  --button-hover-shadow-offset: 0.35rem;
+  --button-hover-lift: 0.1rem;
+  --button-active-shadow-offset: 0.08rem;
+  --button-active-press: 0.17rem;
+  --button-border: var(--colour-ink-charcoal);
+  --button-shadow: var(--colour-ink-charcoal);
+  --button-primary-fill: var(--colour-resistance-red);
+  --button-primary-label: var(--colour-paper-white);
+  --button-secondary-fill: var(--colour-paper-white);
+  --button-secondary-label: var(--colour-ink-charcoal);
 }
 
 *,
@@ -58,7 +80,20 @@ a:focus-visible {
 .site-footer,
 .site-main,
 .document-page {
-  width: min(100% - 2rem, 72rem);
+  /*
+   * One width for the whole site.
+   *
+   * The container was 72rem while document prose was capped at 52rem, so the
+   * charter and governance pages ran three quarters of the width of their own
+   * header and footer and trailed a wide empty margin. The homepage hid it,
+   * because its grids and illustration filled the container.
+   *
+   * Widening the prose to 72rem would have made lines of about 120 characters,
+   * which is past comfortable reading. Narrowing the container instead lets
+   * every page — header, footer, prose, grids and illustration — share a single
+   * measure, so nothing is inset and nothing is stranded.
+   */
+  width: min(100% - 2rem, 60rem);
   margin-inline: auto;
 }
 
@@ -82,6 +117,29 @@ nav {
   gap: 0.75rem 1.25rem;
 }
 
+nav a {
+  position: relative;
+  text-decoration: none;
+}
+
+nav a::after {
+  position: absolute;
+  right: 0;
+  bottom: 0.15em;
+  left: 0;
+  height: 0.1em;
+  background: currentColor;
+  content: "";
+}
+
+nav a:hover {
+  text-decoration: none;
+}
+
+nav a:hover::after {
+  height: 0.18em;
+}
+
 nav [aria-current="page"] {
   font-weight: 800;
 }
@@ -90,12 +148,10 @@ nav [aria-current="page"] {
   display: inline-flex;
   align-items: center;
   gap: var(--space-xs);
-  border-bottom: 0.1em solid currentColor;
   text-decoration: none;
 }
 
 .repository-link:hover {
-  border-bottom-width: 0.18em;
   text-decoration: none;
 }
 
@@ -126,7 +182,7 @@ nav [aria-current="page"] {
 }
 
 .hero {
-  max-width: 62rem;
+  max-width: 100%;
 }
 
 .hero.compact {
@@ -193,13 +249,57 @@ h3 {
   margin-top: var(--space-xl);
 }
 
-.primary-action {
+/* Both variants share one shape, one motion and one border; only the fill and
+   label colour differ. Every value comes from the shared button contract in
+   src/shared/theme/tokens.css, which the game canvas reads too. */
+.primary-action,
+.secondary-action {
   display: inline-block;
   padding: 0.8rem 1.1rem;
-  color: var(--colour-paper-white);
-  background: var(--colour-resistance-red);
+  border: var(--button-border-width) solid var(--button-border);
+  box-shadow: var(--button-shadow-offset) var(--button-shadow-offset) 0 var(--button-shadow);
   font-weight: 800;
   text-decoration: none;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.primary-action {
+  color: var(--button-primary-label);
+  background: var(--button-primary-fill);
+}
+
+.secondary-action {
+  color: var(--button-secondary-label);
+  background: var(--button-secondary-fill);
+}
+
+.primary-action:hover,
+.secondary-action:hover {
+  box-shadow: var(--button-hover-shadow-offset) var(--button-hover-shadow-offset) 0 var(--button-shadow);
+  text-decoration: none;
+  transform: translate(
+    calc(-1 * var(--button-hover-lift)),
+    calc(-1 * var(--button-hover-lift))
+  );
+}
+
+.primary-action:hover {
+  color: var(--button-primary-label);
+}
+
+.secondary-action:hover {
+  color: var(--button-secondary-label);
+}
+
+.primary-action:focus-visible,
+.secondary-action:focus-visible {
+  outline-color: var(--button-border);
+}
+
+.primary-action:active,
+.secondary-action:active {
+  box-shadow: var(--button-active-shadow-offset) var(--button-active-shadow-offset) 0 var(--button-shadow);
+  transform: translate(var(--button-active-press), var(--button-active-press));
 }
 
 .commitment-grid,
@@ -244,15 +344,34 @@ h3 {
 }
 
 .statement {
-  max-width: 54rem;
+  max-width: 100%;
   padding: clamp(1.5rem, 5vw, 3.5rem);
   color: var(--colour-paper-white);
   background: var(--colour-ink-charcoal);
-  border-top: 0.5rem solid var(--colour-management-gold);
+  border-top: 0.5rem solid var(--colour-authority-gold);
 }
 
-.document-page {
-  max-width: 52rem;
+/*
+ * Document pages share the site container so their headings line up with the
+ * site name and navigation above them. Narrowing the whole column instead left
+ * the charter's title indented from its own header, which read as a broken
+ * page rather than a considered measure.
+ *
+ * The measure is applied to the prose itself, the same way `.statement` is
+ * capped on the landing page while staying left-aligned. Long text stays
+ * comfortable to read; structure stays aligned with the rest of the site.
+ */
+/*
+ * Prose fills the shared measure. The cap that used to live here narrowed the
+ * column inside an already wider container, which is what made these pages look
+ * unfinished beside the landing page.
+ */
+.document-page > p,
+.document-page > ul,
+.document-page > ol,
+.document-page > blockquote,
+.document-page > table {
+  max-width: 100%;
 }
 
 .document-page > * {
@@ -347,4 +466,54 @@ h3 {
   html {
     scroll-behavior: auto;
   }
+
+  .primary-action,
+  .secondary-action {
+    transition: none;
+  }
+
+  .primary-action:hover,
+  .primary-action:active,
+  .secondary-action:hover,
+  .secondary-action:active {
+    transform: none;
+  }
+}
+
+/*
+ * The confrontation, shown rather than described. A landing page for a game
+ * about a grotesque in a pinstripe suit should not be entirely text.
+ */
+.hero-illustration {
+  margin: var(--space-xl) 0 var(--space-3xl);
+}
+.hero-illustration img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 2px solid var(--colour-ink-charcoal);
+  box-shadow: 6px 6px 0 var(--colour-ink-charcoal);
+}
+.hero-illustration figcaption {
+  margin-top: var(--space-md);
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+/*
+ * The footer mark is the project's own icon rather than emoji. Emoji render as
+ * whichever glyph the viewer's system supplies, or as nothing at all — the
+ * exact problem the favicon was redrawn to solve, so the footer should not
+ * reintroduce it.
+ */
+.footer-mark img {
+  /*
+   * Inline rather than a flex item, so the mark follows the last word the way
+   * the emoji it replaces did. As a flex item it drifted to the far end of the
+   * paragraph as soon as the text wrapped.
+   */
+  width: 1.35em;
+  height: 1.35em;
+  margin-left: 0.45em;
+  vertical-align: -0.3em;
 }

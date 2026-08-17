@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "id": "illustration-left",
+  "designSize": { "width": 1280, "height": 720 },
+  "illustration": {
+    "x": 36,
+    "y": 36,
+    "width": 784,
+    "height": 648,
+    "originX": 0,
+    "originY": 0
+  },
+  "semanticContent": {
+    "x": 844,
+    "y": 36,
+    "width": 400,
+    "height": 648,
+    "originX": 0,
+    "originY": 0
+  },
+  "appearance": {
+    "illustrationStrokeWidth": 4,
+    "semanticStrokeWidth": 4,
+    "semanticFillAlpha": 0.92
+  },
+  "palette": {
+    "background": "restCream",
+    "illustrationFill": "paperWhite",
+    "illustrationStroke": "inkCharcoal",
+    "semanticFill": "paperWhite",
+    "semanticStroke": "resistanceRed",
+    "detail": "resistanceRed",
+    "instruction": "resistanceRed"
+  },
+  "actions": { "width": 330, "height": 78 },
+  "typography": {
+    "kickerSizePx": 17,
+    "headlineSizePx": 34,
+    "bodySizePx": 21,
+    "instructionSizePx": 15,
+    "horizontalInset": 54,
+    "bodyLineSpacingPx": 7
+  },
+  "anchors": {
+    "kicker": { "x": 1044, "y": 82 },
+    "headline": { "x": 1044, "y": 156 },
+    "body": { "x": 1044, "y": 312 },
+    "detail": { "x": 1044, "y": 450 },
+    "instruction": { "x": 1044, "y": 620 },
+    "primaryAction": { "x": 1044, "y": 515 },
+    "secondaryAction": { "x": 1044, "y": 609 }
+  }
+}

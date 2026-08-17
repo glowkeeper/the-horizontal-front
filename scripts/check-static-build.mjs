@@ -4,6 +4,10 @@ import { fileURLToPath } from "node:url";
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const outputRoot = join(projectRoot, "dist");
+const gameContent = JSON.parse(await readFile(
+  join(projectRoot, "src/play/content/game.json"),
+  "utf8",
+));
 
 const requiredPages = [
   "index.html",
@@ -37,6 +41,20 @@ if (homeHtml.includes(phaserAsset)) {
 }
 if (!playHtml.includes(phaserAsset)) {
   throw new Error("The play page must load the Phaser bundle.");
+}
+for (const value of [
+  gameContent.interface.pageTitle,
+  gameContent.interface.pageDescription,
+  gameContent.interface.exitLabel,
+  gameContent.interface.loadingStatus,
+  gameContent.interface.gameAriaLabel,
+]) {
+  if (!playHtml.includes(value)) {
+    throw new Error(`The built play shell is missing data-owned copy: ${value}`);
+  }
+}
+if (playHtml.includes("{{GAME_")) {
+  throw new Error("The built play shell contains unresolved copy placeholders.");
 }
 if (!charterHtml.includes("This charter is the project") || !charterHtml.includes("social contract")) {
   throw new Error("The generated charter page is out of sync with PROJECT_CHARTER.md.");

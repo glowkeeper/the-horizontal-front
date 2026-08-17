@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "id": "the-alarm-bedroom",
+  "layout": "episode-confrontation",
+  "confrontation": {
+    "copy": {
+      "opposingActorLabel": "MANAGEMENT",
+      "pressureCaption": "LIFTING THE HEAD\nOF THE BED"
+    },
+    "typography": {
+      "opposingActorLabel": { "offsetY": 45, "sizePx": 16, "wrapWidth": 125, "colour": "paperWhite" },
+      "pressureCaption": { "sizePx": 14, "colour": "authorityGold" }
+    },
+    "resistance": {
+      "x": 381.1,
+      "y": 549.2,
+      "width": 850,
+      "height": 850,
+      "originX": 0.195556,
+      "originY": 0.851111,
+      "dangerAngleDegrees": -34,
+      "states": [
+        { "minimumDanger": 0, "asset": { "source": "episode", "id": "the-alarm-resistance-states-rest" }, "drawnAngleDegrees": 0 },
+        { "minimumDanger": 0.28, "asset": { "source": "episode", "id": "the-alarm-resistance-states-early-pressure" }, "drawnAngleDegrees": -15.7 },
+        { "minimumDanger": 0.58, "asset": { "source": "episode", "id": "the-alarm-resistance-states-high-pressure" }, "drawnAngleDegrees": -19.9 },
+        { "minimumDanger": 0.9, "asset": { "source": "episode", "id": "the-alarm-resistance-states-final-pressure" }, "drawnAngleDegrees": -28.2 }
+      ],
+      "transition": {
+        "crossfadeDurationMs": 150,
+        "rotationResponseMs": 240,
+        "ease": "Sine.Out",
+        "joltX": 0,
+        "joltY": 5,
+        "shakeAmplitude": 4,
+        "shakeDurationMs": 120
+      },
+      "reducedMotion": { "crossfadeDurationMs": 80 }
+  },
+    "environment": {
+    "replacesLayoutBackdrop": true,
+    "baseParts": [
+      { "id": "bedroom-base", "shape": "image", "x": 640, "y": 360, "width": 1280, "height": 720, "asset": { "source": "episode", "id": "bedroom-base" } }
+    ],
+    "intensityParts": [
+      {
+        "part": { "id": "office-incursion", "shape": "image", "x": 640, "y": 360, "width": 1280, "height": 720, "asset": { "source": "episode", "id": "office-incursion" } },
+        "restAlpha": 0.94,
+        "dangerAlpha": 0.94,
+        "restOffsetX": 820,
+        "dangerOffsetX": 0
+      }
+    ]
+  },
+    "opposingActor": {
+    "parts": [
+      { "id": "figure", "shape": "image", "x": -40, "y": 15, "width": 340, "height": 425, "asset": { "source": "episode", "id": "management-rest-pose" } }
+    ],
+    "states": [
+    {
+      "minimumDanger": 0,
+      "assets": [
+        { "partId": "figure", "asset": { "source": "episode", "id": "management-rest-pose" } }
+      ]
+    },
+    {
+      "minimumDanger": 0.22,
+      "assets": [
+        { "partId": "figure", "asset": { "source": "episode", "id": "management-early-pressure-pose" } }
+      ]
+    },
+    {
+      "minimumDanger": 0.5,
+      "assets": [
+        { "partId": "figure", "asset": { "source": "episode", "id": "management-high-pressure-pose" } }
+      ]
+    },
+    {
+      "minimumDanger": 0.78,
+      "assets": [
+        { "partId": "figure", "asset": { "source": "episode", "id": "management-lifting-pose" } }
+      ]
+    }
+    ],
+    "strain": {
+      "restFrequencyHz": 0.5,
+      "strainFrequencyHz": 5.4,
+      "restAmplitude": { "x": 0, "y": 1.5 },
+      "strainAmplitude": { "x": 2.5, "y": 6 },
+      "lean": { "x": -14, "y": 7 }
+    },
+    "transition": { "crossfadeDurationMs": 180, "ease": "Sine.Out" },
+    "reducedMotion": { "amplitudeScale": 0, "crossfadeDurationMs": 80 }
+    }
+  }
+}

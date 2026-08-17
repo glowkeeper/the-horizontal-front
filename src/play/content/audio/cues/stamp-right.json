@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "stamp-right",
+  "layers": [
+    {
+      "kind": "noise",
+      "filter": "lowpass",
+      "startCutoffHz": 2800,
+      "endCutoffHz": 500,
+      "resonance": 1,
+      "delayMs": 0,
+      "attackMs": 0,
+      "holdMs": 6,
+      "releaseMs": 62,
+      "gain": 0.3,
+      "pan": 0.55
+    },
+    {
+      "kind": "tone",
+      "wave": "triangle",
+      "startFrequencyHz": 260,
+      "endFrequencyHz": 105,
+      "delayMs": 0,
+      "attackMs": 0,
+      "holdMs": 8,
+      "releaseMs": 105,
+      "gain": 0.32,
+      "pan": 0.45
+    }
+  ]
+}

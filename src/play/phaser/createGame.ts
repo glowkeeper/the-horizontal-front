@@ -2,9 +2,11 @@ import Phaser from "phaser";
 
 import { getThemeColour } from "../theme/theme";
 import { BootScene } from "./scenes/BootScene";
-
-const GAME_WIDTH = 1280;
-const GAME_HEIGHT = 720;
+import { CampaignBriefingScene } from "./scenes/CampaignBriefingScene";
+import { CampaignDebriefingScene } from "./scenes/CampaignDebriefingScene";
+import { CampaignsScene } from "./scenes/CampaignsScene";
+import { ResistanceScene } from "./scenes/ResistanceScene";
+import { CHROME_BACKGROUND, GAME_HEIGHT, GAME_WIDTH } from "./design";
 
 export function createGame(container: HTMLElement): Phaser.Game {
   const config: Phaser.Types.Core.GameConfig = {
@@ -15,7 +17,7 @@ export function createGame(container: HTMLElement): Phaser.Game {
     width: GAME_WIDTH,
     height: GAME_HEIGHT,
 
-    backgroundColor: getThemeColour("duvetCream"),
+    backgroundColor: getThemeColour(CHROME_BACKGROUND),
 
     scale: {
       mode: Phaser.Scale.FIT,
@@ -27,7 +29,21 @@ export function createGame(container: HTMLElement): Phaser.Game {
       roundPixels: false,
     },
 
-    scene: [BootScene],
+    // The game synthesises its own score through a single shared audio device,
+    // and never loads or plays a sound through Phaser. Leaving Phaser's sound
+    // manager enabled would open a second audio context for nothing, against a
+    // limit browsers actually enforce.
+    audio: {
+      noAudio: true,
+    },
+
+    scene: [
+      BootScene,
+      CampaignsScene,
+      CampaignBriefingScene,
+      ResistanceScene,
+      CampaignDebriefingScene,
+    ],
   };
 
   return new Phaser.Game(config);
