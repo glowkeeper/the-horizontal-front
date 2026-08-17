@@ -122,7 +122,10 @@ Before publication:
    the repository rather than depending on one hosting account. The GitHub
    release record carries the same text.
 5. Run the complete automated/source and browser-flow checks against the
-   production-shaped build.
+   production-shaped build, including `npm run test:offline`, which exercises
+   offline play against the built release rather than the dev server. The
+   service worker and its precache exist only in the build, so no other check
+   can substantiate the offline claim.
 6. Record the required human perceptual sessions separately, including real
    touch testing when Android Chrome support is claimed.
 7. Confirm that the distributable contains no development browser tooling,
