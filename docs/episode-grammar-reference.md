@@ -317,7 +317,9 @@ whether they are in trouble or merely late in the day.
 
 The two clock-driven layers rise however well the player is doing, because the
 working day advances regardless. The two danger-driven layers answer the player
-alone, and are silent while safety holds.
+alone, and can be authored to be silent while safety holds: set `restGain` to
+`0` on `resistanceStrain` and choose a `minimumDanger` above zero on
+`resistanceStressBursts` to suppress them until danger rises.
 
 `resistanceStressBursts` is a train of cues rather than a sustained layer,
 because a structure under stress emits discrete bursts rather than a tone: a
