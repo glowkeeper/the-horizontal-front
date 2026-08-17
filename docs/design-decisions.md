@@ -4,24 +4,25 @@ This record collects settled product decisions and the reasoning behind them.
 It is authoritative for design direction; the original discussion is preserved
 unchanged in [history](history/expanded-design-direction.md).
 
-## The duvet communicates danger
+## The scene communicates danger
 
-The duvet, bed and bedroom are the primary danger interface rather than a
-conventional meter. As management gains ground, the duvet moves down the
-player's body, the mattress tilts, cold work light enters the room, office
-clutter appears and the exposed sleeper struggles to remain horizontal.
-Successful resistance restores cover and warmth.
+The scene itself is the primary danger interface rather than a conventional
+meter: what the player is defending is shown being taken, and shown being won
+back. In The Alarm that is the duvet, the bed and the bedroom. As the opposing
+actor gains ground the duvet moves down the player's body, the mattress tilts,
+cold work light enters the room, office clutter appears and the exposed sleeper
+struggles to remain horizontal. Successful resistance restores cover and warmth.
 
 This makes safety physical and emotional: the player is losing comfort,
 privacy, warmth and control. A small accessibility indicator may supplement the
-scene, but must not replace the duvet as the principal communication channel.
+scene, but must not replace it as the principal communication channel.
 
 ## Rhythm is authored, not arbitrary mashing
 
 Resistance follows authored patterns judged by side, action and timing. Touch,
 keyboard and pointer input map into the same domain actions. Unstructured rapid
 input is not the mechanic; rhythm accuracy builds persistent resistance which
-suppresses the corresponding fraction of management pressure between beats.
+suppresses the corresponding fraction of the authored pressure between beats.
 
 The finite rhythm vocabulary supports taps, explicit rests, sustained holds,
 waltz groupings, syncopation and call-and-response. A shared musical clock may

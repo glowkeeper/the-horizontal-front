@@ -38,9 +38,9 @@ export const audioCueRoles = [
   "cue-approach-right",
   "tap-hit",
   "tap-miss",
-  // Resistance and bed movement: the frame itself, hauled up a notch or
-  // settling back as the player wins ground. Judgement cues answer the player;
-  // these answer Management.
+  // The resistance apparatus itself, hauled a notch further or settling back
+  // as the player wins ground. Judgement cues answer the player; these answer
+  // the opposing actor.
   "resistance-strain",
   "resistance-ease",
   "hold-start",
@@ -165,7 +165,7 @@ export const ambienceLayerSchema = z.discriminatedUnion("kind", [
 export const audioAmbienceSchema = z.object({
   restGain: gainSchema,
   strainGain: gainSchema,
-  /** How quickly the bed follows a change in intensity. */
+  /** How quickly the sustained layer follows a change in intensity. */
   responseMs: z.number().int().positive().max(10_000),
   layers: z.array(ambienceLayerSchema).min(1).max(6),
 }).strict();
@@ -199,10 +199,10 @@ export const audioSoundscapeSchema = z.object({
   /**
    * The resistance complaining under load, following physical danger.
    *
-   * Not a bed. A structure under stress emits discrete bursts whose rate and
-   * amplitude both climb as it approaches failure, so this authors a train of
-   * creaks rather than a sustained tone: a continuous oscillator following
-   * danger sounds like a hum, not like timber being worked.
+   * Not a sustained layer. A structure under stress emits discrete bursts
+   * whose rate and amplitude both climb as it approaches failure, so this
+   * authors a train of events rather than a held tone: a continuous oscillator
+   * following danger sounds like a hum, not like a structure being worked.
    */
   resistanceStressBursts: z.object({
     cue: ownedContentReferenceSchema,

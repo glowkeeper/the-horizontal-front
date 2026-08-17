@@ -73,9 +73,9 @@ Each phase authors:
 | `beatIntervalMs` | Milliseconds per beat. |
 | `timingWindowMs` | Input tolerance on either side of a beat; less than half a beat. |
 | `leadInBeats` | Whole beats before this phase's first rhythm cycle. On the first phase this creates READY. |
-| `pressurePerSecond` | Management pressure while play is active. |
-| `recoveryPerAction` | Duvet recovery from a successful action. |
-| `safetyPenaltyPerMiss` | Non-negative duvet penalty for a miss; defaults to zero. |
+| `pressurePerSecond` | Opposing-actor pressure while play is active. |
+| `recoveryPerAction` | Safety recovered by a successful action. |
+| `safetyPenaltyPerMiss` | Non-negative safety penalty for a miss; defaults to zero. |
 | `resistanceGainPerHit` | Persistent resistance gained by a hit, from 0 to 1. |
 | `resistanceLossPerMiss` | Persistent resistance lost by a miss, from 0 to 1. |
 | `resistanceRecoveryBonus` | Recovery multiplier supplied by accumulated resistance. |
@@ -261,10 +261,10 @@ should differ in pitch and timbre as well as stereo position, so the
 distinction survives a mono speaker or hearing in one ear. Stereo alone is
 never sufficient.
 
-`resistance-strain` and `resistance-ease` are the bed itself rather than the
-player: they sound when the resistance artwork advances or eases, so the frame
-is heard being hauled up a notch or settling back as ground is won. Judgement
-cues answer the player; these answer Management.
+`resistance-strain` and `resistance-ease` are the apparatus itself rather than
+the player: they sound when the resistance artwork advances or eases, so the
+structure is heard being hauled a notch further or settling back as ground is
+won. Judgement cues answer the player; these answer the opposing actor.
 
 Interruption cancellation is deliberately silent, because the interaction was
 taken away from the player rather than failed by them.
@@ -302,7 +302,7 @@ third-party asset the project would have to carry provenance for.
 Every parameter is bounded and validated. A cue whose layers are all silent, or
 all zero-length, is rejected rather than shipped as an inaudible mystery.
 
-### Beds and the creak train
+### Sustained layers and the stress train
 
 A soundscape authors three continuous layers and one train of events, each
 answering a different thing. Keeping them apart is what lets a player hear
@@ -313,17 +313,18 @@ whether they are in trouble or merely late in the day.
 | `ambience` | dramatic intensity | the room, tightening with the working day |
 | `opposingActorPresence` | dramatic intensity | the antagonist, grumbling throughout rather than only when interrupting |
 | `resistanceStrain` | physical danger | the sustained body of the structure under load |
-| `resistanceStressBursts` | physical danger | discrete creaks, quickening and growing as ground is lost |
+| `resistanceStressBursts` | physical danger | discrete bursts, quickening and growing as ground is lost |
 
-The two clock-driven beds rise however well the player is doing, because the
+The two clock-driven layers rise however well the player is doing, because the
 working day advances regardless. The two danger-driven layers answer the player
-alone, and are silent while the duvet is held.
+alone, and are silent while safety holds.
 
-`resistanceStressBursts` is a train of cues rather than a bed, because a
-structure under stress emits discrete bursts rather than a tone — a sustained layer
-following danger sounds like a hum, not like timber being worked. It authors a
-`cue`, a `minimumDanger` below which the structure is silent, `restIntervalMs`
-and `strainIntervalMs` between which the creaking quickens, `restGain` and
+`resistanceStressBursts` is a train of cues rather than a sustained layer,
+because a structure under stress emits discrete bursts rather than a tone: a
+sustained layer following danger sounds like a hum, not like a structure being
+worked. It authors a `cue`, a `minimumDanger` below which the structure is
+silent, `restIntervalMs` and `strainIntervalMs` between which the bursts
+quicken, `restGain` and
 `strainGain` between which it grows, and an `intervalPattern` of uneven
 multipliers. The pattern is authored rather than random so an episode sounds the
 same way twice, and uneven because evenly spaced bursts read as machinery. What
@@ -338,11 +339,11 @@ the same register a run of bursts reads as a series of unrelated squeaks rather
 than as one object. It is authored well below them, and is not a substitute for
 them: on its own it is just a hum.
 
-Each bed takes the same shape:
+Each sustained layer takes the same shape:
 
 ```text
 ambience:
-  restGain, strainGain   the bed's level at rest and at full intensity
+  restGain, strainGain   the layer's level at rest and at full intensity
   responseMs             how quickly it follows a change
   layers                 one to six sustained tone or noise layers
 ```
@@ -352,10 +353,10 @@ settings of itself instead — a tone gives `restFrequencyHz` and
 `strainFrequencyHz`, a noise gives `restCutoffHz` and `strainCutoffHz` — and
 the engine glides between them as dramatic intensity rises. That movement is
 what makes an episode feel like it is tightening: the office hum climbs in
-pitch, brightens and grows louder as Management gains ground.
+pitch, brightens and grows louder as the working day advances.
 
-The beds only exist while the game is audible. Muted play builds none of them,
-and unmuting mid-episode brings them in on the next frame.
+The sustained layers only exist while the game is audible. Muted play builds
+none of them, and unmuting mid-episode brings them in on the next frame.
 
 ### Ownership
 
