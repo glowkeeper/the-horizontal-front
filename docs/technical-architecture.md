@@ -58,7 +58,7 @@ Phaser provides the relevant browser-game machinery:
 - Asset loading.
 - Scene transitions and scaling.
 
-This is a more natural fit than representing the animated bedroom as a large collection of ordinary web-page elements. It also allows gameplay and cartoon sequences to share the same rendering and animation system.
+This is a more natural fit than representing an animated cartoon scene as a large collection of ordinary web-page elements. It also allows gameplay and cartoon sequences to share the same rendering and animation system.
 
 ## TypeScript and Phaser
 
@@ -126,7 +126,7 @@ For example:
 
 ```ts
 type ResistanceState = {
-  duvetSafety: number;
+  resistanceSafety: number;
   resistanceStrength: number;
   nextRhythmStep: number;
   elapsedMs: number;
@@ -148,7 +148,7 @@ function applyResistanceInput(
   input: ResistanceInput,
 ): Resistance {
   // Judge the side and timing against the next authored rhythm step,
-  // then update persistent resistance strength and duvet safety.
+  // then update persistent resistance strength and resistance safety.
 }
 ```
 
@@ -213,7 +213,7 @@ The score vocabulary is deliberately finite: tap, hold and rest events positione
 
 Hits build bounded persistent resistance strength; misses apply both the phase's authored resistance loss and safety penalty. Net passive pressure is `authored pressure × (1 − resistance strength)`, so accurate performance protects the interval between beats instead of competing with continuous unavoidable damage through discrete healing alone. Successful safety recovery is deliberately weak at zero strength and grows as accurate actions establish resistance. This lets opening episodes make individual mistakes inexpensive without allowing alternating correct and incorrect one-key input to recover indefinitely. The phase owns its recovery, resistance and penalty scalars as data. Rest events compile to intentional unscored pauses that preserve both safety and earned resistance.
 
-Presentation intensity does not manufacture physical danger. Bed angle, duvet loss and sleeper displacement derive only from duvet safety, so successful inputs can visibly arrest or reverse the lift during a crisis. Authored intensity may escalate atmospheric channels such as the invading work light without falsifying the mechanical state.
+Presentation intensity does not manufacture physical danger. The resistance composition's advancing states derive only from resistance safety, so successful inputs can visibly arrest or reverse that advance during a crisis. Authored intensity may escalate atmospheric channels such as the invading work light without falsifying the mechanical state.
 
 Rhythm complexity should be able to increase without requiring an ever-higher input rate. The rule system must remain suitable for reduced-input mappings and must not assume that keyboard, pointer, and touch inputs impose identical physical effort.
 
@@ -396,7 +396,9 @@ Reusable scenes receive the validated episode as scene data; they do not import 
 
 Artwork files are resolved through a validated asset catalog using stable semantic IDs. Skins may use either documented prototype shapes or image parts with explicit `{ source, id }` asset references; they never contain repository paths. Episodes likewise select layouts and skins through explicit ownership references. Both skins and physical assets are organised by ownership under `shared/` or `episodes/<episode-id>/`. A shared skin may use only shared assets; an episode-owned skin may use shared assets and assets owned by that episode. An episode may select only a shared skin or one in its own namespace. Build-time recursive discovery and policy validation reject unsafe paths, misleading ownership sources, unknown episode namespaces, missing files and unlisted files, and the generic boot scene preloads catalogued images before the selected presentation is instantiated.
 
-Presentation validation has two levels. Zod schemas enforce the finite structural vocabulary, types and numeric ranges. Semantic validation enforces relationships that schemas alone cannot express: coordinates and controls fit the design canvas, required part IDs exist and are unique, image references resolve, layout and skin are compatible, the bed head lies opposite its foot pivot, lift motion raises the correct end, and loose objects move downhill. A JSON file parsing successfully is not sufficient evidence that a composition is usable.
+Presentation validation has two levels. Zod schemas enforce the finite structural vocabulary, types and numeric ranges. Semantic validation enforces relationships that schemas alone cannot express: anchors, panels and controls fit the design canvas; the sided controls read left, feedback, right, and the left/right control anchors share one horizontal lane; a timing gate is wide enough to contain its travelling notes while the centre emitter stays subordinate to it; interruption controls meet the enhanced pointer target; an atmospheric channel moves in the authored direction, so the work light cannot weaken as danger rises; required part IDs exist and are unique; image references resolve through the asset catalogue; and layout, skin and asset ownership agree. A JSON file parsing successfully is not sufficient evidence that a composition is usable.
+
+Geometric validation of the resistance composition itself is **not implemented**. A skin whose authored states advanced the wrong end of its structure, or whose loose parts travelled uphill, would be caught by review rather than by the build. Such rules are wanted, and would have to be expressed generically — a monotonic direction check across the authored state sequence, not anything that knows what a bed is. They earn their keep when a second reusable layout exists, because until then the only composition anyone has inspected is also the only one there is.
 
 Prototypes use these same production boundaries. Prototype tuning, writing and shape artwork may be provisional, but episode-specific wiring or disposable scene architecture must not be used as a shortcut.
 
