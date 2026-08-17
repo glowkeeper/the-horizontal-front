@@ -3,18 +3,34 @@
 ## Purpose
 
 This document defines the durable readiness and publication rules for public
-production releases of The Horizontal Front. A release issue records the exact
-content, support matrix, revision and evidence for one version; it cannot waive
-the project charter, licensing rules or the invariants below.
+releases of The Horizontal Front. A release issue records the exact content,
+support matrix, revision and evidence for one version; it cannot waive the
+project charter, licensing rules or the invariants below.
 
-The first production release is version `1.0.0`. The current completed vertical
-slice remains version `0.1.0` while its production artwork, audio,
-accessibility surface and release evidence are being completed under issue
-`#21`.
+## Two kinds of release
 
-## Production-release invariants
+A **public release** is playable, honest and complete enough to put in front of
+people. Everything under [public-release invariants](#public-release-invariants)
+applies to it without exception.
 
-A production release must:
+A **production release** is a public release that additionally satisfies the
+[no-placeholders invariant](#no-placeholders-invariant): nothing provisional
+remains, and identity-critical work carries the human authorship the artwork
+rules ask for. Version `1.0.0` is reserved for it.
+
+The distinction exists so that shipping is not held hostage to perfection, and
+so that perfection is not quietly redefined as whatever happened to ship. A
+public release that is not a production release says so, in its release notes
+and in this repository, and publishes what it is still missing.
+
+Version `0.2.0` is the first public release. Its artwork is AI-generated under
+maintainer direction rather than human-authored, which is precisely the gap
+between a public release and a production one. See the artwork rules in
+[`AGENTS.md`](../AGENTS.md) and the limitations recorded on the release issue.
+
+## Public-release invariants
+
+Every public release, including `0.2.0`, must:
 
 - preserve the validated game, campaign and episode architecture;
 - remain static and fully playable offline after its required files are cached;
@@ -31,6 +47,11 @@ A production release must:
   tag, GitHub release and deployed build.
 
 ## No-placeholders invariant
+
+**This invariant governs production releases only.** A public release that does
+not meet it is not blocked by it; it is required instead to state plainly which
+parts fall short, so that a reader can tell a deliberate interim release from a
+finished one. Meeting it in full is what makes a release `1.0.0`.
 
 A production release contains no provisional presentation. Every visual role,
 audible role, interface state and outcome required by its authored content is
@@ -89,7 +110,8 @@ actually evaluated.
 
 Before publication:
 
-1. Accept the release's content, artwork, audio and accessibility dependencies.
+1. Accept the release's content, artwork, audio and accessibility dependencies,
+   and record anything accepted as interim rather than finished.
 2. Freeze a release candidate and record the revision under review.
 3. Apply the intended version consistently to package metadata and release
    documentation.
@@ -109,7 +131,7 @@ The canonical public site is deployed to Cloudflare and automatically deploys
 changes merged to `main`. Cloudflare is static hosting infrastructure, not an
 application runtime dependency.
 
-For a production release:
+For any public release:
 
 1. Prepare the GitHub release record in draft while the accepted release
    candidate is still under review.
@@ -131,7 +153,7 @@ rollback does not silently transfer a release tag to a different commit.
 
 ## Release evidence
 
-Every production release report uses all three headings and the exact claim
+Every public release report uses all three headings and the exact claim
 language defined in [Verification evidence](verification-evidence.md):
 
 - **Automated/source verified**

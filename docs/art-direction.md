@@ -6,7 +6,9 @@ This is the provisional art direction for the first production draft. Its first
 intended enactment is the campaign **The Monday Uprising** and its first episode,
 **The Alarm**. It is a deliberate brief rather than final perceptual acceptance:
 asset production, integration and maintainer playtesting may reveal changes
-that should be recorded here before the first production release is accepted.
+that should be recorded here. The first public release ships this brief as
+enacted; a production release additionally requires the human authorship of
+identity-critical work that the artwork rules ask for.
 
 This first enactment establishes a coherent production interpretation for those
 authored works; it does not permanently prescribe one visual treatment for

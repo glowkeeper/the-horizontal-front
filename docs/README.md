@@ -39,11 +39,13 @@ the isolated, credential-free Playwright MCP reviewer, repository-owned browser
 tests, CI execution and diagnostic artefacts. Report the result using the
 authoritative [verification evidence](verification-evidence.md) vocabulary.
 
-## I want to prepare a production release
+## I want to prepare a release
 
-Read [release process](release-process.md) for production invariants, supported
-environment claims, the no-placeholders rule, versioning and the Cloudflare
-publication and rollback sequence. Read [art direction](art-direction.md)
+Read [release process](release-process.md) for the difference between a public
+release and a production release, the invariants every public release must meet,
+supported environment claims, the no-placeholders rule that governs production
+releases alone, versioning and the Cloudflare publication and rollback
+sequence. Read [art direction](art-direction.md)
 before producing, integrating or approving visual assets. Exploratory sheets
 are preserved separately under [art development](art/README.md); their presence
 there does not make them production assets.
