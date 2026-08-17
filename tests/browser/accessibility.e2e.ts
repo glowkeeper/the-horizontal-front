@@ -206,3 +206,40 @@ test("chrome controls track the canvas when the viewport changes", async ({ page
       .toEqual(reference);
   }
 });
+
+test("keeps focus inside the game across every scene transition", async ({ page }) => {
+  // A transition destroys the controls of the screen it replaces. Without
+  // deliberate placement the browser drops focus to the document body, and a
+  // keyboard or screen reader player is silently returned to the top of the
+  // page at every step, with no announcement of where they now are.
+  const focusedDescription = () => page.evaluate(() => {
+    const active = document.activeElement;
+    if (!active || active === document.body) return "body";
+    return `${active.tagName.toLowerCase()}#${active.id || ""}.${active.className || ""}`;
+  });
+
+  await page.goto("/play/");
+  await expect(page.getByRole("button", { name: /The Monday Uprising/i })).toBeVisible();
+  await page.keyboard.press("Enter");
+  await expect(page.locator("#game-status"))
+    .toHaveText(/The Monday Uprising\. MONDAY\. DAWN\./);
+  expect(await focusedDescription(), "briefing must take focus").not.toBe("body");
+
+  await page.evaluate(() => new Promise<void>((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+  }));
+  await page.keyboard.press("Enter");
+  await expect(page.locator("#game-status"))
+    .toHaveText(/Hold the line\. Tap when a note crosses its gate\./);
+  // During play focus belongs to the game surface itself: a focused button
+  // would swallow Space, which the player needs for holds.
+  expect(await focusedDescription()).toContain("#game");
+
+  await page.waitForTimeout(3_500);
+  for (let attempt = 0; attempt < 80; attempt += 1) {
+    await page.keyboard.press("ArrowLeft");
+  }
+  await expect(page.locator("#game-status"))
+    .toHaveText(/Press R or tap Try Again to retry/);
+  expect(await focusedDescription(), "the outcome must take focus").not.toBe("body");
+});

@@ -8,7 +8,12 @@ import { createCampaignRun } from "../../engine/campaign";
 import { createTextStyles, getThemeColour } from "../../theme/theme";
 import { getMenuAction } from "../../input/menuInput";
 import { CHROME_PANEL, GAME_CENTRE_X } from "../design";
-import { announce, createButton } from "../sceneChrome";
+import {
+  announce,
+  createButton,
+  focusOnEntry,
+  chromeControlHandlesKey,
+} from "../sceneChrome";
 import { createIllustratedSemanticPanel } from "../presentation/illustratedSemanticPanel";
 
 type CampaignBriefingData = { readonly campaign: Campaign };
@@ -56,7 +61,7 @@ export class CampaignBriefingScene extends Phaser.Scene {
       });
     };
     if (panelLayout) {
-      createButton(
+      focusOnEntry(createButton(
         this,
         panelLayout.anchors.primaryAction.x,
         panelLayout.anchors.primaryAction.y,
@@ -66,14 +71,15 @@ export class CampaignBriefingScene extends Phaser.Scene {
         panelLayout.actions.height,
         "primary",
         episodes[0].title,
-      );
+      ));
     } else {
-      createButton(
+      focusOnEntry(createButton(
         this, GAME_CENTRE_X, 615, 420, game.interface.beginEpisode, begin,
         undefined, "primary", episodes[0].title,
-      );
+      ));
     }
     this.input.keyboard?.on("keydown", (event: KeyboardEvent) => {
+      if (chromeControlHandlesKey(event)) return;
       if (getMenuAction(event) === "select") begin();
     });
     announce(formatCopy(game.interface.briefingStatus, {

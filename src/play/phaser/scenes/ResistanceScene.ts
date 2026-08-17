@@ -55,7 +55,13 @@ import {
   createResistanceLayout,
   type ResistanceLayout,
 } from "../layouts/resistanceLayout";
-import { announce, createButton } from "../sceneChrome";
+import {
+  announce,
+  createButton,
+  focusGameSurface,
+  focusOnEntry,
+  chromeControlHandlesKey,
+} from "../sceneChrome";
 import {
   getRhythmGateWidth,
   getRhythmNotePosition,
@@ -184,6 +190,10 @@ export class ResistanceScene extends Phaser.Scene {
     this.lastAnnouncedNowStep = -1;
     this.announcedInterruptionState = null;
 
+    // Arriving from the briefing, the control that was focused has just been
+    // destroyed. Play itself takes focus so the player stays inside the game
+    // rather than being dropped back to the top of the document.
+    focusGameSurface();
     this.audio = createSoundscapePlayer(this.episode.audio);
     this.cueScheduler = createCueScheduler();
     this.countInScheduler = createCueScheduler();
@@ -627,6 +637,7 @@ export class ResistanceScene extends Phaser.Scene {
       Phaser.Input.Keyboard.KeyCodes.THREE,
     ]);
     keyboard?.on("keydown", (event: KeyboardEvent) => {
+      if (chromeControlHandlesKey(event)) return;
       if (this.handleInterruptionKey(event, "press")) return;
       const action = getResistanceControlAction(event, "press");
       if (action?.kind === "resist") {
@@ -1221,12 +1232,18 @@ export class ResistanceScene extends Phaser.Scene {
     };
     const width = this.illustratedOutcomeLayout?.actions.width ?? actions.width;
     const height = this.illustratedOutcomeLayout?.actions.height;
+    // The outcome is the first moment in this scene where a control should hold
+    // focus. Until now the player has been answering the rhythm with the
+    // keyboard, and a focused button would have swallowed Space.
     createButton(this, retryPosition.x, retryPosition.y, width, game.interface.retryEpisode, () => {
       this.restartConfrontation();
     }, height);
-    createButton(this, acceptPosition.x, acceptPosition.y, width, game.interface.acceptOutcome, () => {
+    // Accept takes the focus rather than retry, because the announced model is
+    // that R retries and Enter carries on. Focusing retry would have made Enter
+    // do the opposite of what the player was just told.
+    focusOnEntry(createButton(this, acceptPosition.x, acceptPosition.y, width, game.interface.acceptOutcome, () => {
       this.acceptOutcomeAndContinue();
-    }, height, "secondary");
+    }, height, "secondary"));
     this.outcomeActionsAvailable = true;
     announce(formatCopy(game.interface.resultStatus, { outcome, feedback }));
   }

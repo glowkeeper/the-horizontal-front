@@ -6,6 +6,7 @@ import { getMenuAction, moveSelection } from "../../input/menuInput";
 import { createTextStyles, getThemeColour } from "../../theme/theme";
 import { getCampaignCardPlacements } from "../campaignMenuLayout";
 import { addChromeButton } from "../chromeOverlay";
+import { chromeControlHandlesKey } from "../sceneChrome";
 import { CHROME_MENU, CHROME_PANEL, GAME_CENTRE_X } from "../design";
 
 export class CampaignsScene extends Phaser.Scene {
@@ -44,6 +45,7 @@ export class CampaignsScene extends Phaser.Scene {
     // painted a focus ring on players who had just clicked in from the site,
     // and none on players returning from the game within the same document.
     this.input.keyboard?.on("keydown", (event: KeyboardEvent) => {
+      if (chromeControlHandlesKey(event)) return;
       const action = getMenuAction(event);
       if (action === "select") {
         this.openCampaign(game.campaigns[this.selectedIndex]);

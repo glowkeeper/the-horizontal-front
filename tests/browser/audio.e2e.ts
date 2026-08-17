@@ -106,7 +106,15 @@ test("muted play is genuinely silent and mechanically unchanged", async ({ page 
   await expect(audioToggle(page)).toHaveAttribute("aria-pressed", "true");
   await expect(audioToggle(page)).toHaveText(/Unmute sound/);
 
-  await openEpisode(page);
+  // Enter would now go to the control the player is actually on, so the
+  // campaign is opened the way someone who just pressed mute would open it.
+  await campaignCard(page).click();
+  await expect(page.locator("#game-status")).toHaveText(briefingStatus);
+  await page.evaluate(() => new Promise<void>((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+  }));
+  await page.keyboard.press("Enter");
+  await expect(page.locator("#game-status")).toHaveText(resistanceStatus);
   await page.waitForTimeout(4_000);
 
   const counters = await readCounters(page);

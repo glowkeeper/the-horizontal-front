@@ -9,7 +9,12 @@ import { isCampaignComplete } from "../../engine/campaign";
 import { getMenuAction } from "../../input/menuInput";
 import { createTextStyles, getThemeColour } from "../../theme/theme";
 import { CHROME_PANEL, GAME_CENTRE_X } from "../design";
-import { announce, createButton } from "../sceneChrome";
+import {
+  announce,
+  createButton,
+  focusOnEntry,
+  chromeControlHandlesKey,
+} from "../sceneChrome";
 import { createIllustratedSemanticPanel } from "../presentation/illustratedSemanticPanel";
 
 type CampaignDebriefingData = {
@@ -66,14 +71,15 @@ export class CampaignDebriefingScene extends Phaser.Scene {
     });
     const campaigns = () => this.transitionTo("CampaignsScene");
     if (panelLayout) {
-      createButton(this, panelLayout.anchors.primaryAction.x, panelLayout.anchors.primaryAction.y, panelLayout.actions.width, game.interface.replayCampaign, replay, panelLayout.actions.height);
+      focusOnEntry(createButton(this, panelLayout.anchors.primaryAction.x, panelLayout.anchors.primaryAction.y, panelLayout.actions.width, game.interface.replayCampaign, replay, panelLayout.actions.height));
       createButton(this, panelLayout.anchors.secondaryAction.x, panelLayout.anchors.secondaryAction.y, panelLayout.actions.width, game.interface.returnToCampaigns, campaigns, panelLayout.actions.height, "secondary");
     } else {
-      createButton(this, 390, 610, 410, game.interface.replayCampaign, replay);
+      focusOnEntry(createButton(this, 390, 610, 410, game.interface.replayCampaign, replay));
       createButton(this, 890, 610, 410, game.interface.returnToCampaigns, campaigns);
     }
 
     this.input.keyboard?.on("keydown", (event: KeyboardEvent) => {
+      if (chromeControlHandlesKey(event)) return;
       const action = getMenuAction(event);
       if (action === "replay" || action === "select") {
         replay();

@@ -19,7 +19,7 @@
       data-status-audible="{{GAME_AUDIO_AUDIBLE_STATUS}}">{{GAME_MUTE_LABEL}}</button>
     <main id="app">
       <p id="game-status" class="visually-hidden" aria-live="polite" aria-atomic="true">{{GAME_LOADING_STATUS}}</p>
-      <div id="game" role="application" aria-label="{{GAME_ARIA_LABEL}}" aria-describedby="game-status"></div>
+      <div id="game" role="application" tabindex="-1" aria-label="{{GAME_ARIA_LABEL}}" aria-describedby="game-status"></div>
     </main>
     <script type="module" src="/src/play/main.ts"></script>
   </body>
