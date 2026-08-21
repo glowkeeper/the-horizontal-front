@@ -6,6 +6,11 @@ import { marked } from "marked";
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
+const { homepage } = JSON.parse(
+  await readFile(join(projectRoot, "package.json"), "utf8"),
+);
+const siteOrigin = homepage.replace(/\/$/, "");
+
 const sourceEntryPages = [
   { source: "src/site/pages/home.html", output: "index.html" },
   { source: "src/site/pages/commons.html", output: "commons/index.html" },
@@ -164,10 +169,45 @@ function pageTemplate({ title, description, content, documentPage = false }) {
 `;
 }
 
+/**
+ * Canonical URLs, derived from the route rather than declared per page.
+ *
+ * Every page needs one, because the public host answers an unmatched path with
+ * the home page rather than an error. A typo, a stale link or a crawler probing
+ * `/ads.txt` all return indexable HTML, so without a canonical URL the same
+ * document is discoverable under unlimited addresses. The canonical link is
+ * what tells a search engine which one of them is the page.
+ *
+ * Deriving it from the output path is the point. A per-page declaration is a
+ * value someone can copy from the page above and forget to change, and a wrong
+ * canonical URL is worse than none: it points a real page at a different one.
+ * Here a page cannot be given the wrong route, and a page added later cannot be
+ * given no route at all.
+ */
+function canonicalUrl(output) {
+  const route = output === "index.html"
+    ? "/"
+    : `/${output.slice(0, -"index.html".length)}`;
+
+  return `${siteOrigin}${route}`;
+}
+
 async function writePage(output, html) {
+  if (!output.endsWith("index.html")) {
+    throw new Error(`Page output must be a clean-route index file: ${output}`);
+  }
+  if (html.includes('rel="canonical"')) {
+    throw new Error(`Page already declares a canonical URL: ${output}`);
+  }
+  if (!html.includes("</head>")) {
+    throw new Error(`Page has no head to receive its canonical URL: ${output}`);
+  }
+
+  const canonical = `  <link rel="canonical" href="${canonicalUrl(output)}" />\n  `;
   const outputPath = join(projectRoot, output);
+
   await mkdir(dirname(outputPath), { recursive: true });
-  await writeFile(outputPath, html);
+  await writeFile(outputPath, html.replace("</head>", `${canonical}</head>`));
 }
 
 for (const page of sourceEntryPages) {

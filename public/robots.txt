@@ -1,0 +1,13 @@
+# The Horizontal Front is a public digital commons, and its charter commits it
+# to public, inspectable development. Crawling and indexing are permitted
+# deliberately rather than by omission: this file exists so that a crawler gets
+# a parseable answer instead of the host's HTML fallback, which reads as a
+# refusal to well-behaved automated clients.
+#
+# Restricting a particular crawler is a governance decision, not a maintenance
+# one. Take it through the ordinary review path rather than adding a rule here.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://thehorizontalfront.org/sitemap.xml
