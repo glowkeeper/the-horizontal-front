@@ -6,6 +6,7 @@ dist/
 
 # Generated public-document entry points
 /index.html
+/404.html
 /play/
 /commons/
 /sound/

@@ -40,6 +40,7 @@ export default defineConfig({
     rolldownOptions: {
       input: {
         home: page("index.html"),
+        notFound: page("404.html"),
         play: page("play/index.html"),
         commons: page("commons/index.html"),
         sound: page("sound/index.html"),
