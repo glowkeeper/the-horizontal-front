@@ -8,7 +8,7 @@
   },
   "scripts": {
     "browser:install": "playwright install --with-deps chromium",
-    "build": "npm run generate:site && npm run check:policy && npm run check:docs && npm run validate:content && tsc --noEmit && vite build && node scripts/finalize-static-build.mjs && npm run check:static",
+    "build": "npm run generate:site && npm run check:policy && npm run check:docs && npm run validate:content && tsc --noEmit && vite build && node scripts/finalise-static-build.mjs && npm run check:static",
     "check:docs": "node scripts/check-documentation.mjs",
     "check:policy": "node scripts/check-project-policy.mjs",
     "check:static": "node scripts/check-static-build.mjs",
