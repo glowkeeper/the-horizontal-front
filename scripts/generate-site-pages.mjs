@@ -121,14 +121,21 @@ function extractTitle(markdown) {
   return markdown.match(/^#\s+(.+)$/m)?.[1] ?? "The Horizontal Front";
 }
 
-function pageTemplate({ title, description, content, documentPage = false }) {
+function pageTemplate({
+  title,
+  description,
+  content,
+  documentPage = false,
+  robots = "",
+  repositoryAnchor = true,
+}) {
   return `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="description" content="${escapeHtml(description)}" />
+    <meta name="description" content="${escapeHtml(description)}" />${robots ? `\n    <meta name="robots" content="${escapeHtml(robots)}" />` : ""}
     <meta name="theme-color" content="#f3e8d0" />
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
     <link rel="manifest" href="/manifest.webmanifest" />
@@ -147,10 +154,10 @@ function pageTemplate({ title, description, content, documentPage = false }) {
       </nav>
     </header>
     <main id="main-content" class="${documentPage ? "document-page" : "site-main"}">
-      ${content}
+      ${content}${repositoryAnchor ? `
       <aside class="repository-anchor" aria-label="Public repository">
         <p>This document, its history and the project’s public decision process are maintained in the <a href="https://github.com/glowkeeper/the-horizontal-front">GitHub repository</a>.</p>
-      </aside>
+      </aside>` : ""}
     </main>
     <footer class="site-footer">
       <p class="footer-mark">Free to play. No ads. No tracking. No purchases<img src="/assets/mark.svg" alt="" width="20" height="20" /></p>
@@ -192,22 +199,39 @@ function canonicalUrl(output) {
   return `${siteOrigin}${route}`;
 }
 
-async function writePage(output, html) {
-  if (!output.endsWith("index.html")) {
-    throw new Error(`Page output must be a clean-route index file: ${output}`);
-  }
+/**
+ * `canonical: false` exists for exactly one page: the 404.
+ *
+ * A canonical URL is a claim that this document is the authoritative version of
+ * some address. An error page is not the authoritative version of anything, and
+ * the address that produced it should not exist at all. Pointing it at the home
+ * page would be worse than saying nothing, because it would invite a search
+ * engine to treat every mistyped URL as a legitimate alias for the front page —
+ * the exact duplication the canonical URLs were added to stop.
+ */
+async function writePage(output, html, { canonical = true } = {}) {
   if (html.includes('rel="canonical"')) {
     throw new Error(`Page already declares a canonical URL: ${output}`);
   }
   if (!html.includes("</head>")) {
-    throw new Error(`Page has no head to receive its canonical URL: ${output}`);
+    throw new Error(`Page has no head: ${output}`);
   }
 
-  const canonical = `  <link rel="canonical" href="${canonicalUrl(output)}" />\n  `;
+  let finalHtml = html;
+
+  if (canonical) {
+    if (!output.endsWith("index.html")) {
+      throw new Error(`Page output must be a clean-route index file: ${output}`);
+    }
+
+    const link = `  <link rel="canonical" href="${canonicalUrl(output)}" />\n  `;
+    finalHtml = html.replace("</head>", `${link}</head>`);
+  }
+
   const outputPath = join(projectRoot, output);
 
   await mkdir(dirname(outputPath), { recursive: true });
-  await writeFile(outputPath, html.replace("</head>", `${canonical}</head>`));
+  await writeFile(outputPath, finalHtml);
 }
 
 for (const page of sourceEntryPages) {
@@ -246,4 +270,42 @@ for (const page of licencePages) {
   );
 }
 
-console.log("Generated public governance and licence pages.");
+/*
+ * The 404 page, and why the host needs it to exist.
+ *
+ * Cloudflare Pages infers a single-page application when a build ships no
+ * top-level `404.html`, and answers every unmatched path with the home page and
+ * a 200. That is how `/robots.txt` came to return HTML. This file is what tells
+ * the host the site is what it actually is — eleven real pages — so an address
+ * that does not exist can say so.
+ *
+ * It is the one page excluded from the sitemap, the one page asking not to be
+ * indexed, and the one page without a canonical URL. `follow` is kept so that
+ * the links out of it are still worth crawling.
+ */
+const notFoundContent = `<article>
+        <h1>Page not found</h1>
+        <p>Management has no record of this page. It may have been moved, renamed, or filed somewhere nobody is willing to admit to.</p>
+        <p>Nothing is broken, and nothing is required of you. Everything below is still exactly where it should be.</p>
+        <ul>
+          <li><a href="/">The front page</a></li>
+          <li><a href="/play/">Play the game</a></li>
+          <li><a href="/commons/">How the commons works</a></li>
+          <li><a href="/sound/">The sound library</a></li>
+        </ul>
+      </article>`;
+
+await writePage(
+  "404.html",
+  pageTemplate({
+    title: "Page not found",
+    description: "That page does not exist on The Horizontal Front.",
+    content: notFoundContent,
+    documentPage: true,
+    robots: "noindex, follow",
+    repositoryAnchor: false,
+  }),
+  { canonical: false },
+);
+
+console.log("Generated public governance, licence and not-found pages.");

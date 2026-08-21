@@ -95,6 +95,7 @@ await writeFile(serviceWorkerPath, finalServiceWorker);
 
 for (const generatedEntry of [
   "index.html",
+  "404.html",
   "play",
   "commons",
   "sound",

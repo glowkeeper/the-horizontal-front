@@ -156,5 +156,38 @@ for (const page of requiredPages) {
   }
 }
 
+/*
+ * The 404 page.
+ *
+ * Its existence is the load-bearing part. Cloudflare Pages treats a build with
+ * no top-level `404.html` as a single-page application and answers every
+ * unmatched path with the home page and a 200, which is how `/robots.txt` came
+ * to serve HTML. Deleting this file would not fail anything at build time and
+ * would silently restore that behaviour, so the check belongs here.
+ *
+ * The remaining assertions guard properties that currently hold by
+ * construction — the sitemap is derived from clean `index.html` routes, and the
+ * canonical carve-out is explicit in the generator. They exist so that a later
+ * refactor cannot quietly take any of them away.
+ */
+const notFound = await readFile(join(outputRoot, "404.html"), "utf8");
+
+if (!notFound.includes('<meta name="robots" content="noindex, follow" />')) {
+  throw new Error("The 404 page does not declare noindex, follow.");
+}
+if (notFound.includes('rel="canonical"')) {
+  throw new Error("The 404 page must not declare a canonical URL.");
+}
+if (sitemapLocations.some((location) => location.includes("404"))) {
+  throw new Error("The sitemap publishes the 404 page.");
+}
+if (!notFound.includes('<a class="site-name" href="/">')) {
+  throw new Error("The 404 page is missing the site header and navigation.");
+}
+if (!notFound.includes('<footer class="site-footer">')) {
+  throw new Error("The 404 page is missing the site footer.");
+}
+
 console.log("Static multi-page and offline-build checks passed.");
 console.log(`Crawler files verified across ${requiredPages.length} canonical routes.`);
+console.log("Not-found page verified as unindexed, uncanonicalised and unlisted.");
