@@ -37,6 +37,16 @@ The accepted identity references are in `docs/art/production/` — the protagoni
 and Management production sheets. Those are the authority for what a character
 looks like.
 
+**Start from the masters, not from the game files.** The maintainer will send you
+`docs/art/production/sources/`, which holds the full-resolution originals the shipped images were made from, before
+they were cut out and shrunk: the bed and duvet atlas, both Management poses,
+the protagonist cut-outs and the office incursion, each still on the flat
+colour field it was drawn against. The files in the game are resampled,
+matted derivatives of these. For every asset you are refining rather than
+redrawing, open the master — refining the shipped copy means working on a
+smaller, already-degraded version of a picture you could have had at full
+size.
+
 ## The job
 
 Two treatments, decided by what each asset does:
@@ -129,16 +139,21 @@ before it matters.
 
 ## Working method and file sizes
 
-Work as large as you like. **Deliver twice:**
+Work as large as you like. **Send two files for every asset:**
 
 1. **The shipped PNG**, at exactly the dimensions in the table, transparent
    where the table below says transparent.
 2. **The layered source** — your working file, layers intact, at whatever
    resolution you worked at.
 
-The layered sources go in `docs/art/production/sources/`, which is development
-material: it is never catalogued, never built into the game and never downloaded
-by a player. Only the shipped PNGs reach anyone playing.
+Send both to the maintainer however is easiest. **You never need to touch the
+repository, use Git or install anything.** The maintainer files the work,
+writes the catalogue entries and integrates it into the game: the PNG becomes
+the asset the game loads, and your layered source joins the existing masters
+in `docs/art/production/sources/`, which is development material — never
+catalogued, never built into the game, never downloaded by a player. Only the
+shipped PNGs reach anyone playing, which is why they are the only ones that
+have to be small.
 
 This matters more than it sounds. Holding the layered source is what lets the
 project resample, re-cut or re-separate your work later without asking you to
