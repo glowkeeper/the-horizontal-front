@@ -181,6 +181,12 @@ That means:
   the corner that stays on the floor while the opposite end is lifted.
 - **That pivot must fall on exactly the same pixel in all four drawings.**
 
+`docs/art/commissions/templates/resistance-registration.png` is a guide sheet at
+exactly that canvas size, with the pivot marked and each state's tilt drawn as a
+spoke. Drop it in as a layer, draw against it, and delete it before export. It is
+generated from the game's own presentation data, so it cannot disagree with what
+the engine actually does.
+
 The last point is the whole game. If the planted foot sits three pixels left in
 one state, the bed visibly jumps when the game switches to it. Motion between
 states must come from the difference between the drawings — the tilt, the
@@ -208,6 +214,10 @@ riveted brass-and-iron console with a lever, hauling the bed upright.
 - Drawn at twice the size it appears on screen, so detail can afford to be fine.
 - The figure is cropped very slightly by the right edge of the screen in play.
   Keep nothing essential in the last few pixels on the right.
+
+`docs/art/commissions/templates/opposing-actor-registration.png` is the matching
+guide sheet: canvas bounds, the floor line the figure stands on, and the band on
+the right that the screen edge cuts off.
 
 The poses **ratchet**. Each one is a peak that holds — Management reaches a level
 of exertion and stays there rather than relaxing between efforts. Draw them as
@@ -419,6 +429,11 @@ whether the drawing is good and not about whether it fits.
 - AI-tool use answered, including a plain "none", and recorded.
 - The maintainer's acceptance of the finished artwork in play, recorded as its
   own thing rather than inferred from the checks passing.
+
+Ask for the reference clip too — twenty seconds of the episode escalating to its
+failure, which shows the bed turning about its pivot, the poses ratcheting and
+the office sliding in. Three of the constraints above are about motion, and no
+amount of writing conveys them as well as watching it once.
 
 ## Order of work
 

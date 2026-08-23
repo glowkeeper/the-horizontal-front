@@ -20,6 +20,9 @@ dist/
 coverage/
 .artifacts/
 
+# Material packaged up to send to a contributor
+export/
+
 # Local environment files
 .env
 .env.local

@@ -14,6 +14,8 @@
     "check:static": "node scripts/check-static-build.mjs",
     "dev": "npm run generate:site && vite",
     "generate:site": "node scripts/generate-site-pages.mjs",
+    "generate:art-templates": "node scripts/generate-artwork-templates.mjs",
+    "record:art-reference": "node scripts/record-artwork-reference.mjs",
     "preview": "vite preview",
     "preview:device": "npm run build && vite preview --host --port 4173",
     "test": "vitest run",
