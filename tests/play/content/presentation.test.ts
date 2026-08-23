@@ -58,11 +58,11 @@ describe("presentation content", () => {
       "the-monday-uprising",
     ).file).toMatch(/^campaigns\/the-monday-uprising\//);
     expect(resolveIllustrationAsset(
-      { source: "episode", id: "the-alarm-victory" },
+      { source: "episode", id: "the-alarm-line-holds" },
       "the-alarm",
     ).file).toMatch(/^episodes\/the-alarm\//);
     expect(() => resolveIllustrationAsset(
-      { source: "shared", id: "the-alarm-victory" },
+      { source: "shared", id: "the-alarm-line-holds" },
       "the-alarm",
     )).toThrow(/must resolve under shared/);
   });

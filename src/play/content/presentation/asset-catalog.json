@@ -34,8 +34,8 @@
       "replacementStatus": "Production-approved on 16 August 2026. The maintainer perceptually accepted this illustration in its player-facing campaign debriefing scene, including its neutrality with respect to the computed episodes-held tally, in an earlier session. AI-generated under maintainer art direction and integrated without a human repainting pass, so its human authorship is thin; that is recorded as a known limitation of this release rather than resolved."
     },
     {
-      "id": "the-alarm-victory",
-      "file": "episodes/the-alarm/victory.png",
+      "id": "the-alarm-line-holds",
+      "file": "episodes/the-alarm/line-holds.png",
       "origin": "ai-generated",
       "status": "production-approved",
       "creator": "OpenAI image generation tool, directed by the project maintainer and Codex",

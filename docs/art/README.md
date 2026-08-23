@@ -41,6 +41,15 @@ resampled and matted derivatives, so this is where to start any refinement pass
 or any re-export at a different size. Keeping the masters here is what makes it
 safe to resample the shipped copies.
 
+`commissions/` holds the working briefs handed to an artist bringing a specific
+body of artwork to production authorship. A brief names the assets in scope,
+the treatment each receives, the technical contract they must satisfy and the
+rights, credit and provenance terms under which the work is contributed. It is
+addressed to the artist rather than to the project, and it is deliberately
+public: the same artefact is what an outside contributing artist will be handed
+once campaign authoring opens. It currently holds [The Monday Uprising artwork
+brief](commissions/the-monday-uprising-artwork-brief.md).
+
 `first-playable-layered-parts/` holds the separated cut-out parts from the
 first-draft enactment of `The Alarm`, retained after integrated review replaced
 independently rotated parts with complete authored tableaux. Its own
@@ -69,7 +78,11 @@ direction](../research/political-satire-art-direction.md).
 
 The production-facing layer, state and pivot hypothesis for the first playable
 episode is [The Alarm playable-scene production
-specification](the-alarm-playable-scene-production-spec.md). Its first
+specification](the-alarm-playable-scene-production-spec.md). It specifies a
+separated cut-out direction that integrated review replaced with complete drawn
+tableaux, so it is preserved as reasoning rather than as instruction; for the
+assets that ship today the authority is [The Monday Uprising artwork
+brief](commissions/the-monday-uprising-artwork-brief.md). Its first
 protagonist and Management hypotheses are preserved in [First playable character
 production sheets](first-playable-character-sheets.md). The generated source
 sheets, runtime crops and provenance for the first bed, duvet and environment
