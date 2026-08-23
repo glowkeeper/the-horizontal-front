@@ -55,17 +55,20 @@ const guideStyles = `
 
 async function renderSheet(browser, { name, width, height, body }) {
   const page = await browser.newPage({ viewport: { width, height } });
-  await page.setContent(
-    `<style>${guideStyles}</style>`
-    + `<div class="sheet" style="width:${width}px;height:${height}px">${body}</div>`,
-  );
-  await page.screenshot({
-    path: join(outputRoot, `${name}.png`),
-    omitBackground: true,
-    clip: { x: 0, y: 0, width, height },
-  });
-  await page.close();
-  console.log(`  ${name}.png  ${width} × ${height}`);
+  try {
+    await page.setContent(
+      `<style>${guideStyles}</style>`
+      + `<div class="sheet" style="width:${width}px;height:${height}px">${body}</div>`,
+    );
+    await page.screenshot({
+      path: join(outputRoot, `${name}.png`),
+      omitBackground: true,
+      clip: { x: 0, y: 0, width, height },
+    });
+    console.log(`  ${name}.png  ${width} × ${height}`);
+  } finally {
+    await page.close();
+  }
 }
 
 /**
