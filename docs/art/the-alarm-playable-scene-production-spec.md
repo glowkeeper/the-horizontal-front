@@ -1,5 +1,11 @@
 # The Alarm playable-scene production specification
 
+> **Superseded in part.** The separated protagonist, bed, pillow and duvet
+> parts specified below were replaced by complete drawn tableaux and do not
+> ship. This document is preserved as design reasoning. For the artwork that
+> ships today, the authority is [The Monday Uprising artwork
+> brief](commissions/the-monday-uprising-artwork-brief.md).
+
 ## Status and scope
 
 This is the production-facing asset hypothesis for the playable confrontation
