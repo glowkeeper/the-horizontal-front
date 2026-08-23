@@ -50,6 +50,15 @@ public: the same artefact is what an outside contributing artist will be handed
 once campaign authoring opens. It currently holds [The Monday Uprising artwork
 brief](commissions/the-monday-uprising-artwork-brief.md).
 
+`commissions/templates/` holds registration guide sheets generated from the
+presentation data by `npm run generate:art-templates`: one per multi-state
+family, at the exact canvas size, marking the pivot and the tilts. They are
+committed so an artist can pick them up without running anything, and generated
+rather than drawn so that a pivot cannot be recorded in two places and disagree
+with itself. `npm run record:art-reference` produces the companion clip of an
+episode escalating to failure; that output is a build artefact and is not
+committed.
+
 `first-playable-layered-parts/` holds the separated cut-out parts from the
 first-draft enactment of `The Alarm`, retained after integrated review replaced
 independently rotated parts with complete authored tableaux. Its own
