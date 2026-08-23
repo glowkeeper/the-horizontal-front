@@ -317,8 +317,19 @@ back:
 
 ## Rights, credit and provenance
 
-Read this properly before you start drawing, because two parts of it surprise
-people and one of them is irreversible.
+**Two questions need an answer from you, in words, before the first finished
+asset goes into the game. Neither is about the drawing.**
+
+1. **What name do you want on this?** Your credit goes into a public record
+   that is effectively permanent. It can be your full name, a shortened form,
+   or a handle that is nothing like your legal name.
+2. **Did you use any AI tool, and where?** Including features built into
+   ordinary drawing software. "None" is a perfectly good answer, and it is
+   the one this whole job needs to be able to record truthfully.
+
+The rest of this section is why those two matter. Read it properly before you
+start drawing, because two parts of it surprise people and one of them is
+irreversible.
 
 **You keep the copyright in everything you draw.** The project does not ask you
 to sign it over and does not want it.
@@ -390,6 +401,7 @@ whether the drawing is good and not about whether it fits.
 
 - Provenance notes written and added to the catalogue for each asset.
 - Attribution name confirmed.
+- AI-tool use answered, including a plain "none", and recorded.
 - The maintainer's acceptance of the finished artwork in play, recorded as its
   own thing rather than inferred from the checks passing.
 
