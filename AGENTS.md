@@ -174,6 +174,8 @@ Follow this production-conscious workflow:
 
 The maintainer owns output as between the maintainer and the generation service only to the extent provided by the applicable service terms and law. Similar output may be produced for others, and copyrightability varies by jurisdiction. Treat these limitations as part of production risk management.
 
+If a human illustrator, animator or designer contributes production artwork, agree the terms in writing before work starts and keep them with the work: in that artist's brief under `docs/art/commissions/` where the project asked for the work, and in the asset record in every case. Cover the licence the work is contributed under and who retains copyright; the attribution the contributor wants, which may be a pseudonym and is effectively permanent once published; explicit consent to the modification the pipeline performs, including resampling, cropping, matting, compositing and separation into parts; delivery of layered sources as well as shipped images, so the work can be re-cut later without asking the artist to redraw it; a representation that the contributor holds the rights they are granting; and disclosure of any generative-AI tool used in their own process, including features built into ordinary drawing software. Establish that the contributor understands the project's licences permit anyone downstream to use their work commercially, because a contributor who assumed otherwise has been misled rather than merely surprised.
+
 ## Audio production
 
 Procedural synthesis is the default direction for prototype audio and may remain the production direction when the results are good enough.
