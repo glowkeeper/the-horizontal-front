@@ -174,10 +174,18 @@ For any public release:
 3. Allow Cloudflare to deploy that commit automatically.
 4. Verify the canonical domain, landing page, game, public-document routes,
    source links and offline cache against the deployed commit.
-5. Tag that exact `main` commit as `v<version>` and publish the GitHub release
-   for the same revision.
+5. Tag that exact `main` commit as an annotated `v<version>` tag and publish
+   the GitHub release for the same revision.
 6. Record the live verification evidence and any support boundaries in the
    release record.
+
+Release tags are annotated, not lightweight. An annotated tag is an object in
+its own right, recording who tagged the revision and when, independently of the
+commit's own authorship. That suits a project which treats provenance as a
+first-class concern, and it is what `git describe` and signature workflows
+expect. `v0.2.0` was created lightweight before this was settled and is left as
+it is, because moving a published tag is worse than an inconsistent record of
+how it was made; `v0.2.1` onwards are annotated.
 
 If live verification finds a material fault, do not publish the draft release
 as final. Use Cloudflare's deployment rollback when an immediate hosting

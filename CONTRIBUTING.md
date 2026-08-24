@@ -27,6 +27,52 @@ their authoritative references:
 - Do not combine unrelated reformatting or speculative features with the contribution.
 - Do not submit third-party material without clear provenance and redistribution terms.
 
+## How changes reach `main`
+
+Work happens on a branch and arrives through a pull request. Nothing is pushed
+to `main` directly.
+
+Branch names take a prefix describing the kind of work:
+
+| Prefix | For |
+| --- | --- |
+| `feature/` | A new capability, mechanic or piece of tooling. |
+| `bugfix/` | Repairing behaviour that was already meant to work. |
+| `docs/` | Changes whose product is documentation, including process and decision records. |
+| `release/` | Preparing a release, named for its version, as in `release/0.2.1`. |
+
+Follow the prefix with a short hyphenated description rather than an issue
+number, so the branch says what it does: `feature/repeatable-browser-verification`
+rather than `feature/20`.
+
+The `Protect main` ruleset enforces the rest, and [the protected pull-request
+path](docs/release-process.md#the-protected-pull-request-path) records it in
+full: a pull request is required, squash is the only merge method, history on
+`main` stays linear, review threads must be resolved, and the required status
+checks must pass before a merge is offered.
+
+Three checks currently gate a merge: `Verify`, `Browser smoke tests` and
+`Offline play`. A fourth, `Cloudflare Pages`, reports on every pull request and
+does **not** gate one — it is the hosting preview building, not a verification
+of the change. No approving review is required either, so in practice those
+three checks are the gate.
+
+## What a good pull request contains
+
+Fill in [the pull-request template](.github/pull_request_template.md) rather
+than replacing it. Beyond the template, a useful pull request here:
+
+- links the issue it advances, and says which acceptance criteria it meets and
+  which it deliberately leaves open;
+- explains the purpose and the trade-offs in plain language, not only what
+  changed;
+- records each verification level as **Claimed** with its evidence or **Not
+  claimed** with the reason, claiming only the levels proportionate to the
+  change — see [choosing required
+  levels](docs/verification-evidence.md#choosing-required-levels); and
+- says when a decision was settled in discussion rather than derived from the
+  documents, so the reasoning survives the merge.
+
 ## Charter check
 
 Before submitting work, answer these questions:
