@@ -11,6 +11,7 @@
     "build": "npm run generate:site && npm run check:policy && npm run check:docs && npm run validate:content && tsc --noEmit && vite build && node scripts/finalise-static-build.mjs && npm run check:static",
     "check:docs": "node scripts/check-documentation.mjs",
     "check:policy": "node scripts/check-project-policy.mjs",
+    "check:production": "node scripts/check-production-readiness.mjs",
     "check:static": "node scripts/check-static-build.mjs",
     "dev": "npm run generate:site && vite",
     "generate:site": "node scripts/generate-site-pages.mjs",

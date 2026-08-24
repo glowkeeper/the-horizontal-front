@@ -4,7 +4,9 @@ import { fileURLToPath } from "node:url";
 import {
   assetFilePattern,
   contentIdPattern,
+  findPlaceholderCopyTerm,
   findPlaceholderIdSegment,
+  findPlaceholderPathSegment,
   maximumCampaignsWithoutPaging,
 } from "../src/play/content/contentRules.mjs";
 
@@ -451,17 +453,6 @@ requirePolicy(
       mechanicCatalogueData.interruptions.some((entry) => entry.file === file)),
   "Every interruption file must be listed exactly once with a matching durable ID in the mechanic catalogue.",
 );
-for (const id of [
-  gameData.id,
-  ...gameData.campaigns.map(({ id }) => id),
-  ...episodeReferences.map(({ id }) => id),
-]) {
-  const placeholder = findPlaceholderIdSegment(id);
-  requirePolicy(
-    placeholder === undefined,
-    `Content ID "${id}" contains placeholder segment "${placeholder}"; use the durable creative name.`,
-  );
-}
 const listedAssetFiles = new Set(
   assetCatalogData.assets.map(({ file }) => file),
 );
@@ -589,6 +580,71 @@ for (const record of interruptionSkinRecords) {
   );
 }
 
+/**
+ * Prototype vocabulary must not survive into shipped material.
+ *
+ * `docs/release-process.md` forbids filenames, stable IDs and player-visible
+ * copy that describe production material as a prototype, placeholder or
+ * implementation stage. This previously covered only game, campaign and episode
+ * IDs, which left asset IDs, skin IDs, shipped image paths and the writing
+ * itself unguarded.
+ *
+ * Names and prose are checked against different vocabularies on purpose. A name
+ * is chosen, so "draft" or "temp" in an ID segment is a tell; the same words in
+ * a sentence are ordinary English and matching them would flag real writing.
+ */
+for (const id of [
+  gameData.id,
+  ...gameData.campaigns.map(({ id }) => id),
+  ...episodeReferences.map(({ id }) => id),
+  ...assetCatalogData.assets.map(({ id }) => id),
+  ...skinRecords.map(({ content }) => content.id),
+  ...interruptionSkinRecords.map(({ content }) => content.id),
+]) {
+  const placeholder = findPlaceholderIdSegment(id);
+  requirePolicy(
+    placeholder === undefined,
+    `Content ID "${id}" contains placeholder segment "${placeholder}"; use the durable creative name.`,
+  );
+}
+
+for (const { file } of assetCatalogData.assets) {
+  const placeholder = findPlaceholderPathSegment(file);
+  requirePolicy(
+    placeholder === undefined,
+    `Shipped asset path "${file}" contains placeholder segment "${placeholder}"; use the durable creative name.`,
+  );
+}
+
+function findPlaceholderCopyIn(value, path) {
+  if (typeof value === "string") {
+    const term = findPlaceholderCopyTerm(value);
+    return term === undefined ? undefined : { term, path };
+  }
+  if (Array.isArray(value)) {
+    return value
+      .map((entry, index) => findPlaceholderCopyIn(entry, `${path}[${index}]`))
+      .find((found) => found !== undefined);
+  }
+  if (value !== null && typeof value === "object") {
+    return Object.entries(value)
+      .map(([key, entry]) => findPlaceholderCopyIn(entry, `${path}.${key}`))
+      .find((found) => found !== undefined);
+  }
+  return undefined;
+}
+
+for (const [label, content] of [
+  ["game.json", gameData],
+  ...campaignData.map((campaign) => [`campaign ${campaign.id}`, campaign]),
+]) {
+  const found = findPlaceholderCopyIn(content, label);
+  requirePolicy(
+    found === undefined,
+    `Shipped content contains implementation-stage vocabulary "${found?.term}" at ${found?.path}.`,
+  );
+}
+
 for (const { id, file } of episodeReferences) {
   const episode = JSON.parse(
     await readFile(join(projectRoot, "src/play/content/episodes", file), "utf8"),
@@ -596,6 +652,11 @@ for (const { id, file } of episodeReferences) {
   requirePolicy(
     episode.id === id,
     `Episode file ${file} must contain the ID ${id}.`,
+  );
+  const placeholderCopy = findPlaceholderCopyIn(episode, `episode ${id}`);
+  requirePolicy(
+    placeholderCopy === undefined,
+    `Shipped content contains implementation-stage vocabulary "${placeholderCopy?.term}" at ${placeholderCopy?.path}.`,
   );
   const skinReference = episode.confrontation.presentation.skin;
   const skinId = skinReference.id;

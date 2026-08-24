@@ -133,6 +133,22 @@ export const shapePartSchema = z.discriminatedUnion("shape", [
   imagePartSchema,
 ]);
 
+/**
+ * Whether anything is still owed on an asset before it can ship in a production
+ * release.
+ *
+ * `docs/release-process.md` requires that a production release carry "no
+ * unresolved replacement instruction". That was previously expressible only as
+ * English inside `replacementNotes`, which a build cannot read without
+ * keyword-matching prose. This enumerates the answer so the check is exact and
+ * the paragraph is left to do what prose is good at: explaining why.
+ */
+export const replacementSchema = z.enum([
+  "none",
+  "awaiting-human-authorship",
+  "awaiting-replacement",
+]);
+
 const assetBaseSchema = z.object({
   id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
   file: z.string().regex(
@@ -143,7 +159,8 @@ const assetBaseSchema = z.object({
   creator: z.string().trim().min(1),
   edits: z.array(z.string().trim().min(1)),
   licence: z.enum(["CC-BY-SA-4.0"]),
-  replacementStatus: z.string().trim().min(1),
+  replacement: replacementSchema,
+  replacementNotes: z.string().trim().min(1),
 });
 
 const assetSchema = z.discriminatedUnion("origin", [

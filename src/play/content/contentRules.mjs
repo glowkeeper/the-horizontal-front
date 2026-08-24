@@ -34,3 +34,39 @@ export const placeholderIdSegments = new Set([
 export function findPlaceholderIdSegment(id) {
   return id.split("-").find((segment) => placeholderIdSegments.has(segment));
 }
+
+/**
+ * Prototype vocabulary that is unambiguous in player-facing prose.
+ *
+ * This is deliberately narrower than `placeholderIdSegments`. An ID segment is
+ * a chosen name, so "draft" or "temp" there is a tell; in a sentence they are
+ * ordinary English — a draft from the window, the office temperature — and
+ * matching them would flag real writing. Only terms with no innocent reading in
+ * player copy belong here.
+ */
+export const placeholderCopyTerms = [
+  "placeholder",
+  "lorem ipsum",
+  "todo",
+  "tbd",
+  "fixme",
+  "wip",
+  "untitled",
+];
+
+export function findPlaceholderCopyTerm(copy) {
+  const haystack = copy.toLowerCase();
+  return placeholderCopyTerms.find((term) =>
+    new RegExp(`\\b${term.replace(/ /g, "\\s+")}\\b`).test(haystack));
+}
+
+/**
+ * Prototype vocabulary in a shipped file path, checked per path segment so a
+ * word only matches when it was chosen as a name rather than embedded in one.
+ */
+export function findPlaceholderPathSegment(file) {
+  return file
+    .replace(/\.(?:png|webp)$/, "")
+    .split(/[/-]/)
+    .find((segment) => placeholderIdSegments.has(segment));
+}
