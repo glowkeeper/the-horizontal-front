@@ -116,6 +116,49 @@ from the static release.
 The initial repeatable suite intentionally targets Chromium only. That is one
 explicit browser-verification claim, not an implied cross-browser claim.
 
+## Offline verification
+
+Offline play is a charter commitment and a promise on the landing page, so it is
+verified rather than assumed. It has its own suite, `npm run test:offline`,
+because it cannot share the browser suite's setup.
+
+**It runs against the built release, not the dev server.** The service worker
+and its precache exist only in the production build, so the ordinary browser
+suite — which uses Vite's dev server for speed — cannot exercise them at all.
+The offline configuration builds the release and serves it on port 4174, beside
+the browser suite's 4173, which is also the only honest way to test the thing
+that actually ships.
+
+The two suites are separated by filename: `playwright.config.ts` matches
+`*.e2e.ts` and `playwright.offline.config.ts` matches `*.offline.ts`, both under
+`tests/browser/`. A new offline test is picked up by being named for the suite
+rather than by being registered anywhere.
+
+**The test takes the origin away rather than emulating a network condition.**
+Playwright can simulate being offline, but emulation and a genuinely unreachable
+server do not always behave the same way, and the second is what a player on a
+train experiences. The suite aborts every route instead, so only the service
+worker's cache can answer.
+
+**The canvas assertion is there because this broke once.** A page served from
+cache while the game's own JavaScript fails would look offline-capable while
+being unplayable. Cache matching honours a cached response's `Vary` header and
+static hosts attach one, which is exactly how it happened. Asserting that the
+document loaded is not enough; the suite asserts the canvas is visible and then
+plays through campaign selection into the episode.
+
+**The precache expectation comes from the build.** The suite fetches the served
+`sw.js`, reads the app-shell list the build wrote into it, and waits until every
+one of those URLs is present in the cache. It is a condition rather than a
+fixed pause, and it is exact: a single missing entry fails. An asserted count
+would be a second copy of a decision the build already makes, and would keep
+passing while most of the shell went missing.
+
+On failure the suite writes a screenshot and trace under
+`.artifacts/playwright-offline/`, which is ignored and excluded from the static
+release. Like the browser job it retries once in CI and not at all locally,
+since it gates a merge and a single transient failure should not block one.
+
 ## Continuous integration and branch protection
 
 The `CI` GitHub Actions workflow runs on pull requests targeting `main` and on

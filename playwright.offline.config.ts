@@ -16,6 +16,9 @@ export default defineConfig({
   outputDir: ".artifacts/playwright-offline",
   fullyParallel: false,
   forbidOnly: Boolean(process.env.CI),
+  // Matches the browser suite. This suite gates a merge, so a single transient
+  // failure should not block one; a reproducible failure still will.
+  retries: process.env.CI ? 1 : 0,
   workers: 1,
   reporter: "line",
   timeout: 90_000,

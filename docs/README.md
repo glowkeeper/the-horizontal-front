@@ -36,8 +36,9 @@ the claims each level cannot support.
 
 Read [browser verification](browser-verification.md) for the operational setup:
 the isolated, credential-free Playwright MCP reviewer, repository-owned browser
-tests, CI execution and diagnostic artefacts. Report the result using the
-authoritative [verification evidence](verification-evidence.md) vocabulary.
+tests, the separate offline suite that runs against the built release, CI
+execution and diagnostic artefacts. Report the result using the authoritative
+[verification evidence](verification-evidence.md) vocabulary.
 
 ## I want to prepare a release
 
@@ -74,6 +75,7 @@ substitute for that context.
 | Runtime and delivery architecture | [Technical architecture](technical-architecture.md) |
 | Verification claims and evidence levels | [Verification evidence](verification-evidence.md) |
 | Browser-review tooling and safety | [Browser verification](browser-verification.md) |
+| Offline-play verification | [Browser verification](browser-verification.md#offline-verification) |
 | Production release readiness and publication | [Release process](release-process.md) |
 | Provisional production visual direction | [Art direction](art-direction.md) |
 | Exploratory visual-development artefacts | [Art development](art/README.md) |
