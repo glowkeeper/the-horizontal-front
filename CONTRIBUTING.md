@@ -66,10 +66,7 @@ than replacing it. Beyond the template, a useful pull request here:
   which it deliberately leaves open;
 - explains the purpose and the trade-offs in plain language, not only what
   changed;
-- records each verification level as **Claimed** with its evidence or **Not
-  claimed** with the reason, claiming only the levels proportionate to the
-  change — see [choosing required
-  levels](docs/verification-evidence.md#choosing-required-levels); and
+- reports verification as [verification](#verification) below requires; and
 - says when a decision was settled in discussion rather than derived from the
   documents, so the reasoning survives the merge.
 
@@ -104,6 +101,11 @@ evidence](docs/verification-evidence.md). For each level, state **Claimed** with
 the required evidence or **Not claimed** with the reason; never promote source
 checks into browser evidence or browser automation into human acceptance.
 Acceptance criteria should require only the levels proportionate to the change.
+A schema or content correction may need only automated/source verification; a
+navigation or input change usually needs browser-flow verification as well; and
+rhythm tuning, visual clarity, humour or game feel commonly need all three.
+[Choosing required levels](docs/verification-evidence.md#choosing-required-levels)
+is the authoritative version of that judgement.
 
 When browser-flow evidence is required, follow the [browser-verification
 guide](docs/browser-verification.md). Run its repeatable smoke suite with
