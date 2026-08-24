@@ -2,6 +2,8 @@ import { readFile, readdir } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { canonicalPages, cleanRoutePages, generatedPaths } from "./site-pages.mjs";
+
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const outputRoot = join(projectRoot, "dist");
 const gameContent = JSON.parse(await readFile(
@@ -15,20 +17,7 @@ const { homepage } = JSON.parse(await readFile(
 ));
 const siteOrigin = homepage.replace(/\/$/, "");
 
-const requiredPages = [
-  "index.html",
-  "play/index.html",
-  "commons/index.html",
-  "sound/index.html",
-  "charter/index.html",
-  "governance/index.html",
-  "identity/index.html",
-  "contribute/index.html",
-  "roadmap/index.html",
-  "licences/index.html",
-  "licences/agpl/index.html",
-  "licences/cc-by-sa/index.html",
-];
+const requiredPages = canonicalPages.map(({ output }) => output);
 
 function routeFor(page) {
   return page === "index.html"
@@ -84,7 +73,7 @@ for (const page of requiredPages) {
     throw new Error(`The offline cache does not include /${page}.`);
   }
 }
-for (const route of ["/", "/play/", "/commons/", "/sound/", "/charter/", "/governance/", "/identity/", "/contribute/", "/roadmap/", "/licences/"]) {
+for (const { route } of cleanRoutePages) {
   if (!serviceWorker.includes(`"${route}"`)) {
     throw new Error(`The offline cache does not include the clean route ${route}.`);
   }
@@ -171,6 +160,27 @@ for (const page of requiredPages) {
  * canonical carve-out is explicit in the generator. They exist so that a later
  * refactor cannot quietly take any of them away.
  */
+/**
+ * Generated pages must be ignored by Git.
+ *
+ * Every published page is written into the working tree by the generator and
+ * built from there. One missing from `.gitignore` gets committed, so the
+ * repository carries a stale copy of a file the build regenerates — and
+ * nothing else would notice.
+ */
+const gitignoreEntries = new Set(
+  (await readFile(join(projectRoot, ".gitignore"), "utf8"))
+    .split("\n")
+    .map((line) => line.trim()),
+);
+const unignored = generatedPaths.filter((path) => !gitignoreEntries.has(path));
+if (unignored.length > 0) {
+  throw new Error(
+    `.gitignore does not ignore generated page output: ${unignored.join(", ")}. `
+      + "Add it, or the build's own output will be committed.",
+  );
+}
+
 const notFound = await readFile(join(outputRoot, "404.html"), "utf8");
 
 if (!notFound.includes('<meta name="robots" content="noindex, follow" />')) {
