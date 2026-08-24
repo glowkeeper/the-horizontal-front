@@ -131,6 +131,34 @@ Before publication:
 7. Confirm that the distributable contains no development browser tooling,
    secrets, unintended remote dependencies or unresolved placeholders.
 
+## The protected pull-request path
+
+Changes reach `main` only through a pull request. The `Protect main` ruleset
+enforces this, and the publication sequence below depends on it:
+
+- A pull request is required; `main` cannot be pushed to directly, deleted or
+  force-pushed.
+- Squash is the only permitted merge method, and history on `main` stays
+  linear.
+- Review threads must be resolved before merge, but no approving review is
+  required. The status checks, rather than a reviewer, are what gate a merge
+  in practice. Changes GitHub cannot attribute to a known author do require
+  an extra approval.
+- Three status checks must pass: `Verify`, `Browser smoke tests` and
+  `Offline play`.
+- A branch must be up to date with `main` before it can merge, so those checks
+  are evaluated against the state the merge will produce rather than against a
+  stale base.
+
+`Verify` covers unit tests, type checking, content validation and the build.
+The other two cover what a release actually claims to a player: that the game
+is playable by keyboard, pointer and touch, and that it still plays with the
+origin gone. Requiring all three is what stops a merge being offered while the
+evidence for those claims is still running, or after it has failed.
+
+The maintainer retains a pull-request bypass. Its purpose is to prevent an
+accidental merge, not to lock anyone out.
+
 ## Cloudflare publication
 
 The canonical public site is deployed to Cloudflare and automatically deploys

@@ -125,9 +125,11 @@ request exists. Its `Browser smoke tests` job uses the same lockfile,
 `npm run test:browser` command used locally.
 
 GitHub presents the job as the `Browser smoke tests` check, normally grouped as
-`CI / Browser smoke tests`. After its first pull-request run makes the check
-available to the repository ruleset, select that check when browser verification
-is ready to become a required branch-protection condition.
+`CI / Browser smoke tests`. That check gates a merge: it is a required
+branch-protection condition on `main`, alongside `Offline play` and `Verify`,
+so a pull request cannot be merged until browser verification has passed
+against a branch that is up to date with `main`. The
+[release process](release-process.md) records the ruleset as configured.
 
 The workflow has read-only repository permission and receives no secrets or
 authenticated browser state. npm caching stores downloaded package data only;
