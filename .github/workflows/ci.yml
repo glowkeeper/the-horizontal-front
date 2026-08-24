@@ -115,6 +115,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
+    # Read-only, and only so the API calls below are authenticated. Anonymous
+    # requests share a sixty-per-hour limit by source address, which on shared
+    # runners fails for reasons that have nothing to do with this repository.
+    permissions:
+      contents: read
+      issues: read
+
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -126,6 +133,10 @@ jobs:
 
       - name: Compare the documented ruleset against the live one
         run: node scripts/check-ruleset.mjs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
 
       - name: Compare the published roadmap against the issues it names
         run: node scripts/check-roadmap.mjs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}

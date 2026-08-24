@@ -37,6 +37,33 @@ async function fetchJson(path) {
   return response.json();
 }
 
+/**
+ * Follow GitHub's pagination rather than trusting one page.
+ *
+ * List endpoints return thirty items by default. A tranche with more children
+ * than a page holds would silently lose the rest, and every one of them would
+ * then be reported as listed in the roadmap but absent from GitHub — a check
+ * failing loudly for a reason that is not true. No tranche is near that today,
+ * which is exactly why it would go unnoticed until it happened.
+ */
+async function fetchAll(path, perPage = 100) {
+  const items = [];
+  let next = `https://api.github.com/repos/${repository}${path}`
+    + `?per_page=${perPage}`;
+
+  while (next !== null) {
+    const response = await fetch(next, { headers });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status} from ${next}`);
+    }
+    items.push(...await response.json());
+    const link = /<([^>]+)>;\s*rel="next"/.exec(response.headers.get("link") ?? "");
+    next = link === null ? null : link[1];
+  }
+
+  return items;
+}
+
 const problems = [];
 let checked = 0;
 
@@ -50,7 +77,7 @@ for (const tranche of roadmap.tranches) {
     );
   }
 
-  const children = await fetchJson(`/issues/${tranche.issue}/sub_issues`);
+  const children = await fetchAll(`/issues/${tranche.issue}/sub_issues`);
   const actual = new Map(children.map((child) => [child.number, child.title]));
 
   for (const [number, title] of tranche.children) {
