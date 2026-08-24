@@ -140,7 +140,10 @@ enforces this, and the publication sequence below depends on it:
   force-pushed.
 - Squash is the only permitted merge method, and history on `main` stays
   linear.
-- Review threads must be resolved before merge.
+- Review threads must be resolved before merge, but no approving review is
+  required. The status checks, rather than a reviewer, are what gate a merge
+  in practice. Changes GitHub cannot attribute to a known author do require
+  an extra approval.
 - Three status checks must pass: `Verify`, `Browser smoke tests` and
   `Offline play`.
 - A branch must be up to date with `main` before it can merge, so those checks
