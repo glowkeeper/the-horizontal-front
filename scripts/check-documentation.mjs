@@ -38,20 +38,35 @@ const permittedAbsentIdentifiers = new Map([
   ],
 ]);
 
-async function readSourceCorpus() {
-  const roots = ["src"];
-  const contents = [];
+/**
+ * Every identifier-shaped token in the source, as whole tokens.
+ *
+ * Substring matching would let a documented `phaseId` pass because the source
+ * happens to contain `phaseIdentifier` — a check reporting success for
+ * something it did not actually find, which is the failure this whole tranche
+ * is about. Tokenising both sides makes the comparison exact.
+ *
+ * Tokens inside source comments and string literals count as present. Excluding
+ * them would need a parser per language, and the risk they cover — a name that
+ * exists only in a comment — is far narrower than the substring hole.
+ */
+async function readSourceIdentifiers() {
+  const identifiers = new Set();
+  const tokenPattern = /[A-Za-z_$][A-Za-z0-9_$]*/g;
   const walk = async (directory) => {
     for (const entry of await readdir(directory, { withFileTypes: true })) {
       const path = join(directory, entry.name);
       if (entry.isDirectory()) await walk(path);
       else if (/\.(?:ts|tsx|mjs|js|json)$/.test(entry.name)) {
-        contents.push(await readFile(path, "utf8"));
+        const contents = await readFile(path, "utf8");
+        for (const [token] of contents.matchAll(tokenPattern)) {
+          identifiers.add(token);
+        }
       }
     }
   };
-  for (const root of roots) await walk(join(projectRoot, root));
-  return contents.join("\n");
+  await walk(join(projectRoot, "src"));
+  return identifiers;
 }
 
 function fencedCodeBlocks(markdown) {
@@ -141,7 +156,7 @@ for (const file of documentationFiles) {
   }
 }
 
-const sourceCorpus = await readSourceCorpus();
+const sourceIdentifiers = await readSourceIdentifiers();
 const camelCaseToken = /\b[a-z][a-zA-Z0-9]*[A-Z][a-zA-Z0-9]*\b/g;
 
 for (const documentName of identifierDocuments) {
@@ -152,7 +167,7 @@ for (const documentName of identifierDocuments) {
       if (seen.has(token)) continue;
       seen.add(token);
       if (permittedAbsentIdentifiers.has(token)) continue;
-      if (sourceCorpus.includes(token)) continue;
+      if (sourceIdentifiers.has(token)) continue;
       failures.push(
         `${documentName}: code block names "${token}", which appears nowhere `
           + "in src/. Rename it to the identifier the code uses, or add it to "

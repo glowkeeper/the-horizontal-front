@@ -143,10 +143,7 @@ try {
     "/src/play/content/schemas/mechanicsSchema.ts",
   );
   audioRoles = [...audio.audioCueRoles];
-  phaseFields = Object.keys(
-    mechanics.dramaticCurveSchema._zod.def.shape.phases._zod.def.element
-      ._zod.def.shape,
-  );
+  phaseFields = Object.keys(mechanics.phaseSchema.shape);
 } finally {
   await server.close();
 }

@@ -131,7 +131,11 @@ function createPhaseSchema<T extends z.ZodType>(referenceSchema: T) {
   });
 }
 
-const phaseSchema = createPhaseSchema(ownedContentReferenceSchema);
+/**
+ * Exported so the documentation generator can read the phase fields from the
+ * schema itself rather than from a hand-maintained list or from Zod internals.
+ */
+export const phaseSchema = createPhaseSchema(ownedContentReferenceSchema);
 const sharedPhaseSchema = createPhaseSchema(sharedContentReferenceSchema);
 
 function createDramaticCurveSchema<T extends z.ZodType>(phases: T) {
