@@ -31,8 +31,20 @@ const provenanceFields = {
   "licensed-source": ["creator", "licence", "source", "attribution", "permittedUses"],
 };
 
+/**
+ * An origin this report does not recognise counts as missing provenance.
+ *
+ * Returning "nothing required" for an unknown origin would let clause 1 report
+ * MET for an asset whose metadata was never examined — a malformed catalogue,
+ * or a new origin added to the schema without updating the table above. A
+ * report that goes green on something it did not check is the failure this
+ * whole check exists to prevent.
+ */
 function missingProvenance(asset) {
-  return (provenanceFields[asset.origin] ?? [])
+  if (!Object.hasOwn(provenanceFields, asset.origin)) {
+    return [`a recognised origin (found ${JSON.stringify(asset.origin)})`];
+  }
+  return provenanceFields[asset.origin]
     .filter((field) => {
       const value = asset[field];
       return typeof value !== "string" || value.trim().length === 0;
