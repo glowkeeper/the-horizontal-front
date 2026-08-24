@@ -2,7 +2,7 @@
 
 Thank you for helping build The Horizontal Front as a digital commons.
 
-Read the [project charter](PROJECT_CHARTER.md), [governance process](GOVERNANCE.md) and relevant design documents before proposing a change. Contributions must preserve the game's anti-capitalist satire and the charter's protected commitments.
+Read the [project charter](PROJECT_CHARTER.md), [governance process](GOVERNANCE.md) and relevant design documents before proposing a change. Contributions must preserve the game's satire of capitalism and the charter's protected commitments.
 
 ## Where to read next
 
