@@ -82,6 +82,32 @@ Creating the planned files is necessary but not sufficient. They must also be
 integrated, catalogued, provenance-complete, exercised through the production
 architecture and accepted at the evidence level appropriate to their role.
 
+### Reporting the invariant
+
+`npm run check:production` prints these clauses one by one, grouped by who can
+answer them:
+
+- **Asserted by the report.** Every catalogue asset is `production-approved`,
+  carries the provenance and licensing metadata its origin requires, and has
+  `replacement` set to `none`. The enumerated `replacement` field is what makes
+  the third part decidable; before it existed, the answer was a sentence in
+  `replacementNotes` that a build could only find by keyword-matching prose.
+- **Enforced elsewhere in the ordinary build.** Prototype vocabulary in
+  filenames, stable IDs and player copy is refused by `npm run check:policy`,
+  and content validation refuses a soundscape omitting any of the twenty-three
+  audio roles.
+- **Not decidable by any build.** Approved primitive geometry, deliberate
+  composition, the absence of temporary or copied audio material, and human
+  perceptual acceptance. The report names these rather than omitting them, so a
+  clean run can never be mistaken for a met invariant.
+
+The report exits successfully whatever it finds. A public release may
+legitimately ship material that fails this invariant — that is the distinction
+this document draws — so gating every build on it would be wrong. Run
+`npm run check:production -- --strict` when preparing a production release, and
+record its per-clause output as evidence rather than asserting the invariant as
+a whole.
+
 ## Browser and input support
 
 The initial production target is:

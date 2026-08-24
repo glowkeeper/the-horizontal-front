@@ -621,6 +621,47 @@ describe("presentation content", () => {
     })).not.toThrow();
   });
 
+  it("requires an enumerated replacement state on every asset", () => {
+    const asset = catalogContent.assets[0];
+    const { replacement: _replacement, ...withoutReplacement } = asset;
+
+    expect(() => assetCatalogSchema.parse({
+      schemaVersion: 1,
+      assets: [withoutReplacement],
+    })).toThrow();
+
+    expect(() => assetCatalogSchema.parse({
+      schemaVersion: 1,
+      assets: [{ ...asset, replacement: "probably-fine" }],
+    })).toThrow();
+
+    // The prose is what explains; it cannot stand in for the enumerated value.
+    expect(() => assetCatalogSchema.parse({
+      schemaVersion: 1,
+      assets: [{ ...withoutReplacement, replacementNotes: "Awaiting a human pass." }],
+    })).toThrow();
+
+    for (const replacement of ["none", "awaiting-human-authorship", "awaiting-replacement"]) {
+      expect(() => assetCatalogSchema.parse({
+        schemaVersion: 1,
+        assets: [{ ...asset, replacement }],
+      })).not.toThrow();
+    }
+  });
+
+  it("still requires the explanatory replacement notes", () => {
+    const asset = catalogContent.assets[0];
+    const { replacementNotes: _notes, ...withoutNotes } = asset;
+    expect(() => assetCatalogSchema.parse({
+      schemaVersion: 1,
+      assets: [withoutNotes],
+    })).toThrow();
+    expect(() => assetCatalogSchema.parse({
+      schemaVersion: 1,
+      assets: [{ ...asset, replacementNotes: "   " }],
+    })).toThrow();
+  });
+
   it("rejects unsafe, root-level and unsupported asset paths", () => {
     const asset = catalogContent.assets[0];
     for (const file of [

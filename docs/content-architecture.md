@@ -273,11 +273,22 @@ Each asset-catalogue entry is ordinary authored data. For example:
   "prompt": "Generation prompt, when applicable",
   "edits": ["Human selection, preparation and editing performed"],
   "licence": "CC-BY-SA-4.0",
-  "replacementStatus": "What must happen before production approval"
+  "replacement": "awaiting-human-authorship",
+  "replacementNotes": "What must happen before production approval, and why"
 }
 ```
 
 `id` is the stable semantic name used by skins and narrative illustration references. `file` is the only repository path and must be a PNG or WebP inside an allowed ownership namespace. The remaining fields preserve provenance and distinguish provisional material from production-approved artwork.
+
+`replacement` and `replacementNotes` are a deliberate pair. `replacement` is the machine-readable record of whether anything is still owed on the asset, and takes one of three values:
+
+| Value | Meaning |
+| --- | --- |
+| `none` | Nothing outstanding. The asset is at production authorship. |
+| `awaiting-human-authorship` | Shipped without the human authoring or refinement that artwork rule 7 prefers, and recorded as a known limitation rather than resolved. |
+| `awaiting-replacement` | Something else is outstanding, explained in the notes. |
+
+`replacementNotes` is prose and stays prose, because its job is to explain the circumstances a value cannot. The build reads the field, never the paragraph: `docs/release-process.md` requires a production release to carry no unresolved replacement instruction, and matching that against English would mean keyword-searching writing rather than reading a record.
 
 Layout and skin validation must check relationships as well as field types. Coordinates and control bounds must fit the design canvas, dimensions must be positive, semantic part IDs must be unique and required parts present, layout/skin references must be compatible, and motion directions must agree with the layout's physical meaning.
 
