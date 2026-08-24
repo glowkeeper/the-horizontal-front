@@ -3,6 +3,11 @@ import { expect, test, type Page } from "@playwright/test";
 
 import { canvasBounds, canvasTargets } from "./helpers/canvasControls";
 
+import {
+  canonicalPages,
+  documentShellPages,
+} from "../../scripts/site-pages.mjs";
+
 /**
  * Machine-checkable accessibility for every screen a player passes through.
  *
@@ -68,11 +73,7 @@ test("the public landing page has no accessibility violations", async ({ page })
 test("every page offers the same way home", async ({ page }) => {
   // The wordmark links home, but it is styled as a wordmark rather than a link,
   // so it cannot be the only route back. Each page carries an explicit one.
-  for (const path of [
-    "/", "/commons/", "/sound/",
-    "/charter/", "/governance/", "/identity/", "/contribute/", "/roadmap/",
-    "/licences/",
-  ]) {
+  for (const { route: path } of documentShellPages) {
     await page.goto(path);
     const primary = page.getByRole("navigation", { name: "Primary navigation" });
     await expect(
@@ -310,11 +311,7 @@ test("every page shares one content column", async ({ page }) => {
   // prose inside it, so the charter's title sat indented from the site name
   // directly above it. Aligning the container and capping the measure keeps
   // long text readable without the page looking broken.
-  for (const path of [
-    "/", "/commons/", "/sound/",
-    "/charter/", "/governance/", "/identity/", "/contribute/", "/roadmap/",
-    "/licences/", "/licences/agpl/", "/licences/cc-by-sa/",
-  ]) {
+  for (const { route: path } of documentShellPages) {
     await page.goto(path);
     const geometry = await page.evaluate(() => {
       const main = document.querySelector("main");
@@ -349,14 +346,11 @@ test("every internal link points at a page that exists", async ({ page }) => {
   // status codes would not have caught it. The rule is checked instead: the
   // site publishes a known set of paths, and contributor documentation lives on
   // GitHub as an absolute URL.
-  const published = new Set([
-    "/", "/play/", "/commons/", "/sound/",
-    "/charter/", "/governance/", "/identity/", "/contribute/", "/roadmap/",
-    "/licences/", "/licences/agpl/", "/licences/cc-by-sa/",
-  ]);
+  const published = new Set(canonicalPages.map(({ route }) => route));
   const offSite: string[] = [];
 
-  for (const path of [...published].filter((entry) => entry !== "/play/")) {
+  // The game page carries its own chrome, marked documentShell: false.
+  for (const { route: path } of documentShellPages) {
     await page.goto(path);
     const hrefs = await page.$$eval(
       "a[href]",

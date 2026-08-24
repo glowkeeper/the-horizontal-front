@@ -3,6 +3,8 @@ import { readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { generatedPaths } from "./site-pages.mjs";
+
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const outputRoot = join(projectRoot, "dist");
 const serviceWorkerPath = join(outputRoot, "sw.js");
@@ -93,19 +95,14 @@ if (finalServiceWorker === originalServiceWorker) {
 
 await writeFile(serviceWorkerPath, finalServiceWorker);
 
-for (const generatedEntry of [
-  "index.html",
-  "404.html",
-  "play",
-  "commons",
-  "sound",
-  "charter",
-  "governance",
-  "identity",
-  "contribute",
-  "licences",
-]) {
-  await rm(join(projectRoot, generatedEntry), { recursive: true, force: true });
+// Derived from the page list. As a hand-maintained list this omitted
+// `roadmap`, so that page's generated tree was left behind in the working
+// tree after every build while every other one was cleaned.
+for (const generatedEntry of generatedPaths) {
+  await rm(join(projectRoot, generatedEntry.replaceAll("/", "")), {
+    recursive: true,
+    force: true,
+  });
 }
 
 console.log(`Published sitemap.xml with ${routes.length} canonical routes.`);

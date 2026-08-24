@@ -4,6 +4,13 @@ import { fileURLToPath } from "node:url";
 
 import { marked } from "marked";
 
+import {
+  footerNavigation,
+  internalLinkTargets,
+  primaryNavigation,
+  sitePages,
+} from "./site-pages.mjs";
+
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
 const { homepage } = JSON.parse(
@@ -11,71 +18,54 @@ const { homepage } = JSON.parse(
 );
 const siteOrigin = homepage.replace(/\/$/, "");
 
-const sourceEntryPages = [
-  { source: "src/site/pages/home.html", output: "index.html" },
-  { source: "src/site/pages/commons.html", output: "commons/index.html" },
-  { source: "src/site/pages/sound.html", output: "sound/index.html" },
-  { source: "src/play/index.html", output: "play/index.html" },
-];
+const sourceEntryPages = sitePages.filter(({ kind }) => kind === "source");
 
-const documentPages = [
-  {
-    source: "PROJECT_CHARTER.md",
-    output: "charter/index.html",
-    description: "The protected commitments governing The Horizontal Front.",
-  },
-  {
-    source: "GOVERNANCE.md",
-    output: "governance/index.html",
-    description: "How decisions, participation and stewardship work.",
-  },
-  {
-    source: "IDENTITY.md",
-    output: "identity/index.html",
-    description: "A commons-oriented approach to canonical project identity.",
-  },
-  {
-    source: "CONTRIBUTING.md",
-    output: "contribute/index.html",
-    description: "How to contribute while preserving the project charter.",
-  },
-  {
-    source: "ROADMAP.md",
-    output: "roadmap/index.html",
-    description: "What the project intends to do next, and what help is wanted.",
-  },
-  {
-    source: "LICENSE.md",
-    output: "licences/index.html",
-    description: "How the software and cultural work are licensed.",
-  },
-];
+const documentPages = sitePages.filter(({ kind }) => kind === "document");
 
-const licencePages = [
-  {
-    source: "LICENSES/AGPL-3.0-or-later.txt",
-    output: "licences/agpl/index.html",
-    title: "GNU Affero General Public License",
-    description: "The complete AGPL version 3 licence text for project software.",
-  },
-  {
-    source: "LICENSES/CC-BY-SA-4.0.txt",
-    output: "licences/cc-by-sa/index.html",
-    title: "Creative Commons Attribution-ShareAlike 4.0",
-    description: "The complete CC BY-SA 4.0 licence text for cultural work.",
-  },
-];
+const licencePages = sitePages.filter(({ kind }) => kind === "licence");
 
-const internalLinks = new Map([
-  ["PROJECT_CHARTER.md", "/charter/"],
-  ["GOVERNANCE.md", "/governance/"],
-  ["IDENTITY.md", "/identity/"],
-  ["CONTRIBUTING.md", "/contribute/"],
-  ["ROADMAP.md", "/roadmap/"],
-  ["LICENSE.md", "/licences/"],
-  ["LICENSES/AGPL-3.0-or-later.txt", "/licences/agpl/"],
-  ["LICENSES/CC-BY-SA-4.0.txt", "/licences/cc-by-sa/"],
-]);
+const internalLinks = internalLinkTargets;
+
+/**
+ * Both navigations are rendered from the page list, so publishing a page and
+ * forgetting to link it cannot happen. `/roadmap/` was published without a
+ * link from anywhere in the chrome, which is how this was noticed.
+ */
+function navigationLinks(pages, currentRoute) {
+  return pages
+    .map(({ route, nav }) => {
+      const current = route === currentRoute ? ' aria-current="page"' : "";
+      return `<a href="${route}"${current}>${nav.label}</a>`;
+    })
+    .join("\n        ");
+}
+
+/**
+ * Authored entry pages carry the same chrome as generated ones, so they take
+ * their navigation from the same list rather than each keeping a copy.
+ */
+function fillNavigation(page, html) {
+  const { route, documentShell } = page;
+
+  // A page carrying the site chrome must ask for both navigations. Checking
+  // only for leftover markers would let an authored page omit them entirely
+  // and build with no navigation at all, which is the quieter mistake.
+  if (documentShell !== false) {
+    const missing = ["PRIMARY_NAVIGATION", "FOOTER_NAVIGATION"]
+      .filter((marker) => !html.includes(`<!--${marker}-->`));
+    if (missing.length > 0) {
+      throw new Error(
+        `${page.source} is a document-shell page but has no `
+          + `${missing.join(" or ")} placeholder. Add it, or mark the page `
+          + "documentShell: false in scripts/site-pages.mjs.",
+      );
+    }
+  }
+
+  return html
+    .replace("<!--PRIMARY_NAVIGATION-->", navigationLinks(primaryNavigation, route))
+    .replace("<!--FOOTER_NAVIGATION-->", navigationLinks(footerNavigation, route));
+}
 
 const repositoryLink = `<a class="repository-link" href="https://github.com/glowkeeper/the-horizontal-front" aria-label="The Horizontal Front repository on GitHub"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3.3-.4 6.8-1.6 6.8-7A5.4 5.4 0 0 0 19.4 4 5 5 0 0 0 19.3.5S18.2.1 15 1.8a13.4 13.4 0 0 0-7 0C4.8.1 3.7.5 3.7.5A5 5 0 0 0 3.6 4a5.4 5.4 0 0 0-1.4 3.7c0 5.4 3.5 6.6 6.8 7A4.8 4.8 0 0 0 8 18v4"/><path d="M8 19c-3 .9-3-1.5-4-2"/></svg><span>GitHub</span></a>`;
 
@@ -152,10 +142,7 @@ function pageTemplate({
     <header class="site-header">
       <a class="site-name" href="/">The Horizontal Front</a>
       <nav aria-label="Primary navigation">
-        <a href="/">Home</a>
-        <a href="/play/">Play</a>
-        <a href="/commons/">The Commons</a>
-        <a href="/sound/">Sound</a>
+        ${navigationLinks(primaryNavigation)}
         ${repositoryLink}
       </nav>
     </header>
@@ -168,11 +155,7 @@ function pageTemplate({
     <footer class="site-footer">
       <p class="footer-mark">Free to play. No ads. No tracking. No purchases<img src="/assets/mark.svg" alt="" width="20" height="20" /></p>
       <nav aria-label="Project information">
-        <a href="/charter/">Charter</a>
-        <a href="/governance/">Governance</a>
-        <a href="/identity/">Identity</a>
-        <a href="/contribute/">Contribute</a>
-        <a href="/licences/">Licences</a>
+        ${navigationLinks(footerNavigation)}
         ${repositoryLink}
       </nav>
     </footer>
@@ -242,7 +225,7 @@ async function writePage(output, html, { canonical = true } = {}) {
 
 for (const page of sourceEntryPages) {
   const html = await readFile(join(projectRoot, page.source), "utf8");
-  await writePage(page.output, html);
+  await writePage(page.output, fillNavigation(page, html));
 }
 
 for (const page of documentPages) {

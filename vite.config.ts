@@ -3,6 +3,8 @@ import { resolve } from "node:path";
 
 import { defineConfig } from "vite";
 
+import { sitePages } from "./scripts/site-pages.mjs";
+
 const page = (path: string): string => resolve(import.meta.dirname, path);
 const game = JSON.parse(readFileSync(page("src/play/content/game.json"), "utf8"));
 
@@ -38,21 +40,12 @@ export default defineConfig({
   }],
   build: {
     rolldownOptions: {
-      input: {
-        home: page("index.html"),
-        notFound: page("404.html"),
-        play: page("play/index.html"),
-        commons: page("commons/index.html"),
-        sound: page("sound/index.html"),
-        charter: page("charter/index.html"),
-        governance: page("governance/index.html"),
-        identity: page("identity/index.html"),
-        contribute: page("contribute/index.html"),
-        roadmap: page("roadmap/index.html"),
-        licences: page("licences/index.html"),
-        "licences/agpl": page("licences/agpl/index.html"),
-        "licences/cc-by-sa": page("licences/cc-by-sa/index.html"),
-      },
+      // Derived from scripts/site-pages.mjs. A page missing from this map is
+      // simply not built, and nothing else notices, so it must not be a second
+      // hand-maintained list.
+      input: Object.fromEntries(
+        sitePages.map(({ entry, output }) => [entry, page(output)]),
+      ),
     },
   },
 });
