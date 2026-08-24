@@ -44,17 +44,27 @@ function navigationLinks(pages, currentRoute) {
  * Authored entry pages carry the same chrome as generated ones, so they take
  * their navigation from the same list rather than each keeping a copy.
  */
-function fillNavigation(html, currentRoute) {
-  const filled = html
-    .replace("<!--PRIMARY_NAVIGATION-->",
-      navigationLinks(primaryNavigation, currentRoute))
-    .replace("<!--FOOTER_NAVIGATION-->",
-      navigationLinks(footerNavigation, currentRoute));
-  if (filled.includes("<!--PRIMARY_NAVIGATION-->")
-    || filled.includes("<!--FOOTER_NAVIGATION-->")) {
-    throw new Error(`Navigation placeholders remain unfilled in ${currentRoute}.`);
+function fillNavigation(page, html) {
+  const { route, documentShell } = page;
+
+  // A page carrying the site chrome must ask for both navigations. Checking
+  // only for leftover markers would let an authored page omit them entirely
+  // and build with no navigation at all, which is the quieter mistake.
+  if (documentShell !== false) {
+    const missing = ["PRIMARY_NAVIGATION", "FOOTER_NAVIGATION"]
+      .filter((marker) => !html.includes(`<!--${marker}-->`));
+    if (missing.length > 0) {
+      throw new Error(
+        `${page.source} is a document-shell page but has no `
+          + `${missing.join(" or ")} placeholder. Add it, or mark the page `
+          + "documentShell: false in scripts/site-pages.mjs.",
+      );
+    }
   }
-  return filled;
+
+  return html
+    .replace("<!--PRIMARY_NAVIGATION-->", navigationLinks(primaryNavigation, route))
+    .replace("<!--FOOTER_NAVIGATION-->", navigationLinks(footerNavigation, route));
 }
 
 const repositoryLink = `<a class="repository-link" href="https://github.com/glowkeeper/the-horizontal-front" aria-label="The Horizontal Front repository on GitHub"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3.3-.4 6.8-1.6 6.8-7A5.4 5.4 0 0 0 19.4 4 5 5 0 0 0 19.3.5S18.2.1 15 1.8a13.4 13.4 0 0 0-7 0C4.8.1 3.7.5 3.7.5A5 5 0 0 0 3.6 4a5.4 5.4 0 0 0-1.4 3.7c0 5.4 3.5 6.6 6.8 7A4.8 4.8 0 0 0 8 18v4"/><path d="M8 19c-3 .9-3-1.5-4-2"/></svg><span>GitHub</span></a>`;
@@ -215,7 +225,7 @@ async function writePage(output, html, { canonical = true } = {}) {
 
 for (const page of sourceEntryPages) {
   const html = await readFile(join(projectRoot, page.source), "utf8");
-  await writePage(page.output, fillNavigation(html, page.route));
+  await writePage(page.output, fillNavigation(page, html));
 }
 
 for (const page of documentPages) {

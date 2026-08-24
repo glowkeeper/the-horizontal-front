@@ -349,7 +349,8 @@ test("every internal link points at a page that exists", async ({ page }) => {
   const published = new Set(canonicalPages.map(({ route }) => route));
   const offSite: string[] = [];
 
-  for (const path of [...published].filter((entry) => entry !== "/play/")) {
+  // The game page carries its own chrome, marked documentShell: false.
+  for (const { route: path } of documentShellPages) {
     await page.goto(path);
     const hrefs = await page.$$eval(
       "a[href]",

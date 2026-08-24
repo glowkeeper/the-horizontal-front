@@ -129,9 +129,6 @@ export const sitePages = [
     source: "LICENSES/AGPL-3.0-or-later.txt",
     title: "GNU Affero General Public License",
     description: "The complete AGPL version 3 licence text for project software.",
-    // Reached from /licences/ rather than the primary navigation, and not
-    // given a clean route alias in the offline cache.
-    cleanRoute: false,
   },
   {
     route: "/licences/cc-by-sa/",
@@ -141,19 +138,47 @@ export const sitePages = [
     source: "LICENSES/CC-BY-SA-4.0.txt",
     title: "Creative Commons Attribution-ShareAlike 4.0",
     description: "The complete CC BY-SA 4.0 licence text for cultural work.",
-    cleanRoute: false,
   },
 ];
+
+/**
+ * A page's output path is its route, so the two cannot disagree.
+ *
+ * Navigation and the browser suite use `route`; Vite, the sitemap and the
+ * canonical checks use `output`. Renaming one and not the other would publish
+ * the old file and point the navigation at a route with nothing behind it,
+ * with nothing to notice.
+ */
+function outputFor(route) {
+  if (route === "/") return "index.html";
+  if (route.endsWith("/")) return `${route.slice(1)}index.html`;
+  return route.slice(1);
+}
+
+for (const { route, output } of sitePages) {
+  const expected = outputFor(route);
+  if (output !== expected) {
+    throw new Error(
+      `Site page ${route} declares output "${output}" but its route implies `
+        + `"${expected}". Change both, or neither.`,
+    );
+  }
+}
 
 /** Pages that belong in the sitemap, the crawler files and the route set. */
 export const canonicalPages = sitePages.filter(
   ({ canonical }) => canonical !== false,
 );
 
-/** Pages whose clean route must be answerable from the offline cache. */
-export const cleanRoutePages = canonicalPages.filter(
-  ({ cleanRoute }) => cleanRoute !== false,
-);
+/**
+ * Pages whose clean route must be answerable from the offline cache.
+ *
+ * Every canonical page, because the finaliser aliases each built `index.html`
+ * to its clean route. This previously carried a `cleanRoute: false` flag for
+ * the two licence texts, which described an assertion list rather than the
+ * build — they are cached like everything else, so the check now covers them.
+ */
+export const cleanRoutePages = canonicalPages;
 
 /** Pages rendered into the shared site shell, so they carry its chrome. */
 export const documentShellPages = canonicalPages.filter(
