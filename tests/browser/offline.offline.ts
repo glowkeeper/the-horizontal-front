@@ -40,7 +40,13 @@ async function precachedUrls(
  * same way, and the second is what a player on a train actually experiences.
  */
 test("plays with the origin gone", async ({ page, context, request, baseURL }) => {
-  const expected = await precachedUrls(request, baseURL ?? "");
+  // Configured in playwright.offline.config.ts. Defaulting it would turn a
+  // misconfigured run into confusing request failures instead of this line.
+  if (baseURL === undefined) {
+    throw new Error("The offline suite requires a baseURL to be configured.");
+  }
+
+  const expected = await precachedUrls(request, baseURL);
 
   await page.goto("/play/");
   await page.evaluate(() => navigator.serviceWorker.ready);
@@ -54,8 +60,12 @@ test("plays with the origin gone", async ({ page, context, request, baseURL }) =
         const names = await caches.keys();
         if (names.length === 0) return -1;
         const cache = await caches.open(names[0]);
+        // `ignoreVary` matches the service worker's own lookup. Static hosts
+        // attach a Vary header, and querying more strictly here than the code
+        // being verified would report misses for entries it would serve.
         const matches = await Promise.all(
-          urls.map(async (url) => Boolean(await cache.match(url))),
+          urls.map(async (url) =>
+            Boolean(await cache.match(url, { ignoreVary: true }))),
         );
         return matches.filter(Boolean).length;
       }, expected),
