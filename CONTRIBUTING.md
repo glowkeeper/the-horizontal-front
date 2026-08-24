@@ -68,7 +68,16 @@ than replacing it. Beyond the template, a useful pull request here:
   changed;
 - reports verification as [verification](#verification) below requires; and
 - says when a decision was settled in discussion rather than derived from the
-  documents, so the reasoning survives the merge.
+  documents, so the reasoning survives the merge; and
+- names the document it updated, when it changes a schema, an engine type, a
+  validated vocabulary or a validation rule.
+
+That last one exists because prose about code goes stale silently. Some of it
+is now checked — the grammar reference generates the passages that restate a
+schema, and a documented identifier must exist in the source — but no check
+knows whether a described *behaviour* is still true. Saying which document
+states the rule you changed is how that gets noticed by a reader, which is the
+only thing that can notice it.
 
 ## Charter check
 

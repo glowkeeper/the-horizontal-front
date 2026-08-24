@@ -65,6 +65,7 @@ preceding beat. It is what makes the score playable by ear.
 
 Each phase authors:
 
+<!-- generated:phase-fields -->
 | Field | Meaning |
 | --- | --- |
 | `id` | Author-facing phase name. It has no special engine behaviour. |
@@ -80,6 +81,7 @@ Each phase authors:
 | `resistanceLossPerMiss` | Persistent resistance lost by a miss, from 0 to 1. |
 | `resistanceRecoveryBonus` | Recovery multiplier supplied by accumulated resistance. |
 | `presentationIntensity` | `from` and `to`, each from 0 to 1. |
+<!-- /generated:phase-fields -->
 
 `confrontation.resistance.dramaticCurve` selects the curve to compile.
 
@@ -214,14 +216,16 @@ audio production rules in `AGENTS.md`.
 
 ### Roles
 
+<!-- generated:audio-roles -->
 A soundscape maps every one of the twenty-three semantic roles to a cue:
-`count-in`, `beat`, `downbeat`, `cue-approach-left`, `cue-approach-right`,
-`cue-due-left`, `cue-due-right`, `tap-hit`, `tap-miss`,
+`count-in`, `beat`, `downbeat`, `cue-due-left`, `cue-due-right`,
+`cue-approach-left`, `cue-approach-right`, `tap-hit`, `tap-miss`,
 `resistance-strain`, `resistance-ease`, `hold-start`, `hold-release`,
 `hold-broken`, `interruption-warning`, `interruption-input`,
 `interruption-success`, `interruption-failure`, `interruption-return`,
 `opposing-actor-voice`, `outcome-success`, `outcome-failure` and
 `interface-action`.
+<!-- /generated:audio-roles -->
 
 The engine names outcomes `success` and `failure`, not the fiction an episode
 dresses them in. Being forced upright is how The Alarm loses; another episode
@@ -230,7 +234,7 @@ The same holds for the antagonist: the recurring role is Management today, but a
 CEO, a colleague or a whole department could oppose a later episode's player, so
 the grammar says opposing actor and content says who.
 
-All twenty-three are required. A moment meant to pass quietly is authored as a
+All of them are required. A moment meant to pass quietly is authored as a
 quiet cue rather than left out, so silence is always a decision on record.
 Adding a role is an engine change; deciding what a role sounds like is content.
 
