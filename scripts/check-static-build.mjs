@@ -24,6 +24,7 @@ const requiredPages = [
   "governance/index.html",
   "identity/index.html",
   "contribute/index.html",
+  "roadmap/index.html",
   "licences/index.html",
   "licences/agpl/index.html",
   "licences/cc-by-sa/index.html",
@@ -83,7 +84,7 @@ for (const page of requiredPages) {
     throw new Error(`The offline cache does not include /${page}.`);
   }
 }
-for (const route of ["/", "/play/", "/commons/", "/sound/", "/charter/", "/governance/", "/identity/", "/contribute/", "/licences/"]) {
+for (const route of ["/", "/play/", "/commons/", "/sound/", "/charter/", "/governance/", "/identity/", "/contribute/", "/roadmap/", "/licences/"]) {
   if (!serviceWorker.includes(`"${route}"`)) {
     throw new Error(`The offline cache does not include the clean route ${route}.`);
   }

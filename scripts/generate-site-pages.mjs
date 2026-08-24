@@ -40,6 +40,11 @@ const documentPages = [
     description: "How to contribute while preserving the project charter.",
   },
   {
+    source: "ROADMAP.md",
+    output: "roadmap/index.html",
+    description: "What the project intends to do next, and what help is wanted.",
+  },
+  {
     source: "LICENSE.md",
     output: "licences/index.html",
     description: "How the software and cultural work are licensed.",
@@ -66,6 +71,7 @@ const internalLinks = new Map([
   ["GOVERNANCE.md", "/governance/"],
   ["IDENTITY.md", "/identity/"],
   ["CONTRIBUTING.md", "/contribute/"],
+  ["ROADMAP.md", "/roadmap/"],
   ["LICENSE.md", "/licences/"],
   ["LICENSES/AGPL-3.0-or-later.txt", "/licences/agpl/"],
   ["LICENSES/CC-BY-SA-4.0.txt", "/licences/cc-by-sa/"],

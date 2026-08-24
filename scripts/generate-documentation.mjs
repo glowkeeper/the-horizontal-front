@@ -21,10 +21,12 @@ import { createServer } from "vite";
 
 import { phaseFieldMeanings } from "./doc-data/phase-field-meanings.mjs";
 import { protectMainRuleset } from "./doc-data/protect-main-ruleset.mjs";
+import { roadmap } from "./doc-data/roadmap.mjs";
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const referencePath = join(projectRoot, "docs/episode-grammar-reference.md");
 const releasePath = join(projectRoot, "docs/release-process.md");
+const roadmapPath = join(projectRoot, "ROADMAP.md");
 const check = process.argv.includes("--check");
 
 const numberWords = [
@@ -127,6 +129,34 @@ function renderProtectMain() {
   ].join("\n");
 }
 
+const issueUrl = (number) =>
+  `https://github.com/glowkeeper/the-horizontal-front/issues/${number}`;
+
+function renderRoadmap() {
+  const sections = [];
+  for (const tranche of roadmap.tranches) {
+    sections.push(
+      `### [${tranche.title}](${issueUrl(tranche.issue)})`,
+      "",
+      `**${tranche.commitment[0].toUpperCase()}${tranche.commitment.slice(1)}.** `
+        + tranche.summary,
+      "",
+      wrap(`*Help wanted:* ${tranche.help}`),
+      "",
+      ...tranche.children.map(([number, title]) =>
+        `- [#${number} ${title}](${issueUrl(number)})`),
+      "",
+    );
+  }
+  sections.push(
+    "### Separate from the tranches",
+    "",
+    ...roadmap.separate.map(([number, title]) =>
+      `- [#${number} ${title}](${issueUrl(number)})`),
+  );
+  return sections.join("\n");
+}
+
 const server = await createServer({
   server: { middlewareMode: true },
   appType: "custom",
@@ -162,6 +192,11 @@ const documents = [
     label: "docs/release-process.md",
     regions: [["protect-main", renderProtectMain()]],
   },
+  {
+    path: roadmapPath,
+    label: "ROADMAP.md",
+    regions: [["roadmap", renderRoadmap()]],
+  },
 ];
 
 const stale = [];
@@ -180,7 +215,8 @@ if (stale.length === 0) {
   console.log(
     `Generated documentation is up to date: ${audioRoles.length} audio roles, `
       + `${phaseFields.length} phase fields, `
-      + `${protectMainRuleset.requiredStatusChecks.length} required checks.`,
+      + `${protectMainRuleset.requiredStatusChecks.length} required checks, `
+      + `${roadmap.tranches.length} roadmap tranches.`,
   );
 } else if (check) {
   console.error(
