@@ -28,5 +28,6 @@ reason. Do not infer a higher level from a lower one.
 - [ ] This change does not misuse the official project identity or restrict good-faith forks, criticism or cultural participation.
 - [ ] This change does not weaken community accountability or anti-enclosure protections.
 - [ ] I have identified any material product, architecture, funding or governance decision in the linked issue.
+- [ ] If this changes a schema, engine type, validated vocabulary or validation rule, I have named the document that states it.
 
 If an item is not applicable, explain why rather than leaving it unchecked.

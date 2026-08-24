@@ -162,20 +162,28 @@ Before publication:
 Changes reach `main` only through a pull request. The `Protect main` ruleset
 enforces this, and the publication sequence below depends on it:
 
-- A pull request is required; `main` cannot be pushed to directly, deleted or
-  force-pushed.
-- Squash is the only permitted merge method, and history on `main` stays
-  linear.
-- Review threads must be resolved before merge, but no approving review is
-  required. The status checks, rather than a reviewer, are what gate a merge
-  in practice. Changes GitHub cannot attribute to a known author do require
-  an extra approval.
-- Three status checks must pass: `Verify`, `Browser smoke tests` and
-  `Offline play`.
-- A branch must be up to date with `main` before it can merge, so those checks
-  are evaluated against the state the merge will produce rather than against a
-  stale base.
+<!-- generated:protect-main -->
+| Rule | Setting |
+| --- | --- |
+| Pull request required | yes |
+| Direct push to the branch | refused |
+| Branch deletion | refused |
+| Force push | refused |
+| Permitted merge methods | squash only |
+| Linear history | required |
+| Review threads resolved before merge | required |
+| Approving reviews required | none |
+| Extra approval for changes GitHub cannot attribute | required |
+| Branch up to date with the base before merge | required |
+| Status checks that must pass | `Verify`, `Browser smoke tests`, `Offline play` |
+<!-- /generated:protect-main -->
 
+This table is generated from the project's record of the ruleset, and
+`npm run check:ruleset` compares that record against what GitHub actually
+enforces. A ruleset edited in the web interface and not recorded here fails
+that check rather than leaving this page quietly wrong.
+
+The status checks, rather than a reviewer, are what gate a merge in practice.
 `Verify` covers unit tests, type checking, content validation and the build.
 The other two cover what a release actually claims to a player: that the game
 is playable by keyboard, pointer and touch, and that it still plays with the

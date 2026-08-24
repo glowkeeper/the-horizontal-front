@@ -20,9 +20,11 @@ import { fileURLToPath } from "node:url";
 import { createServer } from "vite";
 
 import { phaseFieldMeanings } from "./doc-data/phase-field-meanings.mjs";
+import { protectMainRuleset } from "./doc-data/protect-main-ruleset.mjs";
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const referencePath = join(projectRoot, "docs/episode-grammar-reference.md");
+const releasePath = join(projectRoot, "docs/release-process.md");
 const check = process.argv.includes("--check");
 
 const numberWords = [
@@ -99,18 +101,30 @@ function renderPhaseFields(fields) {
   ].join("\n");
 }
 
-function replaceRegion(markdown, name, body) {
+function replaceRegion(markdown, name, body, label) {
   const open = `<!-- generated:${name} -->`;
   const close = `<!-- /generated:${name} -->`;
   const pattern = new RegExp(
     `${open}\\n[\\s\\S]*?\\n${close}`,
   );
   if (!pattern.test(markdown)) {
-    throw new Error(
-      `docs/episode-grammar-reference.md has no ${open} … ${close} region.`,
-    );
+    throw new Error(`${label} has no ${open} … ${close} region.`);
   }
   return markdown.replace(pattern, `${open}\n${body}\n${close}`);
+}
+
+function renderProtectMain() {
+  const checks = protectMainRuleset.requiredStatusChecks
+    .map((check) => `\`${check}\``);
+  const rows = [
+    ...protectMainRuleset.rules.map(([rule, setting]) => [rule, setting]),
+    ["Status checks that must pass", checks.join(", ")],
+  ];
+  return [
+    "| Rule | Setting |",
+    "| --- | --- |",
+    ...rows.map(([rule, setting]) => `| ${rule} | ${setting} |`),
+  ].join("\n");
 }
 
 const server = await createServer({
@@ -137,27 +151,47 @@ try {
   await server.close();
 }
 
-const original = await readFile(referencePath, "utf8");
-let generated = replaceRegion(original, "audio-roles", renderAudioRoles(audioRoles));
-generated = replaceRegion(generated, "phase-fields", renderPhaseFields(phaseFields));
+const documents = [
+  {
+    path: referencePath,
+    label: "docs/episode-grammar-reference.md",
+    regions: [
+      ["audio-roles", renderAudioRoles(audioRoles)],
+      ["phase-fields", renderPhaseFields(phaseFields)],
+    ],
+  },
+  {
+    path: releasePath,
+    label: "docs/release-process.md",
+    regions: [["protect-main", renderProtectMain()]],
+  },
+];
 
-if (generated === original) {
+const stale = [];
+for (const { path, label, regions } of documents) {
+  const original = await readFile(path, "utf8");
+  let generated = original;
+  for (const [name, body] of regions) {
+    generated = replaceRegion(generated, name, body, label);
+  }
+  if (generated === original) continue;
+  if (check) stale.push(label);
+  else await writeFile(path, generated);
+}
+
+if (stale.length === 0) {
   console.log(
     `Generated documentation is up to date: ${audioRoles.length} audio roles, `
-      + `${phaseFields.length} phase fields.`,
+      + `${phaseFields.length} phase fields, `
+      + `${protectMainRuleset.requiredStatusChecks.length} required checks.`,
   );
 } else if (check) {
   console.error(
-    "Generated documentation is out of date.\n"
-      + "docs/episode-grammar-reference.md no longer matches the schemas it "
-      + "restates.\n"
+    `Generated documentation is out of date: ${stale.join(", ")}.\n`
+      + "These no longer match the definitions they restate.\n"
       + "Run: npm run generate:docs",
   );
   process.exitCode = 1;
 } else {
-  await writeFile(referencePath, generated);
-  console.log(
-    `Regenerated docs/episode-grammar-reference.md: ${audioRoles.length} `
-      + `audio roles, ${phaseFields.length} phase fields.`,
-  );
+  console.log(`Regenerated: ${documents.map(({ label }) => label).join(", ")}.`);
 }

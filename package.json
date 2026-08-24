@@ -12,6 +12,7 @@
     "check:docs": "node scripts/check-documentation.mjs",
     "check:generated": "node scripts/generate-documentation.mjs --check",
     "check:policy": "node scripts/check-project-policy.mjs",
+    "check:ruleset": "node scripts/check-ruleset.mjs",
     "check:production": "node scripts/check-production-readiness.mjs",
     "check:static": "node scripts/check-static-build.mjs",
     "dev": "npm run generate:site && vite",
