@@ -105,12 +105,13 @@ jobs:
           include-hidden-files: true
           retention-days: 7
 
-  # Documentation about the ruleset cannot be checked from the repository
-  # alone, so this asks GitHub what it actually enforces. Kept out of `Verify`
-  # because the ordinary build must work without a network; kept unrequired
-  # because a branch protection that blocks its own repair is a trap.
+  # Some documentation describes things the repository cannot see: the ruleset
+  # GitHub enforces, and the issues the public roadmap names. Both are checked
+  # by asking GitHub. Kept out of `Verify` because the ordinary build must work
+  # without a network; kept unrequired because a branch protection that blocks
+  # its own repair is a trap.
   ruleset:
-    name: Ruleset matches documentation
+    name: Documentation matches GitHub
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
@@ -125,3 +126,6 @@ jobs:
 
       - name: Compare the documented ruleset against the live one
         run: node scripts/check-ruleset.mjs
+
+      - name: Compare the published roadmap against the issues it names
+        run: node scripts/check-roadmap.mjs

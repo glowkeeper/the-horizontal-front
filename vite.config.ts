@@ -48,6 +48,7 @@ export default defineConfig({
         governance: page("governance/index.html"),
         identity: page("identity/index.html"),
         contribute: page("contribute/index.html"),
+        roadmap: page("roadmap/index.html"),
         licences: page("licences/index.html"),
         "licences/agpl": page("licences/agpl/index.html"),
         "licences/cc-by-sa": page("licences/cc-by-sa/index.html"),

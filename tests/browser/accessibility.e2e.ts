@@ -70,7 +70,8 @@ test("every page offers the same way home", async ({ page }) => {
   // so it cannot be the only route back. Each page carries an explicit one.
   for (const path of [
     "/", "/commons/", "/sound/",
-    "/charter/", "/governance/", "/identity/", "/contribute/", "/licences/",
+    "/charter/", "/governance/", "/identity/", "/contribute/", "/roadmap/",
+    "/licences/",
   ]) {
     await page.goto(path);
     const primary = page.getByRole("navigation", { name: "Primary navigation" });
@@ -311,8 +312,8 @@ test("every page shares one content column", async ({ page }) => {
   // long text readable without the page looking broken.
   for (const path of [
     "/", "/commons/", "/sound/",
-    "/charter/", "/governance/", "/identity/", "/contribute/", "/licences/",
-    "/licences/agpl/", "/licences/cc-by-sa/",
+    "/charter/", "/governance/", "/identity/", "/contribute/", "/roadmap/",
+    "/licences/", "/licences/agpl/", "/licences/cc-by-sa/",
   ]) {
     await page.goto(path);
     const geometry = await page.evaluate(() => {
@@ -350,7 +351,7 @@ test("every internal link points at a page that exists", async ({ page }) => {
   // GitHub as an absolute URL.
   const published = new Set([
     "/", "/play/", "/commons/", "/sound/",
-    "/charter/", "/governance/", "/identity/", "/contribute/",
+    "/charter/", "/governance/", "/identity/", "/contribute/", "/roadmap/",
     "/licences/", "/licences/agpl/", "/licences/cc-by-sa/",
   ]);
   const offSite: string[] = [];
