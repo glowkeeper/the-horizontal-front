@@ -571,7 +571,8 @@ describe("presentation content", () => {
           creator: "Test",
           edits: [],
           licence: "CC-BY-SA-4.0",
-          replacementStatus: "Replace",
+          replacement: "none",
+          replacementNotes: "Replace",
         },
         {
           id: "sleeper-head",
@@ -581,7 +582,8 @@ describe("presentation content", () => {
           creator: "Test",
           edits: [],
           licence: "CC-BY-SA-4.0",
-          replacementStatus: "Replace",
+          replacement: "none",
+          replacementNotes: "Replace",
         },
       ],
     })).toThrow(/asset ids must be unique/);
