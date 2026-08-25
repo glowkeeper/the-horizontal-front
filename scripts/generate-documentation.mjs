@@ -22,10 +22,13 @@ import { createServer } from "vite";
 import { phaseFieldMeanings } from "./doc-data/phase-field-meanings.mjs";
 import { protectMainRuleset } from "./doc-data/protect-main-ruleset.mjs";
 import { roadmap } from "./doc-data/roadmap.mjs";
+import { readReleaseRecords } from "./release-records.mjs";
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const referencePath = join(projectRoot, "docs/episode-grammar-reference.md");
 const releasePath = join(projectRoot, "docs/release-process.md");
+const releasesDirectory = join(projectRoot, "docs/releases");
+const releasesPath = join(releasesDirectory, "README.md");
 const roadmapPath = join(projectRoot, "ROADMAP.md");
 const check = process.argv.includes("--check");
 
@@ -129,6 +132,33 @@ function renderProtectMain() {
   ].join("\n");
 }
 
+/**
+ * The published list, ordered by parsed version.
+ *
+ * Drafts are absent by design: the heading says published, and a record marked
+ * `draft` describes a version nobody can play yet. Its own header block is
+ * where that state is recorded, not this index.
+ */
+function renderReleases(records) {
+  const published = records.filter((record) => record.lifecycle !== "draft");
+  if (published.length === 0) {
+    throw new Error("No published release records under docs/releases/.");
+  }
+  return published
+    .map((record) => {
+      const withdrawn = record.lifecycle === "withdrawn"
+        ? "**Withdrawn.** "
+        : "";
+      const entry = `- [${record.name}](${record.name}.md) — ${record.date}, `
+        + `${record.release}. ${withdrawn}${record.summary}`;
+      return wrap(entry, 76)
+        .split("\n")
+        .map((line, index) => (index === 0 ? line : `  ${line}`))
+        .join("\n");
+    })
+    .join("\n");
+}
+
 const issueUrl = (number) =>
   `https://github.com/glowkeeper/the-horizontal-front/issues/${number}`;
 
@@ -155,6 +185,22 @@ function renderRoadmap() {
       `- [#${number} ${title}](${issueUrl(number)})`),
   );
   return sections.join("\n");
+}
+
+/**
+ * A broken record must stop the generator rather than be rendered.
+ *
+ * `npm run check:docs` reports these faults properly; reaching them here means
+ * the generator was run first, and generating a published list from a record
+ * whose claims do not parse would put the fault on the page.
+ */
+const { records: releaseRecords, problems: releaseProblems } =
+  await readReleaseRecords(releasesDirectory);
+if (releaseProblems.length > 0) {
+  throw new Error(
+    "Release records are not valid, so the published list cannot be "
+      + `generated:\n${releaseProblems.map((p) => `  ${p}`).join("\n")}`,
+  );
 }
 
 const server = await createServer({
@@ -193,6 +239,11 @@ const documents = [
     regions: [["protect-main", renderProtectMain()]],
   },
   {
+    path: releasesPath,
+    label: "docs/releases/README.md",
+    regions: [["releases", renderReleases(releaseRecords)]],
+  },
+  {
     path: roadmapPath,
     label: "ROADMAP.md",
     regions: [["roadmap", renderRoadmap()]],
@@ -216,7 +267,8 @@ if (stale.length === 0) {
     `Generated documentation is up to date: ${audioRoles.length} audio roles, `
       + `${phaseFields.length} phase fields, `
       + `${protectMainRuleset.requiredStatusChecks.length} required checks, `
-      + `${roadmap.tranches.length} roadmap tranches.`,
+      + `${roadmap.tranches.length} roadmap tranches, `
+      + `${releaseRecords.length} release records.`,
   );
 } else if (check) {
   console.error(
