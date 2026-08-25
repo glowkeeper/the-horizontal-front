@@ -117,10 +117,18 @@ function headingAnchors(markdown) {
   return anchors;
 }
 
+/*
+ * `.github/` is included because the pull-request template and the agent
+ * skills under `.github/skills/` point at the authority documents by path. A
+ * skill naming a document that has moved is a dead pointer in the one file
+ * nobody thinks to audit, which is the failure the skill itself exists to
+ * describe.
+ */
 const rootMarkdown = (await listMarkdownFiles(projectRoot, false));
 const documentationFiles = [
   ...rootMarkdown,
   ...await listMarkdownFiles(documentationRoot),
+  ...await listMarkdownFiles(join(projectRoot, ".github")),
 ];
 const failures = [];
 
