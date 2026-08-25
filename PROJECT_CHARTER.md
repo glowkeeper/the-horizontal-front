@@ -2,7 +2,7 @@
 
 ## Purpose
 
-> **The Horizontal Front is a free, open-source game about collective power, mutual aid, and resistance to hierarchical systems. It is developed as a digital commons: freely accessible, community-supported, and accountable to its players rather than investors or advertisers.**
+> **The Horizontal Front is a free, open-source game satirising capitalism. It is developed as a digital commons: freely accessible, community-supported, and accountable to its players and contributors.**
 
 This charter is the project's social contract. It governs the canonical project at `thehorizontalfront.org`, including its official repository, releases, name, community spaces, funding and other project-controlled assets.
 
@@ -44,3 +44,21 @@ The scope, attribution rules and full licence texts are recorded in the [licensi
 ## Status and precedence
 
 This charter takes precedence over roadmaps, contribution proposals, funding arrangements and ordinary project documentation. `AGENTS.md` translates it into operational instructions for automated assistants; it cannot weaken this charter.
+
+## Amendment record
+
+Amendments to this charter are recorded here, so that a reader of the published
+charter can see what changed and why without reading the repository's history.
+Protected commitments are not amendable except to strengthen them; entries here
+concern the surrounding wording.
+
+**2026-08-25 — the purpose statement.** It previously described the game as
+being "about collective power, mutual aid, and resistance to hierarchical
+systems". The Alarm is one person, alone, in a bed: it has neither a collective
+nor mutual aid, mechanically or narratively, so the charter asserted something
+the project had not built. The replacement describes the game by what it
+satirises. The clause naming investors and advertisers was removed as a
+paraphrase of commitment 4, which states the same refusal more completely and
+remains binding; commitments 1, 4 and 10 are unchanged, and nothing enforceable
+was lost. Reasoning in
+[#72](https://github.com/glowkeeper/the-horizontal-front/issues/72).

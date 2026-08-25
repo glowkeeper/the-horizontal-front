@@ -30,6 +30,9 @@ const releasePath = join(projectRoot, "docs/release-process.md");
 const releasesDirectory = join(projectRoot, "docs/releases");
 const releasesPath = join(releasesDirectory, "README.md");
 const roadmapPath = join(projectRoot, "ROADMAP.md");
+const charterPath = join(projectRoot, "PROJECT_CHARTER.md");
+const readmePath = join(projectRoot, "README.md");
+const agentsPath = join(projectRoot, "AGENTS.md");
 const check = process.argv.includes("--check");
 
 const numberWords = [
@@ -159,6 +162,32 @@ function renderReleases(records) {
     .join("\n");
 }
 
+/**
+ * The charter's purpose statement, read from the charter.
+ *
+ * It stood in four places: the charter, `README.md`, `AGENTS.md` and the public
+ * home page. `AGENTS.md` had already drifted — a different comma and a reworded
+ * second half — which is exactly what `docs/technical-architecture.md` means
+ * when it says a governance document "must not be manually copied into a second
+ * set of public documents that can drift from the repository record".
+ *
+ * Two of those copies are now generated from the charter and cannot drift. The
+ * home page is prose rather than a quotation and still agrees by hand; making
+ * it generated would mean writing the paragraph around a fixed sentence, which
+ * would be a worse page for a weaker guarantee.
+ */
+function readCharterPurpose(charter) {
+  const match = /^## Purpose\n\n(> \*\*.+?\*\*)$/m.exec(charter);
+  if (match === null) {
+    throw new Error(
+      "PROJECT_CHARTER.md has no bold block-quoted purpose statement directly "
+        + "under its Purpose heading. README.md and AGENTS.md quote it from "
+        + "there, so its shape is load-bearing.",
+    );
+  }
+  return match[1];
+}
+
 const issueUrl = (number) =>
   `https://github.com/glowkeeper/the-horizontal-front/issues/${number}`;
 
@@ -202,6 +231,8 @@ if (releaseProblems.length > 0) {
       + `generated:\n${releaseProblems.map((p) => `  ${p}`).join("\n")}`,
   );
 }
+
+const charterPurpose = readCharterPurpose(await readFile(charterPath, "utf8"));
 
 const server = await createServer({
   server: { middlewareMode: true },
@@ -248,6 +279,16 @@ const documents = [
     label: "ROADMAP.md",
     regions: [["roadmap", renderRoadmap()]],
   },
+  {
+    path: readmePath,
+    label: "README.md",
+    regions: [["charter-purpose", charterPurpose]],
+  },
+  {
+    path: agentsPath,
+    label: "AGENTS.md",
+    regions: [["charter-purpose", charterPurpose]],
+  },
 ];
 
 const stale = [];
@@ -268,7 +309,8 @@ if (stale.length === 0) {
       + `${phaseFields.length} phase fields, `
       + `${protectMainRuleset.requiredStatusChecks.length} required checks, `
       + `${roadmap.tranches.length} roadmap tranches, `
-      + `${releaseRecords.length} release records.`,
+      + `${releaseRecords.length} release records, `
+      + "1 charter purpose statement.",
   );
 } else if (check) {
   console.error(

@@ -8,7 +8,9 @@
 
 **Seize the Means of Relaxation.**
 
-> **The Horizontal Front is a free, open-source game about collective power, mutual aid, and resistance to hierarchical systems. It is developed as a digital commons: freely accessible, community-supported, and accountable to its players rather than investors or advertisers.**
+<!-- generated:charter-purpose -->
+> **The Horizontal Front is a free, open-source game satirising capitalism. It is developed as a digital commons: freely accessible, community-supported, and accountable to its players and contributors.**
+<!-- /generated:charter-purpose -->
 
 The Horizontal Front is a satirical, rhythm-based web and mobile arcade game about refusing a demand from Management and then working absurdly hard to keep refusing it. Its first campaign, **The Monday Uprising**, is that fight to stay in bed while an overbearing boss tries to tip the player out and drag them into work.
 

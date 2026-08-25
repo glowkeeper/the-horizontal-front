@@ -942,12 +942,19 @@ requirePolicy(
  * with a game attached. The satire now comes first and the commons sentence
  * follows it, so both survive: a reader learns what the game is arguing before
  * being told how the project is run, and neither can be quietly dropped.
+ *
+ * `commonsBrief` is the landing page's own wording, not the charter's, because
+ * the page states the commons in prose rather than quoting it. Amending the
+ * charter's purpose statement will therefore fail this check until the page and
+ * this line are updated together, which is the intended amount of friction: the
+ * sentence is governance text, and it should not be possible to reword it on
+ * the public site without noticing.
  */
+const commonsBrief = "A free, open-source game satirising capitalism";
 requirePolicy(
   indexHtml.includes("satirical rhythm game") &&
-    indexHtml.includes("A free, open-source game about collective power") &&
-    indexHtml.indexOf("satirical rhythm game")
-      < indexHtml.indexOf("A free, open-source game about collective power") &&
+    indexHtml.includes(commonsBrief) &&
+    indexHtml.indexOf("satirical rhythm game") < indexHtml.indexOf(commonsBrief) &&
     indexHtml.includes('href="/commons/"') &&
     indexHtml.match(/github\.com\/glowkeeper\/the-horizontal-front/g)?.length >= 3,
   "The public landing page must lead with the satire, still state the commons brief, and link to The Commons and public repository from its header, body and footer.",
