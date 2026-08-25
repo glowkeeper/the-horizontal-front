@@ -356,7 +356,7 @@ The codebase grows only when the game deliberately gains a reusable mechanic or 
 6. **Variety comes primarily from writing, composition, timing, presentation and combination.**
 7. **The complete episode format must remain understandable by a non-programmer.**
 
-The simplicity should be visible in the finished work, not merely hidden in the architecture. The game repeatedly stages one modest political demand:
+The simplicity should be visible in the finished work, not merely hidden in the architecture. The game repeatedly stages one modest political demand, and each campaign chooses which. The first campaign's is:
 
 > Let me remain in bed.
 
