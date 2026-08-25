@@ -2,6 +2,8 @@ import { readFile, readdir, stat } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { readReleaseRecords } from "./release-records.mjs";
+
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const documentationRoot = join(projectRoot, "docs");
 
@@ -155,6 +157,19 @@ for (const file of documentationFiles) {
     }
   }
 }
+
+/**
+ * The release records state what each release is, in fields rather than prose.
+ *
+ * `#48` found stale status claims and left them, on the ground that no checker
+ * could catch a sentence that stops being true without any code changing. That
+ * was true of a sentence. The header block defined in `docs/release-process.md`
+ * makes the same claims decidable, and this is where they are decided.
+ */
+const { problems: releaseProblems } = await readReleaseRecords(
+  join(documentationRoot, "releases"),
+);
+failures.push(...releaseProblems);
 
 const sourceIdentifiers = await readSourceIdentifiers();
 const camelCaseToken = /\b[a-z][a-zA-Z0-9]*[A-Z][a-zA-Z0-9]*\b/g;

@@ -16,21 +16,83 @@ applies to it without exception.
 A **production release** is a public release that additionally satisfies the
 [no-placeholders invariant](#no-placeholders-invariant): nothing provisional
 remains, and identity-critical work carries the human authorship the artwork
-rules ask for. Version `1.0.0` is reserved for it.
+rules ask for. No version below `1.0.0` may claim it; see
+[Versioning](#versioning) for what the number does and does not say.
 
 The distinction exists so that shipping is not held hostage to perfection, and
 so that perfection is not quietly redefined as whatever happened to ship. A
 public release that is not a production release says so, in its release notes
 and in this repository, and publishes what it is still missing.
 
-Version `0.2.0` is the first public release. Its artwork is AI-generated under
-maintainer direction rather than human-authored, which is precisely the gap
-between a public release and a production one. See the artwork rules in
-[`AGENTS.md`](../AGENTS.md) and the limitations recorded on the release issue.
+The distinction is not a theoretical nicety. The first public release, `0.2.0`,
+shipped artwork that was AI-generated under maintainer direction rather than
+human-authored, which is exactly the gap between the two kinds. Whether that
+still describes the current release is answered by that release's own record
+rather than by this document, which would go stale asserting it. See the
+artwork rules in [`AGENTS.md`](../AGENTS.md).
+
+## Versioning
+
+Releases are numbered under [semantic versioning](https://semver.org/spec/v2.0.0.html).
+The [public-release invariants](#public-release-invariants) below require one
+exact revision to be identified consistently through its package version, tag,
+release record and deployed build. This section says what that number means,
+which consistency alone never did.
+
+| Component | Increments when |
+| --- | --- |
+| Major | Something breaks. Saved campaign progress becomes unreadable, a campaign or episode is withdrawn, or an episode-grammar change invalidates content already authored against it. |
+| Minor | Content or capability is added: a campaign, an episode, a mechanic, a widened support matrix. |
+| Patch | Neither. Fixes and documentation, as `0.2.1` was — no new content and no rule changes. |
+
+`1.0.0` is a **floor, not a ceiling**. No version below it may claim production
+status. A version at or above it may, but the number does not confer the claim:
+`1.4.0` is a production release only if it meets the
+[no-placeholders invariant](#no-placeholders-invariant), exactly as `1.0.0` had
+to. Reaching production is crossing a floor that every later production release
+also stands above, not minting one particular number.
+
+### The number does not carry the claim
+
+A version records what changed. The release record states what the release is.
+They move independently, and deliberately so: this document already refuses to
+let one signal stand in for another, and [release evidence](#release-evidence)
+is Claimed with its evidence or Not claimed with its reason, with no level
+inferred from a lower one. A version that also encoded a quality claim would be
+that same substitution, and a reader would still have to open the record to
+learn whether it were true.
+
+The consequence is that production status can be lost and regained without the
+numbering becoming strange:
+
+| Change | Version | Release |
+| --- | --- | --- |
+| Production, one campaign | `1.0.0` | production |
+| A second campaign arrives unfinished | `1.1.0` | public, not production |
+| That campaign gains an episode | `1.2.0` | public, not production |
+| A defect in it is fixed | `1.2.1` | public, not production |
+| Its artwork and audio are accepted | `1.3.0` | production |
+
+The last row needs no special number, because no number was carrying the claim.
+
+### Ordering
+
+Version components are unbounded integers rather than digits. `1.10.0` is valid
+and is greater than `1.9.0`; nothing rolls over into a major.
+
+The hazard is lexical sorting, which puts `1.10.0` before `1.9.0` and is the
+default nearly everywhere: filenames under [`docs/releases/`](releases/README.md),
+`git tag` unless told `--sort=v:refname`, and any index built by listing a
+directory. Anything that orders releases parses the version and compares
+components. The published list in `docs/releases/README.md` is generated that
+way for exactly this reason.
+
+Dates cannot substitute for the version here. `v0.2.0` and `v0.2.1` were both
+published on 2026-08-17, so the versions order them and the dates do not.
 
 ## Public-release invariants
 
-Every public release, including `0.2.0`, must:
+Every public release must:
 
 - preserve the validated game, campaign and episode architecture;
 - remain static and fully playable offline after its required files are cached;
@@ -51,7 +113,9 @@ Every public release, including `0.2.0`, must:
 **This invariant governs production releases only.** A public release that does
 not meet it is not blocked by it; it is required instead to state plainly which
 parts fall short, so that a reader can tell a deliberate interim release from a
-finished one. Meeting it in full is what makes a release `1.0.0`.
+finished one. Meeting it in full is what makes a release a production release.
+What number that release then carries is a separate question, answered under
+[Versioning](#versioning).
 
 A production release contains no provisional presentation. Every visual role,
 audible role, interface state and outcome required by its authored content is
@@ -108,6 +172,108 @@ this document draws — so gating every build on it would be wrong. Run
 record its per-clause output as evidence rather than asserting the invariant as
 a whole.
 
+## The release record
+
+Release notes open with a header block naming what the release is, before any
+prose:
+
+```
+Version: 1.1.0
+Date: 2026-11-03
+Release: public, not production
+Summary: A second campaign arrives, unfinished and saying so.
+Lifecycle: published
+```
+
+Every field is required. `npm run check:docs` refuses a record that omits one,
+spells a value it does not recognise, or carries a `Version` disagreeing with
+its own filename. These are the claims the rest of this document is about, and
+as prose they were unenforceable: two published records had already drifted into
+two spellings of the same status before this block existed.
+
+**`Version`** matches the filename and the published tag.
+
+**`Date`** is the publication date as `YYYY-MM-DD`. It is not what orders the
+records — the version does that — but it is what a reader needs in order to
+judge a support matrix years afterwards.
+
+**`Release`** is `production` or `public, not production`. The negative half is
+stated rather than left to be inferred. A production release is by definition
+also a public one, so a bare `public` would make the shortfall deducible; being
+deducible is not being stated, and stating it is the whole purpose of the
+distinction. The field name carries the noun so the values need not repeat it,
+and so that `not production` cannot be misread as a claim about deployment.
+
+**`Summary`** is one sentence describing the release. It is what the published
+list in [`docs/releases/`](releases/README.md) renders, so that the list is
+generated from the records rather than being a second hand-maintained copy of
+them.
+
+**`Lifecycle`** is `draft`, `published` or `withdrawn`. A `draft` is a record
+committed for a version that is not yet live — notes are written before
+publication and travel in the release commit while the GitHub record is still a
+draft, so the repository legitimately holds notes for a version nobody can play
+yet, and without the field a reader cloning at that moment cannot tell. At most
+one record may be a draft, and its version must exceed every published one.
+`withdrawn` is a record whose release was rolled back after publication. It has
+never happened; it is defined here so that the rollback path below has somewhere
+to record its outcome, rather than being invented under the pressure of the
+incident that first needs it.
+
+### Why there is no third kind
+
+`Release` has two values because this document defines two kinds of release, and
+each is a bar rather than a label: public is the invariant list above, and
+production is that list plus the no-placeholders clauses. A third kind — a
+development release, or anything else below public — would need its own
+invariant list to mean anything at all, and that list could only be the public
+invariants minus whichever ones were currently inconvenient. That is exactly the
+quiet redefinition of perfection as whatever happened to ship that the two-kinds
+distinction exists to prevent. A new kind costs a new invariant list, and this
+is recorded plainly because the pressure to add one recurs.
+
+That pressure is real, but it belongs on the lifecycle axis rather than the kind
+axis. A frozen release candidate is a `draft`. A build handed to playtesters is
+a commit and a playtest record, not a release at all. A rolled-back release is
+`withdrawn`. And a release containing unfinished content is an ordinary public
+release whose content scope says which part is unfinished, which is the subject
+of the next section.
+
+### What a release claims about its content
+
+Production status is a property of the release as a whole, and it is the minimum
+over everything the release contains: one unapproved asset anywhere and the
+release is not a production release. That does not change.
+
+What a minimum cannot do is describe a game holding more than one campaign. Once
+an unfinished campaign can arrive alongside a finished one, "not a production
+release" is true of the whole and silent about the parts, and the finished
+campaign is not merely demoted by it but erased from the record. So a release
+states production status per campaign, beneath the release-level line:
+
+    ## Content scope
+
+    - **The Monday Uprising** — production quality. Unchanged since 1.0.0.
+    - **The Night Shift** — not production quality. Contributor-supplied AI
+      artwork; the audio mix is a first pass. Detailed under known limitations.
+
+This is the shape the [support matrix](#browser-and-input-support) already uses:
+a claim scoped to what it actually covers, naming what was exercised and what
+was not, rather than one global yes or no.
+
+The unit is the campaign rather than the episode. A campaign is what a player
+sits down to, and the human perceptual acceptance the invariant requires is a
+judgement about an integrated result. A campaign with one unfinished episode out
+of twelve is not a production campaign: its line says so, and known limitations
+names the episode. The list is therefore always as long as the number of
+campaigns.
+
+`npm run check:production` reports over the whole catalogue and does not yet
+scope its report by campaign. Doing so needs campaign-level ownership, which is
+[#54](https://github.com/glowkeeper/the-horizontal-front/issues/54). The rule is
+recorded here first because it is decidable now, and because a check should
+implement a settled rule rather than reopen one.
+
 ## Browser and input support
 
 The initial production target is:
@@ -140,10 +306,13 @@ Before publication:
    and record anything accepted as interim rather than finished.
 2. Freeze a release candidate and record the revision under review.
 3. Apply the intended version consistently to package metadata and release
-   documentation.
+   documentation, choosing it under [Versioning](#versioning), and open the
+   release notes with the header block [the release record](#the-release-record)
+   requires.
 4. Write release notes covering content scope, controls, supported
    environments, accessibility boundaries, licences, provenance, offline use
-   and known limitations. Commit them under [`docs/releases/`](releases/README.md)
+   and known limitations. Content scope states production status for each
+   campaign, not only for the release as a whole. Commit them under [`docs/releases/`](releases/README.md)
    as part of the release commit, so the record of what was shipped travels with
    the repository rather than depending on one hosting account. The GitHub
    release record carries the same text.
@@ -225,7 +394,10 @@ If live verification finds a material fault, do not publish the draft release
 as final. Use Cloudflare's deployment rollback when an immediate hosting
 rollback is necessary, then revert or correct `main` through the ordinary
 review path so the canonical source and deployed state converge again. A
-rollback does not silently transfer a release tag to a different commit.
+rollback does not silently transfer a release tag to a different commit. A
+release that was already published and is then rolled back has its record's
+`Lifecycle` set to `withdrawn`, which is the one edit to a published record this
+document asks for beyond correcting a factual error.
 
 ## Release evidence
 
