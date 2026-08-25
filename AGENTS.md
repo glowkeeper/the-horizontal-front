@@ -28,11 +28,11 @@ These instructions apply to every AI coding assistant working in this repository
 
 ## Product intent
 
-The Horizontal Front is a satirical, rhythm-based 2D web and mobile game about working extremely hard to remain in bed while Management, a grotesque embodiment of capitalism at its worst, tries to force the player into work.
+The Horizontal Front is a satirical, rhythm-based 2D web and mobile game about refusing a demand made by Management — a grotesque embodiment of capitalism at its worst — and working extremely hard to keep refusing it. Its first campaign, **The Monday Uprising**, expresses that as remaining in bed while Management tries to force the player into work. What the satire targets, and where the joke points, is stated in [game concept](docs/game-concept.md).
 
 It is a free, open-source game about collective power, mutual aid and resistance to hierarchical systems. Develop it as a digital commons: freely accessible, community-supported and accountable to its players rather than investors or advertisers.
 
-The game is political satire about capitalism, exploitative work culture, compulsory productivity and corporate absurdity. Its central demand is simple:
+The game is political satire about capitalism, exploitative work culture, compulsory productivity and corporate absurdity. Every campaign turns on a worker refusing a demand. In the first, that refusal is simple:
 
 > Let me remain in bed.
 
@@ -132,7 +132,7 @@ Avoid class hierarchies, service containers, unnecessary design patterns and pre
 - Store authored composition values in validated content rather than embedding them in Phaser code. Layout data owns design-space anchors, pivots, slots and motion parameters; skin or asset data owns visual-part geometry and semantic asset references. TypeScript interprets this finite vocabulary and must not become an episode-specific drawing specification.
 - **Presentation genericity is a project invariant, enforced by `npm run check:policy`.** No module under `src/play/phaser/` may contain an authored presentation value: not a size, depth, opacity or stroke width written inline, and not a semantic colour role chosen by a code literal such as `getThemeColour("managementGold")`. Every such value is resolved from validated layout, skin or panel data. The single exemption is `src/play/phaser/design.ts`, which names the interface-chrome constants for buttons, menus and the canvas ground — engine furniture no episode restyles. Choosing an appearance in an adapter rather than in content is the violation, even when the chosen value is already a shared theme role.
 - **Write each document in its own register.** Episode fiction leaks into prose as readily as into code, and the leak is harder to see because the sentence still reads well. Three registers apply:
-  - **Game level.** The bed is the premise; "let me remain in bed" is the game's demand. `docs/game-concept.md`, `docs/art-direction.md`, `README.md`, `PROJECT_CHARTER.md` and the public site say bed, duvet and Management freely.
+  - **Game level.** The bed is the first campaign's premise; "let me remain in bed" is the game's demand. `docs/game-concept.md`, `docs/art-direction.md`, `README.md`, `PROJECT_CHARTER.md` and the public site say bed, duvet and Management freely.
   - **Engine and grammar level.** `docs/episode-grammar-reference.md`, `docs/technical-architecture.md` and `docs/content-architecture.md` describe the contract that an episode set in any workplace is authored against. They say resistance, safety, opposing actor and apparatus. Naming one episode's furniture here tells a later author that a field does not apply to them.
   - **Episode level.** `the-alarm.json`, its skin, its asset namespace and its art sheets are where a duvet is exactly the right word.
 

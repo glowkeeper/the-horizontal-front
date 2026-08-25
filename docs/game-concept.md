@@ -2,13 +2,38 @@
 
 > **Seize the Means of Relaxation.**
 
-## High concept
+## What the game is about
 
-The Horizontal Front is a satirical arcade game for web and mobile. The player is trying to remain safely in bed while their boss applies increasing pressure to tip the bed, expose them from beneath the duvet, and force them into work.
+The Horizontal Front is a satirical, rhythm-based arcade game for web and mobile in which a worker refuses a demand made by Management, and has to work absurdly hard to keep refusing it.
+
+The satire targets:
+
+- **Exploitative work culture** — the employer's claims on a worker's time, health and attention, and the expectation that those claims are met without complaint.
+- **Compulsory productivity** — output as the measure of a person, and idleness as a fault requiring correction.
+- **Corporate euphemism** — the language that makes an imposition sound like an opportunity, delivered by management with complete seriousness.
+- **Executive power** — the authority of someone who does not do the work to decide how it is done, and the spectacle and vanity that come with it.
+- **Repetition rebranded as transformation** — the same demand returning under a new name, a new logo and an unprecedented framework.
+- **The demand that rest be justified** — the assumption that not working is a position needing a defence, which is the demand the player spends every episode refusing.
+
+The recurring boss is Management: a fictional, broadly recognisable and grotesque embodiment of capitalism at its worst rather than a depiction or coded stand-in for any particular politician or other real person.
+
+### Where the joke points
+
+The satire aims up at the hierarchy, never down at the people inside it. Colleagues, cleaners, migrant workers and outsourced staff are not the butt of it; Management is. An episode whose joke lands on the worker for being lazy has inverted the thing the game is for, however well it plays.
+
+The worker's refusal is treated as reasonable, so the game is not about being tired and needing a nap. Tiredness is a state; refusal is an act. Failure is funny, dramatic and sad rather than empty slapstick, because the player was right and lost anyway.
+
+There is no currency, grind, upgrade economy or daily streak, and their absence is part of the satire rather than a gap in it. A game that satirises compulsory productivity while operating a retention economy is telling the joke on itself.
+
+## The Monday Uprising: the first enactment
+
+Each campaign chooses a workplace and a refusal, and the rest follows from that choice: the rhythm, the apparatus that plays it, the interruptions, the artwork and the prose. What stays constant is the shape — a worker holding a line, Management escalating, the joke landing on Management.
+
+The first campaign expresses all of that as a bedroom. The player is trying to remain safely in bed while their boss applies increasing pressure to tip the bed, expose them from beneath the duvet, and force them into work.
 
 To resist, the player must perform rhythmic patterns through taps, clicks, or keys. The irony is the heart of the game: the player has to work extremely hard to avoid work.
 
-The satire targets exploitative work culture, compulsory productivity, corporate euphemisms, and executive power. The recurring boss is Management: a fictional, broadly recognisable and grotesque embodiment of capitalism at its worst rather than a depiction or coded stand-in for any particular politician or other real person.
+Everything below describes the game through this campaign, because it is the only one that exists. A second campaign set in another workplace would be an instance of this game rather than a departure from it. That is a claim about the satire, not about the engine: what can currently be authored as content is defined by the [episode grammar reference](episode-grammar-reference.md), and widening it is its own work.
 
 ## Player fantasy
 
