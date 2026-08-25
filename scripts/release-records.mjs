@@ -107,9 +107,32 @@ function parseRecord(name, markdown) {
     );
   }
 
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(fields.get("Date"))) {
+  const date = fields.get("Date");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    problems.push(`${name}: Date is "${date}", which is not YYYY-MM-DD.`);
+  } else {
+    /*
+     * Rolling the components through Date.UTC and reading them back rejects
+     * 2026-13-45 without throwing. Constructing a Date from the string and
+     * calling toISOString would throw a RangeError on exactly the input this
+     * is meant to catch, which is how a validator becomes a crash.
+     */
+    const [year, month, day] = date.split("-").map(Number);
+    const rolled = new Date(Date.UTC(year, month - 1, day));
+    if (rolled.getUTCFullYear() !== year
+      || rolled.getUTCMonth() !== month - 1
+      || rolled.getUTCDate() !== day) {
+      problems.push(
+        `${name}: Date is "${date}", which is shaped like a date but is not `
+          + "one.",
+      );
+    }
+  }
+
+  if (fields.get("Summary").length === 0) {
     problems.push(
-      `${name}: Date is "${fields.get("Date")}", which is not YYYY-MM-DD.`,
+      `${name}: Summary is blank. It is the sentence the published list `
+        + "renders, so a record without one generates an empty entry.",
     );
   }
 
@@ -159,7 +182,13 @@ export async function readReleaseRecords(releasesDirectory) {
       await readFile(join(releasesDirectory, entry.name), "utf8"),
     );
     problems.push(...record.problems);
-    if (record.version !== undefined) records.push(record);
+    /*
+     * Only records with a parsed version go on. A record whose Version did not
+     * parse has already had that reported, and carrying its null into the
+     * comparator below would throw a TypeError — losing every other problem in
+     * the run, including the one that caused it.
+     */
+    if (Array.isArray(record.version)) records.push(record);
   }
 
   records.sort((a, b) => compareVersions(b.version, a.version));
