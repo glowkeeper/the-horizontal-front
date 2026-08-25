@@ -30,7 +30,14 @@ These instructions apply to every AI coding assistant working in this repository
 
 The Horizontal Front is a satirical, rhythm-based 2D web and mobile game about refusing a demand made by Management — a grotesque embodiment of capitalism at its worst — and working extremely hard to keep refusing it. Its first campaign, **The Monday Uprising**, expresses that as remaining in bed while Management tries to force the player into work. What the satire targets, and where the joke points, is stated in [game concept](docs/game-concept.md).
 
-It is a free, open-source game about collective power, mutual aid and resistance to hierarchical systems. Develop it as a digital commons: freely accessible, community-supported and accountable to its players rather than investors or advertisers.
+The project charter's purpose statement, which this file translates into
+operational instructions and cannot weaken:
+
+<!-- generated:charter-purpose -->
+> **The Horizontal Front is a free, open-source game satirising capitalism. It is developed as a digital commons: freely accessible, community-supported, and accountable to its players and contributors.**
+<!-- /generated:charter-purpose -->
+
+Develop the project accordingly.
 
 The game is political satire about capitalism, exploitative work culture, compulsory productivity and corporate absurdity. Every campaign turns on a worker refusing a demand. In the first, that refusal is simple:
 
