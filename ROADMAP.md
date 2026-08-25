@@ -35,6 +35,7 @@ and both are currently the hardest things for the project to staff.
 - [#37 Bring Management and the protagonist to production authorship](https://github.com/glowkeeper/the-horizontal-front/issues/37)
 - [#38 Complete and accept the production audio](https://github.com/glowkeeper/the-horizontal-front/issues/38)
 - [#39 Playtest The Alarm with representative players](https://github.com/glowkeeper/the-horizontal-front/issues/39)
+- [#73 Commit to a versioning scheme and make release status checkable](https://github.com/glowkeeper/the-horizontal-front/issues/73)
 - [#40 Prepare and publish the 1.0.0 production release](https://github.com/glowkeeper/the-horizontal-front/issues/40)
 
 ### [Meet the commons participation obligations](https://github.com/glowkeeper/the-horizontal-front/issues/44)

@@ -27,6 +27,7 @@ export const roadmap = {
         [37, "Bring Management and the protagonist to production authorship"],
         [38, "Complete and accept the production audio"],
         [39, "Playtest The Alarm with representative players"],
+        [73, "Commit to a versioning scheme and make release status checkable"],
         [40, "Prepare and publish the 1.0.0 production release"],
       ],
     },
