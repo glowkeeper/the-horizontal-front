@@ -7,8 +7,8 @@ It is deliberately short on dates, because the project has none it could keep.
 It is a small, deliberately paced effort, and a roadmap that implied a schedule
 would be inventing one. What it does say is how far the project has committed
 to each thing on it: decided and being worked on, genuinely intended with
-nobody on it, or filed and not yet evaluated. Every entry below carries one of
-those three, and the next section defines them.
+nobody on it, or filed and not yet evaluated. The next section defines those
+three, and says which entries state one.
 
 The issues linked below are the authority. This page is a way in, not a second
 specification: where something is already written down properly, this links to
@@ -23,6 +23,10 @@ it rather than restating it.
 | Wanted, not scheduled | Genuinely intended, nobody currently working on it. |
 | Raised, not decided | Filed and published, but not evaluated. The project has formed no intention about it, and listing it here is not agreement to do it. Moving an issue out of this row is the decision being made. |
 <!-- /generated:commitments -->
+
+A tranche states its commitment once and the work listed under it shares that,
+because committing to a tranche is committing to what it holds. An issue
+separate from the tranches states its own, having no tranche to inherit from.
 
 Every tranche below is a GitHub issue holding the reasoning behind it, with the
 work as child issues, which may hold children of their own. Start with the
