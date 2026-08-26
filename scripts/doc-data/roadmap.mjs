@@ -123,11 +123,6 @@ export const roadmap = {
       title: "Widen the verified support matrix",
       commitment: "wanted, not scheduled",
     },
-    {
-      issue: 82,
-      title: "Retire finished work from the roadmap onto a delivered page",
-      commitment: "committed",
-    },
   ],
 
   /**
@@ -226,6 +221,7 @@ export const roadmap = {
 
     /** Finished work that belonged to no tranche. */
     separate: [
+      [82, "Retire finished work from the roadmap onto a delivered page"],
       [80, "Make the published roadmap complete"],
       [77, "Tell the automated reviewer which rules are invariants"],
       [67, "Derive the site's page list from one place"],

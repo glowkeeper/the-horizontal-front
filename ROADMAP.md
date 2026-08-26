@@ -94,7 +94,6 @@ evidence of work accumulating which no tranche accounts for, and the answer is
 a tranche rather than a longer list.
 
 - [#50 Widen the verified support matrix](https://github.com/glowkeeper/the-horizontal-front/issues/50) — **Wanted, not scheduled.**
-- [#82 Retire finished work from the roadmap onto a delivered page](https://github.com/glowkeeper/the-horizontal-front/issues/82) — **Committed.**
 <!-- /generated:roadmap -->
 
 ## Where help is most wanted

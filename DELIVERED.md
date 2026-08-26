@@ -94,6 +94,7 @@ asset pipeline.
 
 ### Separate from the tranches
 
+- [#82 Retire finished work from the roadmap onto a delivered page](https://github.com/glowkeeper/the-horizontal-front/issues/82)
 - [#80 Make the published roadmap complete](https://github.com/glowkeeper/the-horizontal-front/issues/80)
 - [#77 Tell the automated reviewer which rules are invariants](https://github.com/glowkeeper/the-horizontal-front/issues/77)
 - [#67 Derive the site's page list from one place](https://github.com/glowkeeper/the-horizontal-front/issues/67)
