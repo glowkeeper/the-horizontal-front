@@ -191,27 +191,76 @@ function readCharterPurpose(charter) {
 const issueUrl = (number) =>
   `https://github.com/glowkeeper/the-horizontal-front/issues/${number}`;
 
+/**
+ * Render a commitment as the page states it, and refuse an undefined one.
+ *
+ * The "How to read this" table is generated from the same map, so a value the
+ * record uses without defining would put a term on the page that the table
+ * does not explain — which is worse than no term at all.
+ */
+function commitmentLabel(commitment, where) {
+  if (!Object.hasOwn(roadmap.commitments, commitment)) {
+    throw new Error(
+      `${where} claims the commitment "${commitment}", which is not defined `
+        + "in roadmap.commitments. Define it there so the How to read this "
+        + "table can explain it, or use one of: "
+        + `${Object.keys(roadmap.commitments).map((value) => `"${value}"`)
+          .join(", ")}.`,
+    );
+  }
+  return `${commitment[0].toUpperCase()}${commitment.slice(1)}.`;
+}
+
+function renderCommitments() {
+  return [
+    "| Term | Meaning |",
+    "| --- | --- |",
+    ...Object.entries(roadmap.commitments).map(([term, meaning]) =>
+      `| ${term[0].toUpperCase()}${term.slice(1)} | ${meaning} |`),
+  ].join("\n");
+}
+
+/**
+ * Children may hold children, because GitHub's sub-issues do.
+ *
+ * Nesting rather than flattening keeps the page saying which piece of work a
+ * descendant belongs to, and lets `check:roadmap` compare each level against
+ * the sub-issues of the issue above it rather than losing the structure.
+ */
+function renderChildren(children, depth = 0) {
+  const lines = [];
+  for (const [number, title, nested = []] of children) {
+    lines.push(
+      `${"  ".repeat(depth)}- [#${number} ${title}](${issueUrl(number)})`,
+    );
+    lines.push(...renderChildren(nested, depth + 1));
+  }
+  return lines;
+}
+
 function renderRoadmap() {
   const sections = [];
   for (const tranche of roadmap.tranches) {
     sections.push(
       `### [${tranche.title}](${issueUrl(tranche.issue)})`,
       "",
-      `**${tranche.commitment[0].toUpperCase()}${tranche.commitment.slice(1)}.** `
+      `**${commitmentLabel(tranche.commitment, `#${tranche.issue}`)}** `
         + tranche.summary,
       "",
       wrap(`*Help wanted:* ${tranche.help}`),
       "",
-      ...tranche.children.map(([number, title]) =>
-        `- [#${number} ${title}](${issueUrl(number)})`),
+      ...renderChildren(tranche.children),
       "",
     );
   }
   sections.push(
     "### Separate from the tranches",
     "",
-    ...roadmap.separate.map(([number, title]) =>
-      `- [#${number} ${title}](${issueUrl(number)})`),
+    wrap(roadmap.separateCriterion),
+    "",
+    ...roadmap.separate.map(({ issue, title, commitment }) =>
+      `- [#${issue} ${title}](${issueUrl(issue)}) — `
+        + `**${commitmentLabel(commitment, `#${issue}`)}**`),
   );
   return sections.join("\n");
 }
@@ -277,7 +326,10 @@ const documents = [
   {
     path: roadmapPath,
     label: "ROADMAP.md",
-    regions: [["roadmap", renderRoadmap()]],
+    regions: [
+      ["commitments", renderCommitments()],
+      ["roadmap", renderRoadmap()],
+    ],
   },
   {
     path: readmePath,
@@ -291,7 +343,14 @@ const documents = [
   },
 ];
 
-const stale = [];
+/**
+ * Which documents the record disagrees with, in both modes.
+ *
+ * Recording this only under `--check` would make the write mode unable to say
+ * what it had just rewritten, and it would report every run as finding nothing
+ * to do — including the runs that changed a published page.
+ */
+const changed = [];
 for (const { path, label, regions } of documents) {
   const original = await readFile(path, "utf8");
   let generated = original;
@@ -299,26 +358,26 @@ for (const { path, label, regions } of documents) {
     generated = replaceRegion(generated, name, body, label);
   }
   if (generated === original) continue;
-  if (check) stale.push(label);
-  else await writeFile(path, generated);
+  changed.push(label);
+  if (!check) await writeFile(path, generated);
 }
 
-if (stale.length === 0) {
-  console.log(
-    `Generated documentation is up to date: ${audioRoles.length} audio roles, `
-      + `${phaseFields.length} phase fields, `
-      + `${protectMainRuleset.requiredStatusChecks.length} required checks, `
-      + `${roadmap.tranches.length} roadmap tranches, `
-      + `${releaseRecords.length} release records, `
-      + "1 charter purpose statement.",
-  );
+const counts = `${audioRoles.length} audio roles, `
+  + `${phaseFields.length} phase fields, `
+  + `${protectMainRuleset.requiredStatusChecks.length} required checks, `
+  + `${roadmap.tranches.length} roadmap tranches, `
+  + `${releaseRecords.length} release records, `
+  + "1 charter purpose statement";
+
+if (changed.length === 0) {
+  console.log(`Generated documentation is up to date: ${counts}.`);
 } else if (check) {
   console.error(
-    `Generated documentation is out of date: ${stale.join(", ")}.\n`
+    `Generated documentation is out of date: ${changed.join(", ")}.\n`
       + "These no longer match the definitions they restate.\n"
       + "Run: npm run generate:docs",
   );
   process.exitCode = 1;
 } else {
-  console.log(`Regenerated: ${documents.map(({ label }) => label).join(", ")}.`);
+  console.log(`Regenerated ${changed.join(", ")}: ${counts}.`);
 }
