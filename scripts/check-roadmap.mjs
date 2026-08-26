@@ -107,18 +107,20 @@ function verify(number, title, where) {
  * which the roadmap does not require — an unlisted open one is caught by the
  * completeness pass below, and reported more clearly there.
  *
- * Returns whether every listed descendant is closed, which is what decides
- * whether a tranche has finished and should retire.
+ * Returns every listed descendant, at any depth, rather than a verdict about
+ * them. Both pages ask a different question of the same walk — the plan asks
+ * whether all of them are closed, the delivered record asks which are not — and
+ * a boolean answers only one of those without naming the issue at fault.
  */
 async function compareChildren(parent, listed, where, plan) {
   const children = await fetchAll(`/issues/${parent}/sub_issues`);
   const actual = new Map(children.map((child) => [child.number, child.title]));
-  let allClosed = true;
+  const descendants = [];
 
   for (const [number, title, nested = []] of listed) {
-    const issue = verify(number, title, where);
+    verify(number, title, where);
     if (plan) named.add(number);
-    if (issue !== undefined && issue.state !== "closed") allClosed = false;
+    descendants.push(number);
     if (!actual.has(number)) {
       problems.push(
         `#${number} is listed under #${parent} in the record but is not a `
@@ -126,8 +128,7 @@ async function compareChildren(parent, listed, where, plan) {
       );
     }
     if (nested.length > 0) {
-      const nestedClosed = await compareChildren(number, nested, where, plan);
-      if (!nestedClosed) allClosed = false;
+      descendants.push(...await compareChildren(number, nested, where, plan));
     }
   }
 
@@ -141,56 +142,63 @@ async function compareChildren(parent, listed, where, plan) {
     }
   }
 
-  return allClosed;
+  return descendants;
 }
+
+/**
+ * An issue nobody can find is not finished.
+ *
+ * A number the record names but GitHub does not know is already reported as a
+ * disagreement. Treating it as closed on top of that would let a tranche be
+ * called finished on the strength of an issue that does not exist.
+ */
+const isClosed = (number) => issues.get(number)?.state === "closed";
 
 const finished = [];
 const unfinished = [];
 
 for (const tranche of roadmap.tranches) {
-  const issue = verify(tranche.issue, tranche.title, "as a tranche on the plan");
+  verify(tranche.issue, tranche.title, "as a tranche on the plan");
   named.add(tranche.issue);
-  const childrenClosed = await compareChildren(
+  const descendants = await compareChildren(
     tranche.issue,
     tranche.children,
     `under #${tranche.issue} on the plan`,
     true,
   );
-  if (issue?.state === "closed" && childrenClosed) {
+  if (isClosed(tranche.issue) && descendants.every(isClosed)) {
     finished.push(`#${tranche.issue} ${tranche.title} — the whole tranche.`);
   }
 }
 
 for (const { issue: number, title } of roadmap.separate) {
-  const issue = verify(number, title, "separate from the tranches on the plan");
+  verify(number, title, "separate from the tranches on the plan");
   named.add(number);
-  if (issue?.state === "closed") finished.push(`#${number} ${title}`);
+  if (isClosed(number)) finished.push(`#${number} ${title}`);
+}
+
+/** Report a delivered entry that is not closed, naming the issue at fault. */
+function requireClosed(number) {
+  const issue = issues.get(number);
+  if (issue !== undefined && issue.state !== "closed") {
+    unfinished.push(`#${number} ${issue.title}`);
+  }
 }
 
 for (const tranche of roadmap.delivered.tranches) {
-  const issue = verify(tranche.issue, tranche.title, "as a delivered tranche");
-  if (issue !== undefined && issue.state !== "closed") {
-    unfinished.push(`#${tranche.issue} ${tranche.title}`);
-  }
-  await compareChildren(
+  verify(tranche.issue, tranche.title, "as a delivered tranche");
+  const descendants = await compareChildren(
     tranche.issue,
     tranche.children,
     `under delivered #${tranche.issue}`,
     false,
   );
-  for (const [number] of tranche.children) {
-    const child = issues.get(number);
-    if (child !== undefined && child.state !== "closed") {
-      unfinished.push(`#${number} ${child.title}`);
-    }
-  }
+  for (const number of [tranche.issue, ...descendants]) requireClosed(number);
 }
 
 for (const [number, title] of roadmap.delivered.separate) {
-  const issue = verify(number, title, "as delivered, separate from the tranches");
-  if (issue !== undefined && issue.state !== "closed") {
-    unfinished.push(`#${number} ${title}`);
-  }
+  verify(number, title, "as delivered, separate from the tranches");
+  requireClosed(number);
 }
 
 /**
