@@ -3,6 +3,24 @@
 The Horizontal Front documentation is organised by audience and authority. Use
 the shortest route that fits the work you are doing.
 
+## Where a document lives
+
+Publication decides the location, not importance. The documents in the
+repository root are published as pages on the public site — the [project
+charter](../PROJECT_CHARTER.md), [governance](../GOVERNANCE.md),
+[identity](../IDENTITY.md), [contributing](../CONTRIBUTING.md), the
+[roadmap](../ROADMAP.md), [delivered](../DELIVERED.md) and the
+[licences](../LICENSE.md) — so links between them become site paths and a
+reader following one never leaves.
+
+Everything in this directory is contributor documentation, and deliberately
+stays on GitHub beside the source it describes. A published page linking to a
+file here sends the reader to GitHub, which is the intended behaviour rather
+than a broken link.
+
+`README.md`, `AGENTS.md` and `CLAUDE.md` are in the root because their
+locations are fixed by convention, not by this rule.
+
 ## I want to understand the game
 
 Start with the [game concept](game-concept.md) for the player fantasy, satire,

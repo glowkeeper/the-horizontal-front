@@ -14,6 +14,12 @@ The issues linked below are the authority. This page is a way in, not a second
 specification: where something is already written down properly, this links to
 it rather than restating it.
 
+A **tranche** is a body of work with a single reason behind it: one GitHub
+issue holding that reasoning, with the individual pieces as its child issues,
+which may hold children of their own. It is the unit this page commits to, so
+start with the tranche rather than its children: the tranche is the part that
+says why.
+
 Finished work is not here. A tranche leaves this page when all of it is done,
 and an individual issue leaves when it closes; both are recorded on
 [delivered](DELIVERED.md). This page is what is ahead.
@@ -31,10 +37,6 @@ and an individual issue leaves when it closes; both are recorded on
 A tranche states its commitment once and the work listed under it shares that,
 because committing to a tranche is committing to what it holds. An issue
 separate from the tranches states its own, having no tranche to inherit from.
-
-Every tranche below is a GitHub issue holding the reasoning behind it, with the
-work as child issues, which may hold children of their own. Start with the
-tranche, not the children — the tranche says why.
 
 Every open issue appears somewhere on this page: in its own tranche, under one,
 or separate from the tranches. If it is not here, that is a fault in the page

@@ -83,11 +83,12 @@ const repositoryBlobBase =
 /**
  * Point every repository link somewhere that resolves.
  *
- * The eight governing documents are published as site pages, so links between
- * them become site paths and a reader never leaves. Everything else in the
- * repository — the architecture notes, the grammar reference, the research —
- * is contributor documentation that deliberately stays on GitHub, where it sits
- * beside the source it describes.
+ * The governing documents in the repository root are published as site pages, so
+ * links between them become site paths and a reader never leaves. Everything
+ * else in the repository — the architecture notes, the grammar reference, the
+ * research — is contributor documentation that deliberately stays on GitHub,
+ * where it sits beside the source it describes. Deliberately no count here: a
+ * hand-maintained one had already drifted before anyone noticed.
  *
  * Those links must become absolute. A repository-relative path survives being
  * rendered into HTML and then resolves against the page it landed on, so
