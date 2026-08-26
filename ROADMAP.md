@@ -5,9 +5,10 @@ wanted from other people.
 
 It is deliberately short on dates, because the project has none it could keep.
 It is a small, deliberately paced effort, and a roadmap that implied a schedule
-would be inventing one. What it does say is what is **committed** — decided and
-being worked on — and what is **wanted but not scheduled**: real intentions with
-nobody currently on them.
+would be inventing one. What it does say is how far the project has committed
+to each thing on it: decided and being worked on, genuinely intended with
+nobody on it, or filed and not yet evaluated. Every entry below carries one of
+those three, and the next section defines them.
 
 The issues linked below are the authority. This page is a way in, not a second
 specification: where something is already written down properly, this links to
@@ -15,14 +16,21 @@ it rather than restating it.
 
 ## How to read this
 
+<!-- generated:commitments -->
 | Term | Meaning |
 | --- | --- |
 | Committed | Decided, and either in progress or next. |
 | Wanted, not scheduled | Genuinely intended, nobody currently working on it. |
+| Raised, not decided | Filed and published, but not evaluated. The project has formed no intention about it, and listing it here is not agreement to do it. Moving an issue out of this row is the decision being made. |
+<!-- /generated:commitments -->
 
 Every tranche below is a GitHub issue holding the reasoning behind it, with the
-work as child issues. Start with the tranche, not the children — the tranche
-says why.
+work as child issues, which may hold children of their own. Start with the
+tranche, not the children — the tranche says why.
+
+Every open issue appears somewhere on this page: in its own tranche, under one,
+or separate from the tranches. If it is not here, that is a fault in the page
+rather than work being kept quiet.
 
 <!-- generated:roadmap -->
 ### [Publish the first production release (1.0.0)](https://github.com/glowkeeper/the-horizontal-front/issues/36)
@@ -33,6 +41,7 @@ says why.
 and both are currently the hardest things for the project to staff.
 
 - [#37 Bring Management and the protagonist to production authorship](https://github.com/glowkeeper/the-horizontal-front/issues/37)
+  - [#27 Reconcile Management's fixed console across the four pose states](https://github.com/glowkeeper/the-horizontal-front/issues/27)
 - [#38 Complete and accept the production audio](https://github.com/glowkeeper/the-horizontal-front/issues/38)
 - [#39 Playtest The Alarm with representative players](https://github.com/glowkeeper/the-horizontal-front/issues/39)
 - [#73 Commit to a versioning scheme and make release status checkable](https://github.com/glowkeeper/the-horizontal-front/issues/73)
@@ -82,7 +91,16 @@ keep. Episodes written against the grammar are a different matter entirely.
 
 ### Separate from the tranches
 
-- [#50 Widen the verified support matrix](https://github.com/glowkeeper/the-horizontal-front/issues/50)
+An issue belongs here when it is genuinely a one-off: real work with no body
+of work behind it for a tranche to explain. Inventing a tranche to hold a
+single issue would produce a grouping that says nothing, and the instruction
+above is to start with the tranche because the tranche says why. This is a
+declared exception rather than a queue: if the list grows long, that is
+evidence of work accumulating which no tranche accounts for, and the answer is
+a tranche rather than a longer list.
+
+- [#50 Widen the verified support matrix](https://github.com/glowkeeper/the-horizontal-front/issues/50) — **Wanted, not scheduled.**
+- [#80 Make the published roadmap complete](https://github.com/glowkeeper/the-horizontal-front/issues/80) — **Committed.**
 <!-- /generated:roadmap -->
 
 ## Where help is most wanted
@@ -133,6 +151,16 @@ waiting is the best argument for scheduling it.
 
 This page is generated from a record in the repository, and a check compares its
 issue numbers and titles against GitHub. If an issue here is renamed or
-reparented and this page is not updated, that check fails. It deliberately does
-not restate whether each issue is open or closed — the linked issue answers that
-better than a copy of it could.
+reparented and this page is not updated, that check fails. The check also runs
+the other way: it lists every open issue and fails if one of them is named
+nowhere here, so work cannot start — or sit open for weeks — without appearing
+on the plan that claims to be the way in.
+
+One part of this is editorial rather than checked: a tranche goes on the plan
+before its work starts. Commitment is what this page publishes, so deciding to
+commit and publishing that decision are the same act. An individual issue only
+needs listing, with no ordering requirement, and the check leaves a
+pull-request cycle of slack for that.
+
+The page still deliberately does not restate whether each issue is open or
+closed — the linked issue answers that better than a copy of it could.

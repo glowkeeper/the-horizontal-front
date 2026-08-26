@@ -9,9 +9,30 @@
  * was open would go stale every time one closed, and the linked issue already
  * answers that better than a copy of it could. Commitment is recorded per
  * tranche, because that is the part that reflects a decision rather than a
- * state.
+ * state. Entries under `separate` carry their own, because they have no
+ * tranche to inherit one from.
+ *
+ * Every open issue must appear here, which `npm run check:roadmap` enforces in
+ * both directions. An issue named nowhere is one a reader cannot find.
  */
 export const roadmap = {
+  /**
+   * What the page means by each commitment value.
+   *
+   * The "How to read this" table in `ROADMAP.md` is generated from this, so a
+   * value cannot be used without the reader being told what it means. That
+   * table is what a reader uses to interpret every entry on the page.
+   */
+  commitments: {
+    committed: "Decided, and either in progress or next.",
+    "wanted, not scheduled":
+      "Genuinely intended, nobody currently working on it.",
+    "raised, not decided":
+      "Filed and published, but not evaluated. The project has formed no "
+      + "intention about it, and listing it here is not agreement to do it. "
+      + "Moving an issue out of this row is the decision being made.",
+  },
+
   tranches: [
     {
       issue: 36,
@@ -24,7 +45,9 @@ export const roadmap = {
         "Production audio and human artwork refinement are both wanted, and "
         + "both are currently the hardest things for the project to staff.",
       children: [
-        [37, "Bring Management and the protagonist to production authorship"],
+        [37, "Bring Management and the protagonist to production authorship", [
+          [27, "Reconcile Management's fixed console across the four pose states"],
+        ]],
         [38, "Complete and accept the production audio"],
         [39, "Playtest The Alarm with representative players"],
         [73, "Commit to a versioning scheme and make release status checkable"],
@@ -92,8 +115,37 @@ export const roadmap = {
     },
   ],
 
-  /** Work that belongs to no tranche. */
+  /**
+   * What qualifies as separate from the tranches.
+   *
+   * Rendered onto the page, because a section with no stated criterion is a
+   * place things fall into rather than a declared exception.
+   */
+  separateCriterion:
+    "An issue belongs here when it is genuinely a one-off: real work with no "
+    + "body of work behind it for a tranche to explain. Inventing a tranche to "
+    + "hold a single issue would produce a grouping that says nothing, and the "
+    + "instruction above is to start with the tranche because the tranche says "
+    + "why. This is a declared exception rather than a queue: if the list grows "
+    + "long, that is evidence of work accumulating which no tranche accounts "
+    + "for, and the answer is a tranche rather than a longer list.",
+
+  /**
+   * Work that belongs to no tranche.
+   *
+   * Each entry carries its own commitment, since there is no tranche above it
+   * holding one.
+   */
   separate: [
-    [50, "Widen the verified support matrix"],
+    {
+      issue: 50,
+      title: "Widen the verified support matrix",
+      commitment: "wanted, not scheduled",
+    },
+    {
+      issue: 80,
+      title: "Make the published roadmap complete",
+      commitment: "committed",
+    },
   ],
 };

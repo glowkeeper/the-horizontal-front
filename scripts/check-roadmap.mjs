@@ -10,8 +10,15 @@
  * `npm run build`; it runs as its own CI job. The endpoints need no
  * authentication for a public repository.
  *
- * Deliberately not checked: whether an issue is open or closed. The roadmap
- * does not claim that, because a page restating it would be wrong within a day
+ * It runs in two directions. From the record outwards, every issue the roadmap
+ * names must exist under the parent the roadmap claims for it. From GitHub
+ * inwards, every open issue must be named somewhere in the record, because an
+ * issue listed nowhere is one a reader has no way to find.
+ *
+ * Closed issues are only checked in the first direction. The roadmap keeps
+ * naming them, but requiring one to be added after the fact would fail forever
+ * on work that was finished before this rule existed. The page still does not
+ * restate whether an issue is open or closed: that would be wrong within a day,
  * and the linked issue already says so.
  */
 import { roadmap } from "./doc-data/roadmap.mjs";
@@ -49,7 +56,7 @@ async function fetchJson(path) {
 async function fetchAll(path, perPage = 100) {
   const items = [];
   let next = `https://api.github.com/repos/${repository}${path}`
-    + `?per_page=${perPage}`;
+    + `${path.includes("?") ? "&" : "?"}per_page=${perPage}`;
 
   while (next !== null) {
     const response = await fetch(next, { headers });
@@ -65,27 +72,29 @@ async function fetchAll(path, perPage = 100) {
 }
 
 const problems = [];
+const named = new Set();
 let checked = 0;
 
-for (const tranche of roadmap.tranches) {
-  const issue = await fetchJson(`/issues/${tranche.issue}`);
-  checked += 1;
-  if (issue.title !== tranche.title) {
-    problems.push(
-      `#${tranche.issue} is titled "${issue.title}", the roadmap says `
-        + `"${tranche.title}".`,
-    );
-  }
-
-  const children = await fetchAll(`/issues/${tranche.issue}/sub_issues`);
+/**
+ * Compare one level of the record against the sub-issues of the issue above it.
+ *
+ * Recursion follows the record rather than GitHub: a listed entry with nested
+ * children costs one more request, and one with none costs nothing. Descending
+ * everywhere would buy only the detection of unlisted *closed* descendants,
+ * which the roadmap does not require — an unlisted open one is caught by the
+ * completeness pass below, and reported more clearly there.
+ */
+async function compareChildren(parent, listed) {
+  const children = await fetchAll(`/issues/${parent}/sub_issues`);
   const actual = new Map(children.map((child) => [child.number, child.title]));
 
-  for (const [number, title] of tranche.children) {
+  for (const [number, title, nested = []] of listed) {
     checked += 1;
+    named.add(number);
     if (!actual.has(number)) {
       problems.push(
-        `#${number} is listed under #${tranche.issue} in the roadmap but is `
-          + "not a child of it on GitHub.",
+        `#${number} is listed under #${parent} in the roadmap but is not a `
+          + "child of it on GitHub.",
       );
     } else if (actual.get(number) !== title) {
       problems.push(
@@ -93,22 +102,38 @@ for (const tranche of roadmap.tranches) {
           + `"${title}".`,
       );
     }
+    if (nested.length > 0) await compareChildren(number, nested);
   }
 
-  const listed = new Set(tranche.children.map(([number]) => number));
+  const expected = new Set(listed.map(([number]) => number));
   for (const [number, title] of actual) {
-    if (!listed.has(number)) {
+    if (!expected.has(number)) {
       problems.push(
-        `#${number} "${title}" is a child of #${tranche.issue} on GitHub but `
-          + "the roadmap does not list it.",
+        `#${number} "${title}" is a child of #${parent} on GitHub but the `
+          + "roadmap does not list it.",
       );
     }
   }
 }
 
-for (const [number, title] of roadmap.separate) {
+for (const tranche of roadmap.tranches) {
+  const issue = await fetchJson(`/issues/${tranche.issue}`);
+  checked += 1;
+  named.add(tranche.issue);
+  if (issue.title !== tranche.title) {
+    problems.push(
+      `#${tranche.issue} is titled "${issue.title}", the roadmap says `
+        + `"${tranche.title}".`,
+    );
+  }
+
+  await compareChildren(tranche.issue, tranche.children);
+}
+
+for (const { issue: number, title } of roadmap.separate) {
   const issue = await fetchJson(`/issues/${number}`);
   checked += 1;
+  named.add(number);
   if (issue.title !== title) {
     problems.push(
       `#${number} is titled "${issue.title}", the roadmap says "${title}".`,
@@ -116,16 +141,49 @@ for (const [number, title] of roadmap.separate) {
   }
 }
 
-console.log(`Roadmap comparison for ${repository}: ${checked} issues checked.`);
+/**
+ * The other direction: every open issue must be named somewhere above.
+ *
+ * The issues endpoint returns pull requests as well, which are not roadmap
+ * entries and are filtered out by the member that only a pull request carries.
+ */
+const openIssues = (await fetchAll("/issues?state=open"))
+  .filter((issue) => issue.pull_request === undefined);
+const unlisted = openIssues.filter((issue) => !named.has(issue.number));
+
+console.log(
+  `Roadmap comparison for ${repository}: ${checked} issues checked, `
+    + `${openIssues.length} open.`,
+);
 
 if (problems.length > 0) {
   console.error(
     `\n${problems.length} disagreement${problems.length === 1 ? "" : "s"} `
       + "between the roadmap and GitHub:\n"
-      + problems.map((problem) => `  ${problem}`).join("\n")
-      + "\n\nUpdate scripts/doc-data/roadmap.mjs and run npm run generate:docs.",
+      + problems.map((problem) => `  ${problem}`).join("\n"),
+  );
+}
+
+if (unlisted.length > 0) {
+  console.error(
+    `\n${unlisted.length} open issue${unlisted.length === 1 ? " is" : "s are"} `
+      + "named nowhere in the roadmap:\n"
+      + unlisted.map(({ number, title }) => `  #${number} ${title}`).join("\n")
+      + "\n\nEvery open issue belongs in one of three places: its own tranche, "
+      + "for a body of work with\nreasoning behind it; under a tranche, for work "
+      + "belonging to one; or separate from the\ntranches, for a genuine "
+      + "one-off. Nothing else counts as published.",
+  );
+}
+
+if (problems.length > 0 || unlisted.length > 0) {
+  console.error(
+    "\nUpdate scripts/doc-data/roadmap.mjs and run npm run generate:docs.",
   );
   process.exitCode = 1;
 } else {
-  console.log("The published roadmap matches the issues it names.");
+  console.log(
+    "The published roadmap matches the issues it names, and names every open "
+      + "issue.",
+  );
 }
