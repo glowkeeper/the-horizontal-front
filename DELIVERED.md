@@ -14,6 +14,11 @@ not on the same page.
 
 ## How work arrives here
 
+A **tranche** is a body of work with a single reason behind it: one GitHub
+issue holding that reasoning, with the individual pieces as its child issues.
+It is the unit the [roadmap](ROADMAP.md) commits to, and so the unit that
+retires.
+
 A tranche retires when all of it is done, and brings its children with it. A
 tranche with one unfinished child stays on the roadmap listing all of them,
 because that is its scope. Work separate from the tranches retires when it
