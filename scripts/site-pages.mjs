@@ -113,6 +113,15 @@ export const sitePages = [
     description: "What the project intends to do next, and what help is wanted.",
   },
   {
+    route: "/delivered/",
+    nav: { group: "footer", label: "Delivered" },
+    output: "delivered/index.html",
+    entry: "delivered",
+    kind: "document",
+    source: "DELIVERED.md",
+    description: "What the project has finished, and what each tranche delivered.",
+  },
+  {
     route: "/licences/",
     nav: { group: "footer", label: "Licences" },
     output: "licences/index.html",

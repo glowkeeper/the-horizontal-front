@@ -30,6 +30,7 @@ const releasePath = join(projectRoot, "docs/release-process.md");
 const releasesDirectory = join(projectRoot, "docs/releases");
 const releasesPath = join(releasesDirectory, "README.md");
 const roadmapPath = join(projectRoot, "ROADMAP.md");
+const deliveredPath = join(projectRoot, "DELIVERED.md");
 const charterPath = join(projectRoot, "PROJECT_CHARTER.md");
 const readmePath = join(projectRoot, "README.md");
 const agentsPath = join(projectRoot, "AGENTS.md");
@@ -238,6 +239,33 @@ function renderChildren(children, depth = 0) {
   return lines;
 }
 
+/**
+ * The finished work, rendered from the same record as the plan.
+ *
+ * Deliberately no commitment values and no help-wanted lines: both describe an
+ * intention to do something, and nothing here is still an intention.
+ */
+function renderDelivered() {
+  const sections = [];
+  for (const tranche of roadmap.delivered.tranches) {
+    sections.push(
+      `### [${tranche.title}](${issueUrl(tranche.issue)})`,
+      "",
+      wrap(tranche.summary),
+      "",
+      ...renderChildren(tranche.children),
+      "",
+    );
+  }
+  sections.push(
+    "### Separate from the tranches",
+    "",
+    ...roadmap.delivered.separate.map(([number, title]) =>
+      `- [#${number} ${title}](${issueUrl(number)})`),
+  );
+  return sections.join("\n");
+}
+
 function renderRoadmap() {
   const sections = [];
   for (const tranche of roadmap.tranches) {
@@ -332,6 +360,11 @@ const documents = [
     ],
   },
   {
+    path: deliveredPath,
+    label: "DELIVERED.md",
+    regions: [["delivered", renderDelivered()]],
+  },
+  {
     path: readmePath,
     label: "README.md",
     regions: [["charter-purpose", charterPurpose]],
@@ -366,6 +399,7 @@ const counts = `${audioRoles.length} audio roles, `
   + `${phaseFields.length} phase fields, `
   + `${protectMainRuleset.requiredStatusChecks.length} required checks, `
   + `${roadmap.tranches.length} roadmap tranches, `
+  + `${roadmap.delivered.tranches.length} delivered tranches, `
   + `${releaseRecords.length} release records, `
   + "1 charter purpose statement";
 

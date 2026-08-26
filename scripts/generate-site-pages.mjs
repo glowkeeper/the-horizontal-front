@@ -83,7 +83,7 @@ const repositoryBlobBase =
 /**
  * Point every repository link somewhere that resolves.
  *
- * The seven governing documents are published as site pages, so links between
+ * The eight governing documents are published as site pages, so links between
  * them become site paths and a reader never leaves. Everything else in the
  * repository — the architecture notes, the grammar reference, the research —
  * is contributor documentation that deliberately stays on GitHub, where it sits

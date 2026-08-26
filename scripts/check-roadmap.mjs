@@ -10,16 +10,21 @@
  * `npm run build`; it runs as its own CI job. The endpoints need no
  * authentication for a public repository.
  *
- * It runs in two directions. From the record outwards, every issue the roadmap
- * names must exist under the parent the roadmap claims for it. From GitHub
- * inwards, every open issue must be named somewhere in the record, because an
- * issue listed nowhere is one a reader has no way to find.
+ * It runs in two directions. From the record outwards, every issue the record
+ * names must exist under the parent claimed for it, and must be open or closed
+ * as the page it appears on implies. From GitHub inwards, every open issue must
+ * be named on the plan, because an issue listed nowhere is one a reader has no
+ * way to find.
  *
- * Closed issues are only checked in the first direction. The roadmap keeps
- * naming them, but requiring one to be added after the fact would fail forever
- * on work that was finished before this rule existed. The page still does not
- * restate whether an issue is open or closed: that would be wrong within a day,
- * and the linked issue already says so.
+ * The record feeds two pages. `ROADMAP.md` is work that is ahead and
+ * `DELIVERED.md` is work that is finished, so a tranche whose every part is
+ * closed belongs on the second and is a fault on the first. Retirement is a
+ * move between two lists rather than a deletion, which is why this can be
+ * checked at all.
+ *
+ * Neither page restates each issue's state issue by issue. The page an entry
+ * appears on carries that claim for it, and this check is what makes the claim
+ * safe to rely on.
  */
 import { roadmap } from "./doc-data/roadmap.mjs";
 
@@ -33,16 +38,6 @@ const headers = {
     ? { authorization: `Bearer ${process.env.GITHUB_TOKEN}` }
     : {}),
 };
-
-async function fetchJson(path) {
-  const response = await fetch(`https://api.github.com/repos/${repository}${path}`, {
-    headers,
-  });
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status} from ${path}`);
-  }
-  return response.json();
-}
 
 /**
  * Follow GitHub's pagination rather than trusting one page.
@@ -76,6 +71,34 @@ const named = new Set();
 let checked = 0;
 
 /**
+ * Every issue in the repository, in one request rather than one each.
+ *
+ * Titles and states are all this needs, and the list endpoint carries both, so
+ * fetching each issue individually would spend a request per listed issue to
+ * learn what one page already said. It returns pull requests too, which are
+ * not roadmap entries and are filtered out by the member only they carry.
+ */
+const allIssues = (await fetchAll("/issues?state=all"))
+  .filter((issue) => issue.pull_request === undefined);
+const issues = new Map(allIssues.map((issue) => [issue.number, issue]));
+
+/** Confirm a listed issue exists under the title the record gives it. */
+function verify(number, title, where) {
+  checked += 1;
+  const issue = issues.get(number);
+  if (issue === undefined) {
+    problems.push(`#${number} is listed ${where} but does not exist.`);
+    return undefined;
+  }
+  if (issue.title !== title) {
+    problems.push(
+      `#${number} is titled "${issue.title}", the record says "${title}".`,
+    );
+  }
+  return issue;
+}
+
+/**
  * Compare one level of the record against the sub-issues of the issue above it.
  *
  * Recursion follows the record rather than GitHub: a listed entry with nested
@@ -83,26 +106,30 @@ let checked = 0;
  * everywhere would buy only the detection of unlisted *closed* descendants,
  * which the roadmap does not require — an unlisted open one is caught by the
  * completeness pass below, and reported more clearly there.
+ *
+ * Returns every listed descendant, at any depth, rather than a verdict about
+ * them. Both pages ask a different question of the same walk — the plan asks
+ * whether all of them are closed, the delivered record asks which are not — and
+ * a boolean answers only one of those without naming the issue at fault.
  */
-async function compareChildren(parent, listed) {
+async function compareChildren(parent, listed, where, plan) {
   const children = await fetchAll(`/issues/${parent}/sub_issues`);
   const actual = new Map(children.map((child) => [child.number, child.title]));
+  const descendants = [];
 
   for (const [number, title, nested = []] of listed) {
-    checked += 1;
-    named.add(number);
+    verify(number, title, where);
+    if (plan) named.add(number);
+    descendants.push(number);
     if (!actual.has(number)) {
       problems.push(
-        `#${number} is listed under #${parent} in the roadmap but is not a `
+        `#${number} is listed under #${parent} in the record but is not a `
           + "child of it on GitHub.",
       );
-    } else if (actual.get(number) !== title) {
-      problems.push(
-        `#${number} is titled "${actual.get(number)}", the roadmap says `
-          + `"${title}".`,
-      );
     }
-    if (nested.length > 0) await compareChildren(number, nested);
+    if (nested.length > 0) {
+      descendants.push(...await compareChildren(number, nested, where, plan));
+    }
   }
 
   const expected = new Set(listed.map(([number]) => number));
@@ -110,45 +137,78 @@ async function compareChildren(parent, listed) {
     if (!expected.has(number)) {
       problems.push(
         `#${number} "${title}" is a child of #${parent} on GitHub but the `
-          + "roadmap does not list it.",
+          + "record does not list it.",
       );
     }
   }
-}
 
-for (const tranche of roadmap.tranches) {
-  const issue = await fetchJson(`/issues/${tranche.issue}`);
-  checked += 1;
-  named.add(tranche.issue);
-  if (issue.title !== tranche.title) {
-    problems.push(
-      `#${tranche.issue} is titled "${issue.title}", the roadmap says `
-        + `"${tranche.title}".`,
-    );
-  }
-
-  await compareChildren(tranche.issue, tranche.children);
-}
-
-for (const { issue: number, title } of roadmap.separate) {
-  const issue = await fetchJson(`/issues/${number}`);
-  checked += 1;
-  named.add(number);
-  if (issue.title !== title) {
-    problems.push(
-      `#${number} is titled "${issue.title}", the roadmap says "${title}".`,
-    );
-  }
+  return descendants;
 }
 
 /**
- * The other direction: every open issue must be named somewhere above.
+ * An issue nobody can find is not finished.
  *
- * The issues endpoint returns pull requests as well, which are not roadmap
- * entries and are filtered out by the member that only a pull request carries.
+ * A number the record names but GitHub does not know is already reported as a
+ * disagreement. Treating it as closed on top of that would let a tranche be
+ * called finished on the strength of an issue that does not exist.
  */
-const openIssues = (await fetchAll("/issues?state=open"))
-  .filter((issue) => issue.pull_request === undefined);
+const isClosed = (number) => issues.get(number)?.state === "closed";
+
+const finished = [];
+const unfinished = [];
+
+for (const tranche of roadmap.tranches) {
+  verify(tranche.issue, tranche.title, "as a tranche on the plan");
+  named.add(tranche.issue);
+  const descendants = await compareChildren(
+    tranche.issue,
+    tranche.children,
+    `under #${tranche.issue} on the plan`,
+    true,
+  );
+  if (isClosed(tranche.issue) && descendants.every(isClosed)) {
+    finished.push(`#${tranche.issue} ${tranche.title} — the whole tranche.`);
+  }
+}
+
+for (const { issue: number, title } of roadmap.separate) {
+  verify(number, title, "separate from the tranches on the plan");
+  named.add(number);
+  if (isClosed(number)) finished.push(`#${number} ${title}`);
+}
+
+/** Report a delivered entry that is not closed, naming the issue at fault. */
+function requireClosed(number) {
+  const issue = issues.get(number);
+  if (issue !== undefined && issue.state !== "closed") {
+    unfinished.push(`#${number} ${issue.title}`);
+  }
+}
+
+for (const tranche of roadmap.delivered.tranches) {
+  verify(tranche.issue, tranche.title, "as a delivered tranche");
+  const descendants = await compareChildren(
+    tranche.issue,
+    tranche.children,
+    `under delivered #${tranche.issue}`,
+    false,
+  );
+  for (const number of [tranche.issue, ...descendants]) requireClosed(number);
+}
+
+for (const [number, title] of roadmap.delivered.separate) {
+  verify(number, title, "as delivered, separate from the tranches");
+  requireClosed(number);
+}
+
+/**
+ * The other direction: every open issue must be named on the plan.
+ *
+ * Delivered entries do not count. An open issue listed there is reported as
+ * unfinished rather than accepted as published, since the page it sits on is
+ * the thing claiming it is done.
+ */
+const openIssues = allIssues.filter((issue) => issue.state === "open");
 const unlisted = openIssues.filter((issue) => !named.has(issue.number));
 
 console.log(
@@ -159,7 +219,7 @@ console.log(
 if (problems.length > 0) {
   console.error(
     `\n${problems.length} disagreement${problems.length === 1 ? "" : "s"} `
-      + "between the roadmap and GitHub:\n"
+      + "between the record and GitHub:\n"
       + problems.map((problem) => `  ${problem}`).join("\n"),
   );
 }
@@ -167,7 +227,7 @@ if (problems.length > 0) {
 if (unlisted.length > 0) {
   console.error(
     `\n${unlisted.length} open issue${unlisted.length === 1 ? " is" : "s are"} `
-      + "named nowhere in the roadmap:\n"
+      + "named nowhere on the plan:\n"
       + unlisted.map(({ number, title }) => `  #${number} ${title}`).join("\n")
       + "\n\nEvery open issue belongs in one of three places: its own tranche, "
       + "for a body of work with\nreasoning behind it; under a tranche, for work "
@@ -176,14 +236,38 @@ if (unlisted.length > 0) {
   );
 }
 
-if (problems.length > 0 || unlisted.length > 0) {
+if (finished.length > 0) {
+  console.error(
+    `\n${finished.length} entr${finished.length === 1 ? "y is" : "ies are"} `
+      + "finished but still on the plan:\n"
+      + finished.map((entry) => `  ${entry}`).join("\n")
+      + "\n\nROADMAP.md is work that is ahead. Move these to the delivered "
+      + "record: a tranche\nretires with its children once all of it is done, "
+      + "and an individual issue retires when\nit closes.",
+  );
+}
+
+if (unfinished.length > 0) {
+  console.error(
+    `\n${unfinished.length} delivered entr`
+      + `${unfinished.length === 1 ? "y is" : "ies are"} not closed:\n`
+      + unfinished.map((entry) => `  ${entry}`).join("\n")
+      + "\n\nDELIVERED.md says this work is finished. Either close it or put "
+      + "it back on the plan.",
+  );
+}
+
+const faults = problems.length + unlisted.length + finished.length
+  + unfinished.length;
+
+if (faults > 0) {
   console.error(
     "\nUpdate scripts/doc-data/roadmap.mjs and run npm run generate:docs.",
   );
   process.exitCode = 1;
 } else {
   console.log(
-    "The published roadmap matches the issues it names, and names every open "
-      + "issue.",
+    "The plan and the delivered record match the issues they name, the plan "
+      + "names every open\nissue, and nothing is on the wrong page.",
   );
 }

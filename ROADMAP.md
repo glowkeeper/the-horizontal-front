@@ -14,6 +14,10 @@ The issues linked below are the authority. This page is a way in, not a second
 specification: where something is already written down properly, this links to
 it rather than restating it.
 
+Finished work is not here. A tranche leaves this page when all of it is done,
+and an individual issue leaves when it closes; both are recorded on
+[delivered](DELIVERED.md). This page is what is ahead.
+
 ## How to read this
 
 <!-- generated:commitments -->
@@ -50,20 +54,6 @@ and both are currently the hardest things for the project to staff.
 - [#39 Playtest The Alarm with representative players](https://github.com/glowkeeper/the-horizontal-front/issues/39)
 - [#73 Commit to a versioning scheme and make release status checkable](https://github.com/glowkeeper/the-horizontal-front/issues/73)
 - [#40 Prepare and publish the 1.0.0 production release](https://github.com/glowkeeper/the-horizontal-front/issues/40)
-
-### [Meet the commons participation obligations](https://github.com/glowkeeper/the-horizontal-front/issues/44)
-
-**Committed.** Make the project's stated commitments to community participation real, and enforce the process rules it writes down but does not check.
-
-*Help wanted:* Mostly maintainer work on repository process, but the documents
-it produces are for contributors and corrections to them are welcome.
-
-- [#45 Publish a public roadmap](https://github.com/glowkeeper/the-horizontal-front/issues/45)
-- [#46 Record branch and pull-request conventions in CONTRIBUTING](https://github.com/glowkeeper/the-horizontal-front/issues/46)
-- [#47 Require browser and offline checks on main](https://github.com/glowkeeper/the-horizontal-front/issues/47)
-- [#48 Keep documentation accurate by construction](https://github.com/glowkeeper/the-horizontal-front/issues/48)
-- [#49 Make the no-placeholders invariant machine-checkable](https://github.com/glowkeeper/the-horizontal-front/issues/49)
-- [#61 Document and harden offline verification](https://github.com/glowkeeper/the-horizontal-front/issues/61)
 
 ### [Open the game to outside authors](https://github.com/glowkeeper/the-horizontal-front/issues/53)
 
@@ -104,7 +94,7 @@ evidence of work accumulating which no tranche accounts for, and the answer is
 a tranche rather than a longer list.
 
 - [#50 Widen the verified support matrix](https://github.com/glowkeeper/the-horizontal-front/issues/50) — **Wanted, not scheduled.**
-- [#80 Make the published roadmap complete](https://github.com/glowkeeper/the-horizontal-front/issues/80) — **Committed.**
+- [#82 Retire finished work from the roadmap onto a delivered page](https://github.com/glowkeeper/the-horizontal-front/issues/82) — **Committed.**
 <!-- /generated:roadmap -->
 
 ## Where help is most wanted
@@ -166,5 +156,11 @@ commit and publishing that decision are the same act. An individual issue only
 needs listing, with no ordering requirement, and the check leaves a
 pull-request cycle of slack for that.
 
-The page still deliberately does not restate whether each issue is open or
-closed — the linked issue answers that better than a copy of it could.
+The check enforces retirement in the same way. It fails when a tranche on this
+page is entirely finished, or when an individual issue here has closed, and
+when anything on [delivered](DELIVERED.md) is still open. The two pages are
+generated from one record, so retiring work is a move rather than a deletion.
+
+This page still deliberately does not restate whether each issue is open or
+closed — the linked issue answers that better than a copy of it could. What it
+does say is that everything on it is unfinished.

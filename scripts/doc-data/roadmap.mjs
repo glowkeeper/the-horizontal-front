@@ -55,25 +55,6 @@ export const roadmap = {
       ],
     },
     {
-      issue: 44,
-      title: "Meet the commons participation obligations",
-      commitment: "committed",
-      summary:
-        "Make the project's stated commitments to community participation real, "
-        + "and enforce the process rules it writes down but does not check.",
-      help:
-        "Mostly maintainer work on repository process, but the documents it "
-        + "produces are for contributors and corrections to them are welcome.",
-      children: [
-        [45, "Publish a public roadmap"],
-        [46, "Record branch and pull-request conventions in CONTRIBUTING"],
-        [47, "Require browser and offline checks on main"],
-        [48, "Keep documentation accurate by construction"],
-        [49, "Make the no-placeholders invariant machine-checkable"],
-        [61, "Document and harden offline verification"],
-      ],
-    },
-    {
       issue: 53,
       title: "Open the game to outside authors",
       commitment: "wanted, not scheduled",
@@ -143,9 +124,115 @@ export const roadmap = {
       commitment: "wanted, not scheduled",
     },
     {
-      issue: 80,
-      title: "Make the published roadmap complete",
+      issue: 82,
+      title: "Retire finished work from the roadmap onto a delivered page",
       commitment: "committed",
     },
   ],
+
+  /**
+   * Work that is finished, rendered on `DELIVERED.md` rather than the plan.
+   *
+   * A tranche retires when all of it is done and takes its children with it,
+   * because a tranche listing only its unfinished children would misrepresent
+   * what it set out to do. An entry separate from the tranches retires when it
+   * closes, having no tranche to wait for. Nothing is deleted: an entry moves
+   * between two lists generated from this one record, and `check:roadmap`
+   * verifies that everything here is closed and that nothing on the plan is
+   * entirely finished.
+   *
+   * Newest first. No commitment values, because commitment describes an
+   * intention and these are outcomes.
+   */
+  delivered: {
+    tranches: [
+      {
+        issue: 70,
+        title: "Describe the game as it is",
+        summary:
+          "The game described as it is rather than as it was first pitched, "
+          + "separating what it is about from how the first campaign expresses "
+          + "it, and correcting the charter to match.",
+        children: [
+          [71, "Separate what the game is about from how the first campaign expresses it"],
+          [72, "Correct the charter's description of the game"],
+        ],
+      },
+      {
+        issue: 44,
+        title: "Meet the commons participation obligations",
+        summary:
+          "The participation commitments made real and checkable: a public "
+          + "roadmap, recorded branch and pull-request conventions, required "
+          + "browser and offline checks, documentation accurate by "
+          + "construction, and offline verification hardened.",
+        children: [
+          [45, "Publish a public roadmap"],
+          [46, "Record branch and pull-request conventions in CONTRIBUTING"],
+          [47, "Require browser and offline checks on main"],
+          [48, "Keep documentation accurate by construction"],
+          [49, "Make the no-placeholders invariant machine-checkable"],
+          [61, "Document and harden offline verification"],
+        ],
+      },
+      {
+        issue: 21,
+        title: "Publish the first public release (0.2.0)",
+        summary:
+          "The first public release: a production-approved visual asset set, a "
+          + "procedural audio grammar, The Alarm's soundscape, and the "
+          + "composition reviewed and published as 0.2.0.",
+        children: [
+          [22, "Produce the production-approved visual asset set"],
+          [12, "Build the procedural audio grammar"],
+          [23, "Author and tune The Alarm’s production soundscape"],
+          [24, "Integrate and perceptually review the production audiovisual composition"],
+          [25, "Prepare and publish the 0.2.0 public release"],
+        ],
+      },
+      {
+        issue: 15,
+        title: "Establish repeatable browser verification",
+        summary:
+          "Browser verification anyone can repeat: smoke tests owned by the "
+          + "repository, running in continuous integration, credential-free "
+          + "browser access for AI reviewers, and written evidence levels that "
+          + "stop one kind of proof being mistaken for another.",
+        children: [
+          [18, "Enable isolated, pinned Playwright MCP access for AI reviewers"],
+          [16, "Add repository-owned Playwright browser smoke tests"],
+          [17, "Run browser smoke tests in continuous integration"],
+          [19, "Document verification evidence levels"],
+        ],
+      },
+      {
+        issue: 1,
+        title: "One Scene",
+        summary:
+          "The first playable episode, and with it the architecture everything "
+          + "since has been built on: a resistance engine, a scene drawn from "
+          + "shapes, a tuned dramatic curve, interruptions, the validated "
+          + "episode grammar and a catalogued asset pipeline.",
+        children: [
+          [2, "Build the core resistance engine"],
+          [3, "Create the shape-based bedroom scene"],
+          [4, "Tune the 20–30 second dramatic curve"],
+          [5, "Add Quick Call and Urgent Email interruptions"],
+          [6, "Define the minimum validated episode grammar"],
+          [7, "Prove the catalogued image-asset pipeline"],
+        ],
+      },
+    ],
+
+    /** Finished work that belonged to no tranche. */
+    separate: [
+      [80, "Make the published roadmap complete"],
+      [77, "Tell the automated reviewer which rules are invariants"],
+      [67, "Derive the site's page list from one place"],
+      [31, "Episode vocabulary leaks into the engine and grammar documentation"],
+      [30, "Emoji still used as punctuation in game feedback and the README"],
+      [29, "Outcome-screen controls read as double-bordered; focus ring collides with the panel stroke"],
+      [26, "Make game interface chrome accessible DOM controls"],
+    ],
+  },
 };
