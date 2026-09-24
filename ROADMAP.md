@@ -96,6 +96,7 @@ evidence of work accumulating which no tranche accounts for, and the answer is
 a tranche rather than a longer list.
 
 - [#50 Widen the verified support matrix](https://github.com/glowkeeper/the-horizontal-front/issues/50) — **Wanted, not scheduled.**
+- [#87 Make the browser smoke tests faster and stop them flaking on CI](https://github.com/glowkeeper/the-horizontal-front/issues/87) — **Wanted, not scheduled.**
 <!-- /generated:roadmap -->
 
 ## Where help is most wanted

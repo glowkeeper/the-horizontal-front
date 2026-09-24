@@ -123,6 +123,11 @@ export const roadmap = {
       title: "Widen the verified support matrix",
       commitment: "wanted, not scheduled",
     },
+    {
+      issue: 87,
+      title: "Make the browser smoke tests faster and stop them flaking on CI",
+      commitment: "wanted, not scheduled",
+    },
   ],
 
   /**
