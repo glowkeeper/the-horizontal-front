@@ -63,8 +63,30 @@ function fillNavigation(page, html) {
   }
 
   return html
-    .replace("<!--PRIMARY_NAVIGATION-->", navigationLinks(primaryNavigation, route))
-    .replace("<!--FOOTER_NAVIGATION-->", navigationLinks(footerNavigation, route));
+    .replace("<!--PRIMARY_NAVIGATION-->", primaryNavigationHtml(route))
+    .replace("<!--FOOTER_NAVIGATION-->", footerNavigationHtml(route));
+}
+
+/**
+ * Share controls, as in the maintainer's other projects: an icon in the header
+ * and a written control in the footer. They ride in with the navigations so
+ * every page carrying the chrome has them, authored or generated, without a
+ * copy in each page. `src/site/share.ts` wires them to one status message,
+ * which is visually hidden because it exists for screen readers; the share
+ * sheet or clipboard is the sighted reader's feedback.
+ */
+const shareHeaderButton = `<button class="share-button share-button--icon" type="button" data-share-site data-share-url="${siteOrigin}/" aria-label="Share The Horizontal Front"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="m8.2 10.8 7.6-4.5M8.2 13.2l7.6 4.5"/></svg></button>`;
+
+const shareFooterButton = `<button class="share-button" type="button" data-share-site data-share-url="${siteOrigin}/">Share The Horizontal Front</button>`;
+
+const shareFeedback = `<span class="visually-hidden" data-share-feedback aria-live="polite" aria-atomic="true"></span>`;
+
+function primaryNavigationHtml(currentRoute) {
+  return `${navigationLinks(primaryNavigation, currentRoute)}\n        ${shareHeaderButton}`;
+}
+
+function footerNavigationHtml(currentRoute) {
+  return `${navigationLinks(footerNavigation, currentRoute)}\n        ${shareFooterButton}\n        ${shareFeedback}`;
 }
 
 const repositoryLink = `<a class="repository-link" href="https://github.com/glowkeeper/the-horizontal-front" aria-label="The Horizontal Front repository on GitHub"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3.3-.4 6.8-1.6 6.8-7A5.4 5.4 0 0 0 19.4 4 5 5 0 0 0 19.3.5S18.2.1 15 1.8a13.4 13.4 0 0 0-7 0C4.8.1 3.7.5 3.7.5A5 5 0 0 0 3.6 4a5.4 5.4 0 0 0-1.4 3.7c0 5.4 3.5 6.6 6.8 7A4.8 4.8 0 0 0 8 18v4"/><path d="M8 19c-3 .9-3-1.5-4-2"/></svg><span>GitHub</span></a>`;
@@ -143,7 +165,7 @@ function pageTemplate({
     <header class="site-header">
       <a class="site-name" href="/">The Horizontal Front</a>
       <nav aria-label="Primary navigation">
-        ${navigationLinks(primaryNavigation)}
+        ${primaryNavigationHtml()}
         ${repositoryLink}
       </nav>
     </header>
@@ -156,7 +178,7 @@ function pageTemplate({
     <footer class="site-footer">
       <p class="footer-mark">Free to play. No ads. No tracking. No purchases<img src="/assets/mark.svg" alt="" width="20" height="20" /></p>
       <nav aria-label="Project information">
-        ${navigationLinks(footerNavigation)}
+        ${footerNavigationHtml()}
         ${repositoryLink}
       </nav>
     </footer>
