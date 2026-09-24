@@ -165,6 +165,73 @@ nav [aria-current="page"] {
   stroke-width: 2;
 }
 
+/*
+ * Share controls are buttons, not links, because they do not navigate. They
+ * borrow the navigation's underline and the repository link's icon treatment
+ * so they read as part of the same chrome rather than as a new component.
+ */
+.share-button {
+  position: relative;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.share-button:not(.share-button--icon)::after {
+  position: absolute;
+  right: 0;
+  bottom: 0.15em;
+  left: 0;
+  height: 0.1em;
+  background: currentColor;
+  content: "";
+}
+
+.share-button:not(.share-button--icon):hover::after {
+  height: 0.18em;
+}
+
+/*
+ * The glyph matches the repository icon at 1.2em, but a button with nothing
+ * else in it would then be about 19px square — under the 24px minimum target
+ * in WCAG 2.2 success criterion 2.5.8. The button carries the target size and
+ * centres the glyph inside it.
+ */
+.share-button--icon {
+  display: inline-flex;
+  min-width: 1.5rem;
+  min-height: 1.5rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.share-button--icon svg {
+  width: 1.2em;
+  height: 1.2em;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.share-button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .site-main {
   padding-block: var(--space-2xl);
 }
