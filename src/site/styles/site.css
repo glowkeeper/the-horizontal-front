@@ -194,9 +194,18 @@ nav [aria-current="page"] {
   height: 0.18em;
 }
 
+/*
+ * The glyph matches the repository icon at 1.2em, but a button with nothing
+ * else in it would then be about 19px square — under the 24px minimum target
+ * in WCAG 2.2 success criterion 2.5.8. The button carries the target size and
+ * centres the glyph inside it.
+ */
 .share-button--icon {
   display: inline-flex;
+  min-width: 1.5rem;
+  min-height: 1.5rem;
   align-items: center;
+  justify-content: center;
 }
 
 .share-button--icon svg {
