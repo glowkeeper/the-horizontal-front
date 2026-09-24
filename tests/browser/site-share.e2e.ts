@@ -17,7 +17,7 @@ import { documentShellPages } from "../../scripts/site-pages.mjs";
 
 const shareLabel = "Share The Horizontal Front";
 
-type ShareStub = "none" | "cancel";
+type ShareStub = "none" | "share" | "cancel";
 
 /**
  * The link the controls should share: the home page's canonical URL. Both are
@@ -52,7 +52,7 @@ async function stubShareServices(page: Page, share: ShareStub): Promise<void> {
         ? undefined
         : async (data: ShareData) => {
           record.shared.push(data);
-          throw new DOMException("Dismissed", "AbortError");
+          if (mode === "cancel") throw new DOMException("Dismissed", "AbortError");
         },
     });
 
@@ -74,8 +74,17 @@ function shareRecord(page: Page): Promise<ShareRecord> {
 
 test("every page carrying the site chrome offers both share controls", async ({ page }) => {
   const siteUrl = await canonicalHome(page);
-  for (const { route } of documentShellPages) {
+  // The 404 is rendered into the same shell but is not a canonical page, so
+  // it is absent from documentShellPages and has to be named here. The dev
+  // server answers a missing page with the home page, which also carries the
+  // controls, so the 404 must prove it is the page actually being checked.
+  const routes = [...documentShellPages.map(({ route }) => route), "/404.html"];
+
+  for (const route of routes) {
     await page.goto(route);
+    if (route === "/404.html") {
+      await expect(page.getByRole("heading", { level: 1 })).toHaveText("Page not found");
+    }
     const header = page.getByRole("navigation", { name: "Primary navigation" })
       .getByRole("button", { name: shareLabel });
     const footer = page.getByRole("navigation", { name: "Project information" })
@@ -118,6 +127,24 @@ test("without a share sheet the link is copied, and both controls wait for it", 
   expect(copied).toHaveLength(1);
   expect(copied[0]).toMatch(/^The Horizontal Front\n.+\n/);
   expect(copied[0].endsWith(`\n${siteUrl}`)).toBe(true);
+});
+
+test("a completed share through the share sheet is announced and copies nothing", async ({ page }) => {
+  const siteUrl = await canonicalHome(page);
+  await stubShareServices(page, "share");
+  await page.goto("/");
+
+  await page.getByRole("navigation", { name: "Primary navigation" })
+    .getByRole("button", { name: shareLabel }).click();
+
+  await expect(page.locator("[data-share-feedback]")).toHaveText("The Horizontal Front shared.");
+  await expect(page.locator("[data-share-site]").nth(0)).toBeEnabled();
+
+  const { copied, shared } = await shareRecord(page);
+  expect(shared).toHaveLength(1);
+  expect(shared[0]).toMatchObject({ title: "The Horizontal Front", url: siteUrl });
+  expect(shared[0].text).toBeTruthy();
+  expect(copied).toEqual([]);
 });
 
 test("dismissing the share sheet copies nothing and announces nothing", async ({ page }) => {
